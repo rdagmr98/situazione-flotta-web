@@ -42,6 +42,7 @@ details summary{cursor:pointer;color:#7aa2ff;font-weight:600;margin:16px 0 4px}
 .pager>*{flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
 .nr{align-items:flex-start}
 .nr .m{white-space:normal}
+.nr .x{background:none;border:0;color:var(--mu);font-size:20px;line-height:1;padding:0 0 0 6px;cursor:pointer}
 .nr .m div{margin-top:2px;overflow-wrap:anywhere}
 .linea{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
 .lh{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--line)}
@@ -50,10 +51,11 @@ details summary{cursor:pointer;color:#7aa2ff;font-weight:600;margin:16px 0 4px}
 .lh .t b{font-size:17px}
 .bar{height:6px;background:var(--line);border-radius:3px;margin-top:6px;overflow:hidden}
 .bar i{display:block;height:100%}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:6px;padding:10px}
-.tile{position:relative;background:var(--card2);border:1px solid var(--line);border-left:4px solid var(--st);border-radius:9px;padding:5px 7px;cursor:pointer;min-width:0;text-align:left;color:var(--tx);font:inherit}
-.tile b{display:block;font-size:17px}
-.tile .st{font-size:11px;font-weight:600;color:var(--st);white-space:nowrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:10px}
+.tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;background:var(--card2);border:1px solid var(--line);border-left:4px solid var(--st);border-radius:10px;padding:8px 10px;cursor:pointer;min-width:0;text-align:left;color:var(--tx);font:inherit}
+.tile b{display:block;font-size:21px}
+.tile .h{display:block;font-size:14px;font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
+.tile .st{font-size:12px;font-weight:600;color:var(--st);white-space:nowrap}
 .tile .pill{position:absolute;top:4px;right:4px}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
 .pill{font-size:10px;border:1px solid var(--line);border-radius:6px;padding:0 4px;color:var(--mu)}
@@ -101,6 +103,7 @@ const TIPI = { // silhouette e colori di AVES Tecnici (helicopter_catalog.dart)
 const STATI = { "IN LINEA": ["ok", "IN LINEA"], "DISPONIBILE": ["warn", "DISP."], "INDISPONIBILE": ["ko", "INDISP."],
   "INDUSTRIA": ["ind", "INDUSTRIA"], "ALIENAZIONE": ["off", "ALIEN."] };
 const CAT = { eff: ["ok", "EFF", "Efficiente"], ineff: ["ko", "INEFF", "Inefficiente"], ind: ["ind", "IND.", "In industria"], alien: ["off", "ALIEN.", "In alienazione"] };
+const ORD = Object.keys(CAT); // ordine dei riquadri: prima gli efficienti
 const FILTRI = [["tutti", "Tutti", () => true], ["eff", "Efficienti", (c) => c === "eff"], ["ineff", "Inefficienti", (c) => c === "ineff" || c === "ind"],
   ["ind", "Industria", (c) => c === "ind"], ["alien", "Alienazione", (c) => c === "alien"]];
 const $ = (s) => document.querySelector(s);
@@ -125,6 +128,10 @@ function livello(sc) { // 2 = scaduta, 1 = vicina, 0 = ok, -1 = senza valore
 const LV = ["var(--ok)", "var(--warn)", "var(--ko)"];
 const valore = (sc) => sc.ore != null ? fh(sc.ore) + " h" : sc.data ? fd(sc.data) + " (" + giorni(sc.data) + " gg)" : esc(sc.raw || "–");
 const vive = (a) => a.stato !== "ALIENAZIONE";
+const disp = (a) => { const o = a.scadenze.filter((s) => s.ore != null).map((s) => s.ore); return o.length ? Math.min(...o) : null; }; // ore alla prossima scadenza a ore
+// righe nascoste della pagina Note (solo su questo dispositivo): ricompaiono se cambiano note o efficienza
+const firma = (s) => JSON.stringify([S.note[s] || null, S.stati[s] || null]);
+const nascoste = () => { try { return JSON.parse(ls("sf_nascoste") || "{}"); } catch (_) { return {}; } };
 const giornoIso = () => new Date().toLocaleDateString("sv-SE"); // AAAA-MM-GG locale, non UTC
 function eff(a, aMano = true) { // { c: chiave di CAT, m: motivo, man: correzione a mano valida }
   if (!vive(a)) return { c: "alien", m: "" };
@@ -187,13 +194,14 @@ function render() {
   }
   const [E, T, P] = conta(g.linee.flatMap((l) => l.aerei));
   const pag = ["note", ...g.linee.map((l) => l.tipo)], k0 = pag.indexOf(S.flotta), i = k0 < 0 ? 1 : k0;
-  const ann = g.linee.flatMap((l) => l.aerei.filter((a) => S.note[a.sigla] || eff(a).man).map((a) => [l, a]));
+  const N = nascoste(), tutte = g.linee.flatMap((l) => l.aerei.filter((a) => S.note[a.sigla] || eff(a).man).map((a) => [l, a]));
+  const ann = tutte.filter(([, a]) => N[a.sigla] !== firma(a.sigla)), nn = tutte.length - ann.length;
   $("#app").innerHTML = `<header><h1>Situazione flotta</h1>${imp}
     <div class="sub" style="flex-basis:100%">Giornaliera del <b>${fd(g.data)}</b> · efficienti ${E} su ${T} (${P}%)</div></header>
    <nav class="tabs"><button data-p="0" style="--c:#7aa2ff"><b>Note</b>${ann.length}</button>${g.linee.map((x, k) => { const [a, b] = conta(x.aerei);
      return `<button data-p="${k + 1}" style="--c:${tipo(x.tipo)[1]}"><b>${esc(x.tipo)}</b>${a}/${b}</button>`; }).join("")}</nav>
    <div class="pager" id="pg"><section class="list"><h2>Note e correzioni a mano</h2>${ann.map(annotata).join("")
-     || '<p class="empty">Nessuna nota: tocca una macchina per aggiungerne.</p>'}</section>${g.linee.map(pagina).join("")}</div>
+     || '<p class="empty">Nessuna nota: tocca una macchina per aggiungerne.</p>'}${nn ? `<p style="text-align:center"><button class="btn" id="rn">Mostra nascoste (${nn})</button></p>` : ""}</section>${g.linee.map(pagina).join("")}</div>
    <p class="sub" style="text-align:center">Importata ${new Date(g.importata).toLocaleString("it-IT")}</p>`;
   const pg = $("#pg"), tabs = document.querySelectorAll("[data-p]"), passo = () => pg.clientWidth + 16; // 16 = gap del pager
   const segna = (k) => { tabs.forEach((b, j) => b.classList.toggle("on", j === k)); if (pag[k] !== S.flotta) { S.flotta = pag[k]; ls("sf_flotta", S.flotta); } };
@@ -203,6 +211,9 @@ function render() {
   document.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => { S.filtro = b.dataset.k; ls("sf_filtro", S.filtro); render(); });
   document.querySelectorAll("[data-vi]").forEach((b) => b.onclick = () => { S.vista = S.vista === "macchine" ? "scad" : "macchine"; render(); });
   document.querySelectorAll("[data-s]").forEach((e) => e.onclick = () => dettaglio(e.dataset.s));
+  document.querySelectorAll("[data-h]").forEach((b) => b.onclick = (ev) => { ev.stopPropagation();
+    const N = nascoste(); N[b.dataset.h] = firma(b.dataset.h); ls("sf_nascoste", JSON.stringify(N)); render(); });
+  if ($("#rn")) $("#rn").onclick = () => { ls("sf_nascoste", "{}"); render(); };
   $("#file").onchange = importa;
 }
 function pagina(l) { // una pagina dello swipe per ogni flotta
@@ -215,18 +226,19 @@ function pagina(l) { // una pagina dello swipe per ogni flotta
      <button class="btn" data-vi>${mac ? `Scadenze${urg ? ` <b style="color:var(--warn)">${urg}</b>` : ""}` : "Macchine"}</button></div>
     ${mac ? `<div class="chips">${FILTRI.map(([k, n, f]) => { const c = cats.filter(f).length;
       return c || k === "tutti" || k === "eff" || k === "ineff" || k === filtro[0] ? `<button data-k="${k}" class="${k === filtro[0] ? "on" : ""}">${n} ${c}</button>` : ""; }).join("")}</div>
-     <div class="grid">${l.aerei.filter((a) => filtro[2](eff(a).c)).map(tile).join("") || '<p class="sub">Nessuno</p>'}</div>` : scadenze(l)}</section>`;
+     <div class="grid">${l.aerei.filter((a) => filtro[2](eff(a).c)).sort((x, y) => ORD.indexOf(eff(x).c) - ORD.indexOf(eff(y).c)).map(tile).join("") || '<p class="sub">Nessuno</p>'}</div>` : scadenze(l)}</section>`;
 }
 function annotata([l, a]) { // riga della pagina Note: sigla, motivo, note, efficienza
   const x = eff(a), [c, s] = CAT[x.c], mot = x.man ? (x.m || "cambiata a mano") + " · " + fd(x.man.d).slice(0, 5) : x.m;
   return `<div class="row nr" data-s="${esc(a.sigla)}" style="--lv:var(--${c})"><div class="a"><b>${esc(a.sigla)}</b><span class="sub">${esc(l.tipo)}</span></div>
     <div class="m">${mot ? `<span class="sub">${esc(mot)}</span>` : ""}${(S.note[a.sigla] || []).map((n) => `<div>${esc(n.t)} <span class="sub">${fd(n.d).slice(0, 5)}</span></div>`).join("")}</div>
-    <div class="v"><b style="color:var(--${c})">${s}${x.man ? "*" : ""}</b></div></div>`;
+    <div class="v"><b style="color:var(--${c})">${s}${x.man ? "*" : ""}</b></div><button class="x" data-h="${esc(a.sigla)}" aria-label="Nascondi">×</button></div>`;
 }
 function tile(a) {
-  const x = eff(a), [c, s] = CAT[x.c], n = (S.note[a.sigla] || []).length;
+  const x = eff(a), [c, s] = CAT[x.c], n = (S.note[a.sigla] || []).length, h = vive(a) ? disp(a) : null;
   return `<button class="tile" data-s="${esc(a.sigla)}" style="--st:var(--${c})"><b>${esc(a.sigla)}</b>
-    <span class="st">${s}${x.man ? "*" : ""}</span>${n ? `<span class="pill">✎${n}</span>` : ""}</button>`;
+    <span class="st">${s}${x.man ? "*" : ""}</span>${n ? `<span class="pill">✎${n}</span>` : ""}
+    ${h != null ? `<span class="h" style="color:${LV[livello({ ore: h })]}">${fh(h)} h</span>` : ""}</button>`;
 }
 function scadenze(l) {
   const voci = l.aerei.filter(vive).flatMap((a) => a.scadenze.map((s) => ({ a, s })));
