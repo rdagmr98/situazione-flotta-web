@@ -25,7 +25,8 @@ padding:8px 12px;border-radius:10px;font:inherit;cursor:pointer}
 .tabs{display:flex;gap:6px;margin:4px 0 12px}
 .tabs button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;border:1px solid var(--line);border-bottom:3px solid var(--line);
 background:var(--card);color:var(--mu);padding:6px 2px;border-radius:10px;font:inherit;font-size:12px;cursor:pointer}
-.tabs button b{font-size:14px;color:var(--mu)}
+.tabs button b{font-size:13px;color:var(--mu);white-space:nowrap}
+.tabs button[data-p="0"]{flex:.7}
 .tabs button.on{background:var(--card2);border-bottom-color:var(--c)}
 .tabs button.on b{color:var(--c)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;padding:10px 10px 0}
@@ -36,6 +37,12 @@ background:var(--card);color:var(--mu);padding:6px 2px;border-radius:10px;font:i
 .seg button.on[data-e="1"]{background:var(--ok);border-color:var(--ok);color:#062312}
 .seg button.on[data-e="0"]{background:var(--ko);border-color:var(--ko);color:#fff}
 details summary{cursor:pointer;color:#7aa2ff;font-weight:600;margin:16px 0 4px}
+.pager{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;align-items:flex-start;overscroll-behavior-x:contain}
+.pager::-webkit-scrollbar{display:none}
+.pager>*{flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
+.nr{align-items:flex-start}
+.nr .m{white-space:normal}
+.nr .m div{margin-top:2px;overflow-wrap:anywhere}
 .linea{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
 .lh{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--line)}
 .lh img{width:96px;height:48px;object-fit:contain;flex:none}
@@ -179,27 +186,42 @@ function render() {
     $("#file").onchange = importa; return;
   }
   const [E, T, P] = conta(g.linee.flatMap((l) => l.aerei));
-  const l = g.linee.find((x) => x.tipo === S.flotta) || g.linee[0];
+  const pag = ["note", ...g.linee.map((l) => l.tipo)], k0 = pag.indexOf(S.flotta), i = k0 < 0 ? 1 : k0;
+  const ann = g.linee.flatMap((l) => l.aerei.filter((a) => S.note[a.sigla] || eff(a).man).map((a) => [l, a]));
+  $("#app").innerHTML = `<header><h1>Situazione flotta</h1>${imp}
+    <div class="sub" style="flex-basis:100%">Giornaliera del <b>${fd(g.data)}</b> · efficienti ${E} su ${T} (${P}%)</div></header>
+   <nav class="tabs"><button data-p="0" style="--c:#7aa2ff"><b>Note</b>${ann.length}</button>${g.linee.map((x, k) => { const [a, b] = conta(x.aerei);
+     return `<button data-p="${k + 1}" style="--c:${tipo(x.tipo)[1]}"><b>${esc(x.tipo)}</b>${a}/${b}</button>`; }).join("")}</nav>
+   <div class="pager" id="pg"><section class="list"><h2>Note e correzioni a mano</h2>${ann.map(annotata).join("")
+     || '<p class="empty">Nessuna nota: tocca una macchina per aggiungerne.</p>'}</section>${g.linee.map(pagina).join("")}</div>
+   <p class="sub" style="text-align:center">Importata ${new Date(g.importata).toLocaleString("it-IT")}</p>`;
+  const pg = $("#pg"), tabs = document.querySelectorAll("[data-p]"), passo = () => pg.clientWidth + 16; // 16 = gap del pager
+  const segna = (k) => { tabs.forEach((b, j) => b.classList.toggle("on", j === k)); if (pag[k] !== S.flotta) { S.flotta = pag[k]; ls("sf_flotta", S.flotta); } };
+  tabs.forEach((b) => b.onclick = () => pg.scrollTo({ left: +b.dataset.p * passo(), behavior: "smooth" }));
+  pg.onscroll = () => segna(Math.round(pg.scrollLeft / passo()));
+  pg.scrollLeft = i * passo(); segna(i);
+  document.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => { S.filtro = b.dataset.k; ls("sf_filtro", S.filtro); render(); });
+  document.querySelectorAll("[data-vi]").forEach((b) => b.onclick = () => { S.vista = S.vista === "macchine" ? "scad" : "macchine"; render(); });
+  document.querySelectorAll("[data-s]").forEach((e) => e.onclick = () => dettaglio(e.dataset.s));
+  $("#file").onchange = importa;
+}
+function pagina(l) { // una pagina dello swipe per ogni flotta
   const [img, col] = tipo(l.tipo), [e, t, pc] = conta(l.aerei), cats = l.aerei.map((a) => eff(a).c);
   const urg = l.aerei.filter(vive).flatMap((a) => a.scadenze).filter((s) => livello(s) >= 1).length;
   const filtro = FILTRI.find((f) => f[0] === S.filtro) || FILTRI[0], mac = S.vista === "macchine";
-  $("#app").innerHTML = `<header><h1>Situazione flotta</h1>${imp}
-    <div class="sub" style="flex-basis:100%">Giornaliera del <b>${fd(g.data)}</b> · efficienti ${E} su ${T} (${P}%)</div></header>
-   <nav class="tabs">${g.linee.map((x) => { const [a, b] = conta(x.aerei);
-     return `<button data-f="${esc(x.tipo)}" class="${x === l ? "on" : ""}" style="--c:${tipo(x.tipo)[1]}"><b>${esc(x.tipo)}</b>${a}/${b}</button>`; }).join("")}</nav>
-   <section class="linea"><div class="lh"><img src="img/${img}.webp" alt="">
+  return `<section class="linea"><div class="lh"><img src="img/${img}.webp" alt="">
      <div class="t"><b style="color:${col}">${esc(l.tipo)}</b><div class="sub">Efficienti ${e} su ${t} · ${pc}% · ore mese ${fh(l.totMese)}</div>
      <div class="bar"><i style="width:${pc}%;background:${col}"></i></div></div>
-     <button class="btn" id="vi">${mac ? `Scadenze${urg ? ` <b style="color:var(--warn)">${urg}</b>` : ""}` : "Macchine"}</button></div>
+     <button class="btn" data-vi>${mac ? `Scadenze${urg ? ` <b style="color:var(--warn)">${urg}</b>` : ""}` : "Macchine"}</button></div>
     ${mac ? `<div class="chips">${FILTRI.map(([k, n, f]) => { const c = cats.filter(f).length;
       return c || k === "tutti" || k === "eff" || k === "ineff" || k === filtro[0] ? `<button data-k="${k}" class="${k === filtro[0] ? "on" : ""}">${n} ${c}</button>` : ""; }).join("")}</div>
-     <div class="grid">${l.aerei.filter((a) => filtro[2](eff(a).c)).map(tile).join("") || '<p class="sub">Nessuno</p>'}</div>` : scadenze(l)}</section>
-   <p class="sub" style="text-align:center">Importata ${new Date(g.importata).toLocaleString("it-IT")}</p>`;
-  document.querySelectorAll("[data-f]").forEach((b) => b.onclick = () => { S.flotta = b.dataset.f; ls("sf_flotta", S.flotta); render(); });
-  document.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => { S.filtro = b.dataset.k; ls("sf_filtro", S.filtro); render(); });
-  $("#vi").onclick = () => { S.vista = mac ? "scad" : "macchine"; render(); };
-  document.querySelectorAll("[data-s]").forEach((e) => e.onclick = () => dettaglio(e.dataset.s));
-  $("#file").onchange = importa;
+     <div class="grid">${l.aerei.filter((a) => filtro[2](eff(a).c)).map(tile).join("") || '<p class="sub">Nessuno</p>'}</div>` : scadenze(l)}</section>`;
+}
+function annotata([l, a]) { // riga della pagina Note: sigla, motivo, note, efficienza
+  const x = eff(a), [c, s] = CAT[x.c], mot = x.man ? (x.m || "cambiata a mano") + " · " + fd(x.man.d).slice(0, 5) : x.m;
+  return `<div class="row nr" data-s="${esc(a.sigla)}" style="--lv:var(--${c})"><div class="a"><b>${esc(a.sigla)}</b><span class="sub">${esc(l.tipo)}</span></div>
+    <div class="m">${mot ? `<span class="sub">${esc(mot)}</span>` : ""}${(S.note[a.sigla] || []).map((n) => `<div>${esc(n.t)} <span class="sub">${fd(n.d).slice(0, 5)}</span></div>`).join("")}</div>
+    <div class="v"><b style="color:var(--${c})">${s}${x.man ? "*" : ""}</b></div></div>`;
 }
 function tile(a) {
   const x = eff(a), [c, s] = CAT[x.c], n = (S.note[a.sigla] || []).length;
@@ -227,7 +249,8 @@ function dettaglio(sigla) {
     <h3>Efficienza</h3>
     <p class="sub">Giornaliera: ${esc(stato(a.stato)[1])}${auto.m ? " · " + esc(auto.m) : ""}</p>
     ${x.man ? `<p>Cambiata a mano il ${fd(x.man.d)}${x.man.m ? ": " + esc(x.man.m) : ""}. Vale fino alla prossima giornaliera.</p>` : ""}
-    ${vive(a) ? `<input id="mo" placeholder="Motivo (es. guasto a fine giornata)" value="${esc(x.man ? x.man.m : "")}">
+    ${vive(a) ? `<label class="sub" for="mo">Motivo (si salva toccando Efficiente o Inefficiente)</label>
+     <input id="mo" placeholder="es. guasto a fine giornata, attesa messa in moto" value="${esc(x.man ? x.man.m : "")}">
      <div class="seg"><button data-e="1" class="${x.c === "eff" ? "on" : ""}">Efficiente</button><button data-e="0" class="${x.c !== "eff" ? "on" : ""}">Inefficiente</button></div>
      ${x.man ? `<button class="btn" id="rp">Torna alla giornaliera</button>` : ""}` : ""}
     <h3>Note</h3>${note.map((n, i) => `<div class="note"><p data-ed="${i}"><small>${fd(n.d)} · tocca per modificare</small>${esc(n.t)}</p><button data-del="${i}" aria-label="Elimina nota">×</button></div>`).join("")}
