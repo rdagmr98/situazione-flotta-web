@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1220">
+<meta name="robots" content="noindex">
+<title>Situazione flotta</title>
+<link rel="icon" href="img/ab206.webp">
+<link rel="apple-touch-icon" href="img/ab206.webp">
+<style>
+:root{--bg:#0b1220;--card:#131c2e;--card2:#1a2540;--line:#26324d;--tx:#e8edf7;--mu:#8b97b0;
+--ok:#3ccf6e;--warn:#f5b942;--ko:#ff5a5a;--ind:#b48cff;--off:#6b7280}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:12px 16px calc(24px + env(safe-area-inset-bottom))}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:12px}
+h1{font-size:20px;margin:0;flex:1 1 auto}
+.sub{color:var(--mu);font-size:13px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card2);color:var(--tx);
+padding:8px 12px;border-radius:10px;font:inherit;cursor:pointer}
+.btn.pri{background:#2b5cff;border-color:#2b5cff}
+.btn:disabled{opacity:.5}
+.tabs{display:flex;gap:6px;margin:4px 0 14px}
+.tabs button{flex:1;border:1px solid var(--line);background:var(--card);color:var(--mu);padding:9px;border-radius:10px;font:inherit;cursor:pointer}
+.tabs button.on{background:var(--card2);color:var(--tx);border-color:#3a4a70}
+.sum{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.kpi{flex:1 1 90px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.kpi b{display:block;font-size:22px}
+.linea{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
+.lh{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.lh img{width:96px;height:48px;object-fit:contain;flex:none}
+.lh .t{flex:1;min-width:0}
+.lh .t b{font-size:17px}
+.bar{height:6px;background:var(--line);border-radius:3px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px;padding:10px}
+.tile{background:var(--card2);border:1px solid var(--line);border-left:4px solid var(--st);border-radius:10px;padding:7px 8px;cursor:pointer;min-width:0;text-align:left;color:var(--tx);font:inherit}
+.tile .s{display:flex;justify-content:space-between;align-items:baseline;gap:4px}
+.tile .s b{font-size:18px}
+.tile .st{font-size:11px;font-weight:600;color:var(--st);white-space:nowrap}
+.tile .x{font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.pill{font-size:10px;border:1px solid var(--line);border-radius:6px;padding:0 4px;color:var(--mu)}
+.list{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px}
+.list h2{font-size:15px;margin:0;padding:10px 12px;border-bottom:1px solid var(--line)}
+.row{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--line);border-left:4px solid var(--lv);cursor:pointer}
+.row:last-child{border-bottom:0}
+.row .a{width:64px;flex:none}
+.row .a b{display:block}
+.row .m{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .v{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+dialog{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:16px;padding:0;width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px)}
+dialog::backdrop{background:#000a}
+.dh{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card)}
+.dh img{width:72px;height:36px;object-fit:contain}
+.dh .t{flex:1}
+.db{padding:4px 12px 14px}
+.db h3{font-size:13px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 6px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td{padding:4px 0;border-bottom:1px solid var(--line);vertical-align:top}
+td:last-child{text-align:right}
+.note{background:var(--card2);border-radius:10px;padding:8px 10px;margin-bottom:6px;display:flex;gap:8px}
+.note p{margin:0;flex:1;white-space:pre-wrap;overflow-wrap:anywhere}
+.note small{color:var(--mu);display:block}
+.note button{background:none;border:0;color:var(--mu);font-size:18px;cursor:pointer;padding:0 4px}
+textarea,input[type=password]{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:9px;font:inherit}
+textarea{min-height:70px;resize:vertical}
+.msg{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222c44;border:1px solid var(--line);padding:9px 14px;border-radius:10px;max-width:calc(100vw - 32px)}
+.empty{color:var(--mu);text-align:center;padding:40px 10px}
+a{color:#7aa2ff}
+</style>
+</head>
+<body>
+<main id="app"><p class="empty">Caricamento...</p></main>
+<dialog id="dlg"></dialog>
+<script src="giornaliera.js"></script>
+<script>
+"use strict";
+const API = "https://api.github.com/repos/rdagmr98/situazione-flotta-data/contents/";
+const ORE_WARN = 25 * 60, GG_WARN = 60; // stesse soglie del SIEL: < 25 h o < 60 giorni
+const TIPI = { // silhouette e colori di AVES Tecnici (helicopter_catalog.dart)
+  "RH-206C": ["ab206", "#FFC14D"], "UH-205A": ["uh205", "#FF8A65"],
+  "UH-169B": ["uh169b", "#35C2FF"], "UH-169D": ["uh169d", "#7CF29A"] };
+const STATI = { "IN LINEA": ["ok", "IN LINEA"], "DISPONIBILE": ["warn", "DISP."], "INDISPONIBILE": ["ko", "INDISP."],
+  "INDUSTRIA": ["ind", "INDUSTRIA"], "ALIENAZIONE": ["off", "ALIEN."] };
+const S = { g: null, note: {}, tab: "flotta" };
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const pat = () => { try { return localStorage.getItem("sf_pat") || ""; } catch (_) { return ""; } };
+
+// --- formati ---
+const fh = (m) => m == null ? "–" : (m < 0 ? "-" : "") + Math.floor(Math.abs(m) / 60) + ":" + String(Math.abs(m) % 60).padStart(2, "0");
+const fd = (d) => d ? d.slice(8, 10) + "/" + d.slice(5, 7) + "/" + d.slice(0, 4) : "–";
+const oggi = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
+const giorni = (d) => Math.round((new Date(d + "T00:00:00") - oggi()) / 864e5);
+const tipo = (t) => TIPI[t] || ["ab206", "#8b97b0"];
+const stato = (s) => STATI[s] || ["off", s || "?"];
+function livello(sc) { // 2 = scaduta, 1 = vicina, 0 = ok, -1 = senza valore
+  if (sc.ore != null) return sc.ore <= 0 ? 2 : sc.ore < ORE_WARN ? 1 : 0;
+  if (sc.data) { const g = giorni(sc.data); return g < 0 ? 2 : g < GG_WARN ? 1 : 0; }
+  return -1;
+}
+const LV = ["var(--ok)", "var(--warn)", "var(--ko)"];
+const valore = (sc) => sc.ore != null ? fh(sc.ore) + " h" : sc.data ? fd(sc.data) + " (" + giorni(sc.data) + " gg)" : esc(sc.raw || "–");
+const vive = (a) => a.stato !== "ALIENAZIONE";
+
+// --- dati: repo privato via GitHub Contents API ---
+async function gh(path, opts = {}) {
+  const r = await fetch(API + path, { ...opts, cache: "no-store", headers: {
+    Authorization: "Bearer " + pat(), Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" } });
+  if (r.status === 404) return null;
+  if (!r.ok) throw new Error(r.status === 401 || r.status === 403 ? "Token non valido o senza accesso al repo dati" : "Errore GitHub " + r.status);
+  return r.json();
+}
+const dec = (b) => new TextDecoder().decode(Uint8Array.from(atob(b.replace(/\s/g, "")), (c) => c.charCodeAt(0)));
+const enc = (s) => { let b = ""; new TextEncoder().encode(s).forEach((x) => b += String.fromCharCode(x)); return btoa(b); };
+async function leggi(path) { const j = await gh(path); return j ? { sha: j.sha, data: JSON.parse(dec(j.content)) } : { sha: null, data: null }; }
+async function scrivi(path, data, msg) {
+  const { sha } = await leggi(path); // sha fresco: niente 409 se l'altro dispositivo ha scritto nel frattempo
+  await gh(path, { method: "PUT", body: JSON.stringify({ message: msg, content: enc(JSON.stringify(data, null, 1)), sha: sha || undefined }) });
+}
+async function carica() {
+  const dir = (await gh("giornaliere")) || [];
+  const ult = dir.map((f) => f.name).filter((n) => /\.json$/.test(n)).sort().pop();
+  const [g, n] = await Promise.all([ult ? leggi("giornaliere/" + ult) : { data: null }, leggi("note.json")]);
+  S.g = g.data; S.note = n.data || {};
+}
+async function salvaNote(sigla, fn) { // rilegge, modifica, scrive: le note dell'altro dispositivo non si perdono
+  const cur = (await leggi("note.json")).data || {};
+  cur[sigla] = fn(cur[sigla] || []);
+  if (!cur[sigla].length) delete cur[sigla];
+  await scrivi("note.json", cur, "note " + sigla);
+  S.note = cur;
+}
+
+// --- viste ---
+function toast(t) { const d = document.createElement("div"); d.className = "msg"; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 3500); }
+function vistaToken(err) {
+  $("#app").innerHTML = `<header><h1>Situazione flotta</h1></header>
+  <div class="list" style="padding:14px">
+   <p>Serve un token GitHub (una volta per dispositivo, resta in questo browser).</p>
+   <ol class="sub"><li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Crea un fine-grained token</a></li>
+   <li>Repository access: solo <b>situazione-flotta-data</b></li><li>Permissions → Contents: <b>Read and write</b></li></ol>
+   ${err ? `<p style="color:var(--ko)">${esc(err)}</p>` : ""}
+   <input type="password" id="tok" placeholder="github_pat_..." autocomplete="off">
+   <p><button class="btn pri" id="ok">Salva</button></p></div>`;
+  $("#ok").onclick = () => { try { localStorage.setItem("sf_pat", $("#tok").value.trim()); } catch (_) {} avvia(); };
+}
+function render() {
+  const g = S.g;
+  const imp = `<label class="btn pri">Importa giornaliera<input type="file" accept=".ods" id="file" hidden></label>`;
+  if (!g) {
+    $("#app").innerHTML = `<header><h1>Situazione flotta</h1>${imp}</header>
+      <p class="empty">Nessuna giornaliera ancora. Dal PC: «Importa giornaliera» e scegli il file SIT_GIOR_CAAE .ods.</p>`;
+    $("#file").onchange = importa; return;
+  }
+  const tutti = g.linee.flatMap((l) => l.aerei).filter(vive), inl = tutti.filter((a) => a.stato === "IN LINEA").length;
+  const urg = g.linee.flatMap((l) => l.aerei.filter(vive).flatMap((a) => a.scadenze)).filter((s) => livello(s) >= 1).length;
+  $("#app").innerHTML = `<header><h1>Situazione flotta</h1><span class="sub">Giornaliera del <b>${fd(g.data)}</b></span>${imp}</header>
+   <div class="sum"><div class="kpi"><span class="sub">In linea</span><b>${inl} su ${tutti.length}</b></div>
+    <div class="kpi"><span class="sub">Efficienza</span><b>${Math.round(100 * inl / (tutti.length || 1))}%</b></div>
+    <div class="kpi"><span class="sub">Scadenze in allerta</span><b style="color:${urg ? "var(--warn)" : "var(--ok)"}">${urg}</b></div></div>
+   <div class="tabs"><button data-t="flotta" class="${S.tab === "flotta" ? "on" : ""}">Flotta</button>
+    <button data-t="scad" class="${S.tab === "scad" ? "on" : ""}">Scadenze</button></div>
+   <div id="body"></div>
+   <p class="sub" style="text-align:center">Importata ${new Date(g.importata).toLocaleString("it-IT")} · <a href="#" id="tk">token</a></p>`;
+  $("#body").innerHTML = S.tab === "flotta" ? flotta(g) : scadenze(g);
+  document.querySelectorAll(".tabs button").forEach((b) => b.onclick = () => { S.tab = b.dataset.t; render(); });
+  document.querySelectorAll("[data-s]").forEach((e) => e.onclick = () => dettaglio(e.dataset.s));
+  $("#file").onchange = importa;
+  $("#tk").onclick = (e) => { e.preventDefault(); vistaToken(); };
+}
+function flotta(g) {
+  return g.linee.map((l) => {
+    const [img, col] = tipo(l.tipo), v = l.aerei.filter(vive), e = v.filter((a) => a.stato === "IN LINEA").length;
+    const pc = Math.round(100 * e / (v.length || 1));
+    return `<section class="linea"><div class="lh"><img src="img/${img}.webp" alt="">
+      <div class="t"><b style="color:${col}">${esc(l.tipo)}</b><div class="sub">In linea ${e} su ${v.length} · ${pc}% · ore mese ${fh(l.totMese)}</div>
+      <div class="bar"><i style="width:${pc}%;background:${col}"></i></div></div></div>
+      <div class="grid">${l.aerei.map(tile).join("")}</div></section>`;
+  }).join("");
+}
+function tile(a) {
+  const [c, s] = stato(a.stato);
+  const sc = a.scadenze.filter((x) => livello(x) >= 0).sort((x, y) => livello(y) - livello(x))[0];
+  const n = (S.note[a.sigla] || []).length;
+  return `<button class="tile" data-s="${esc(a.sigla)}" style="--st:var(--${c})">
+    <div class="s"><b>${esc(a.sigla)}</b><span class="st">${esc(s)}</span></div>
+    <div class="x">${fh(a.oreTot)} h${n ? ` <span class="pill">✎${n}</span>` : ""}</div>
+    <div class="x">${sc ? `<span class="dot" style="background:${LV[livello(sc)]}"></span><b>${sc.ore != null ? fh(sc.ore) : fd(sc.data).slice(0, 6) + fd(sc.data).slice(8)}</b> ${esc(sc.tipo)}` : esc(a.attivita) || "&nbsp;"}</div></button>`;
+}
+function scadenze(g) {
+  const voci = g.linee.flatMap((l) => l.aerei.filter(vive).flatMap((a) => a.scadenze.map((s) => ({ l, a, s }))));
+  const riga = ({ l, a, s }) => `<div class="row" data-s="${esc(a.sigla)}" style="--lv:${LV[Math.max(livello(s), 0)]}">
+    <div class="a"><b>${esc(a.sigla)}</b><span class="sub">${esc(l.tipo)}</span></div><div class="m">${esc(s.tipo)}</div><div class="v">${valore(s)}</div></div>`;
+  const ore = voci.filter((v) => v.s.ore != null).sort((x, y) => x.s.ore - y.s.ore);
+  const dat = voci.filter((v) => v.s.data).sort((x, y) => x.s.data.localeCompare(y.s.data));
+  return `<div class="list"><h2>A ore (residuo)</h2>${ore.map(riga).join("") || '<p class="empty">Nessuna</p>'}</div>
+    <div class="list"><h2>A data</h2>${dat.map(riga).join("") || '<p class="empty">Nessuna</p>'}</div>`;
+}
+function dettaglio(sigla) {
+  const l = S.g.linee.find((x) => x.aerei.some((a) => a.sigla === sigla)), a = l.aerei.find((x) => x.sigla === sigla);
+  const [img, col] = tipo(l.tipo), [c, s] = stato(a.stato), note = S.note[sigla] || [];
+  const tr = (k, v) => v ? `<tr><td>${k}</td><td>${v}</td></tr>` : "";
+  const d = $("#dlg");
+  d.innerHTML = `<div class="dh"><img src="img/${img}.webp" alt=""><div class="t"><b style="font-size:20px">${esc(sigla)}</b>
+    <div class="sub" style="color:${col}">${esc(l.tipo)} · MM ${esc(a.mm)}</div></div>
+    <span class="st" style="color:var(--${c});font-weight:700">${esc(s)}</span><button class="btn" id="cl">Chiudi</button></div>
+   <div class="db">
+    ${a.attivita || a.inizio ? `<h3>Attività</h3><table>${tr("Descrizione", esc(a.attivita))}${tr("Inizio", a.inizio && fd(a.inizio))}${tr("Lavorazione", esc(a.perc))}${tr("Termine stimato", esc(a.fine))}</table>` : ""}
+    <h3>Ore di volo</h3><table>${tr("Nel mese", fh(a.oreMese))}${tr("Totali", fh(a.oreTot))}</table>
+    ${a.scadenze.length ? `<h3>Prossime scadenze</h3><table>${a.scadenze.map((x) => `<tr><td><span class="dot" style="background:${LV[Math.max(livello(x), 0)]}"></span>${esc(x.tipo)}</td><td>${valore(x)}</td></tr>`).join("")}</table>` : ""}
+    ${a.motori.length ? `<h3>Turbomotori</h3><table>${a.motori.map((m) => tr(esc((m.tipo ? m.tipo + " " : "") + m.sn), m.fh != null ? fh(m.fh) + " h" : "–")).join("")}</table>` : ""}
+    ${a.cessione ? `<h3>Cessione temporanea</h3><table>${tr("Da", esc(a.cessione.da))}${tr("A", esc(a.cessione.a))}${tr("Dal", a.cessione.dal && fd(a.cessione.dal))}</table>` : ""}
+    <h3>Configurazione</h3><table>${tr("Config", esc(a.config))}${tr("Verricello", esc(a.verr))}${tr("Gancio", esc(a.gancio))}${tr("NVG", esc(a.nvg))}${tr("GG in linea / presenza", esc(a.ggLinea + " / " + a.ggPres))}</table>
+    <h3>Note</h3>${note.map((n, i) => `<div class="note"><p><small>${fd(n.d)}</small>${esc(n.t)}</p><button data-del="${i}" aria-label="Elimina nota">×</button></div>`).join("")}
+    <textarea id="nt" placeholder="Annota qualcosa su ${esc(sigla)}..."></textarea>
+    <p><button class="btn pri" id="ns">Aggiungi nota</button></p></div>`;
+  $("#cl").onclick = () => d.close();
+  $("#ns").onclick = () => nota(sigla, (arr) => [...arr, { d: new Date().toISOString().slice(0, 10), t: $("#nt").value.trim() }], $("#nt").value.trim());
+  d.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => nota(sigla, (arr) => arr.filter((_, i) => i !== +b.dataset.del), true));
+  if (!d.open) d.showModal();
+}
+async function nota(sigla, fn, ok) {
+  if (!ok) return;
+  document.querySelectorAll("#dlg button").forEach((b) => b.disabled = true);
+  try { await salvaNote(sigla, fn); dettaglio(sigla); render(); } catch (e) { toast(e.message); dettaglio(sigla); }
+}
+async function importa(ev) {
+  const f = ev.target.files[0]; if (!f) return;
+  try {
+    const g = await Giornaliera.leggiGiornaliera(await f.arrayBuffer());
+    if (!g.data) throw new Error("Data della giornaliera non trovata nel file");
+    const d = $("#dlg");
+    d.innerHTML = `<div class="dh"><div class="t"><b>Giornaliera del ${fd(g.data)}</b><div class="sub">${esc(f.name)}</div></div></div>
+      <div class="db"><table>${g.linee.map((l) => `<tr><td>${esc(l.tipo)}</td><td>${l.aerei.length} aeromobili · ore mese ${fh(l.totMese)}</td></tr>`).join("")}</table>
+      ${S.g && S.g.data > g.data ? `<p style="color:var(--warn)">È più vecchia di quella attuale (${fd(S.g.data)}): viene archiviata, la vista resta sull'ultima.</p>` : ""}
+      <p><button class="btn pri" id="sv">Salva</button> <button class="btn" id="an">Annulla</button></p></div>`;
+    $("#an").onclick = () => d.close();
+    $("#sv").onclick = async () => {
+      $("#sv").disabled = true;
+      try { await scrivi("giornaliere/" + g.data + ".json", g, "giornaliera " + g.data); d.close(); await carica(); render(); toast("Giornaliera del " + fd(g.data) + " salvata"); }
+      catch (e) { toast(e.message); $("#sv").disabled = false; }
+    };
+    d.showModal();
+  } catch (e) { toast(e.message); }
+  ev.target.value = "";
+}
+async function avvia() {
+  if (!pat()) return vistaToken();
+  try { await carica(); render(); } catch (e) { vistaToken(e.message); }
+}
+avvia();
+</script>
+</body>
+</html>
