@@ -6,8 +6,9 @@
 <meta name="theme-color" content="#0b1220">
 <meta name="robots" content="noindex">
 <title>Situazione flotta</title>
-<link rel="icon" href="img/ab206.webp">
-<link rel="apple-touch-icon" href="img/ab206.webp">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
 <style>
 :root{--bg:#0b1220;--card:#131c2e;--card2:#1a2540;--line:#26324d;--tx:#e8edf7;--mu:#8b97b0;
 --ok:#3ccf6e;--warn:#f5b942;--ko:#ff5a5a;--ind:#b48cff;--off:#6b7280}
@@ -75,6 +76,7 @@ a{color:#7aa2ff}
 <main id="app"><p class="empty">Caricamento...</p></main>
 <dialog id="dlg"></dialog>
 <script src="giornaliera.js"></script>
+<script src="pat.js"></script>
 <script>
 "use strict";
 const API = "https://api.github.com/repos/rdagmr98/situazione-flotta-data/contents/";
@@ -87,7 +89,8 @@ const STATI = { "IN LINEA": ["ok", "IN LINEA"], "DISPONIBILE": ["warn", "DISP."]
 const S = { g: null, note: {}, tab: "flotta" };
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const pat = () => { try { return localStorage.getItem("sf_pat") || ""; } catch (_) { return ""; } };
+let PAT = ""; // in chiaro solo in memoria: nella pagina pubblica c'è cifrato (pat.js)
+const ls = (k, v) => { try { return v === undefined ? localStorage.getItem(k) || "" : localStorage.setItem(k, v); } catch (_) { return ""; } };
 
 // --- formati ---
 const fh = (m) => m == null ? "–" : (m < 0 ? "-" : "") + Math.floor(Math.abs(m) / 60) + ":" + String(Math.abs(m) % 60).padStart(2, "0");
@@ -108,7 +111,7 @@ const vive = (a) => a.stato !== "ALIENAZIONE";
 // --- dati: repo privato via GitHub Contents API ---
 async function gh(path, opts = {}) {
   const r = await fetch(API + path, { ...opts, cache: "no-store", headers: {
-    Authorization: "Bearer " + pat(), Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" } });
+    Authorization: "Bearer " + PAT, Accept: "application/vnd.github+json", "X-GitHub-Api-Version": "2022-11-28" } });
   if (r.status === 404) return null;
   if (!r.ok) throw new Error(r.status === 401 || r.status === 403 ? "Token non valido o senza accesso al repo dati" : "Errore GitHub " + r.status);
   return r.json();
@@ -136,16 +139,14 @@ async function salvaNote(sigla, fn) { // rilegge, modifica, scrive: le note dell
 
 // --- viste ---
 function toast(t) { const d = document.createElement("div"); d.className = "msg"; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 3500); }
-function vistaToken(err) {
+function vistaFrase(err) {
   $("#app").innerHTML = `<header><h1>Situazione flotta</h1></header>
-  <div class="list" style="padding:14px">
-   <p>Serve un token GitHub (una volta per dispositivo, resta in questo browser).</p>
-   <ol class="sub"><li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">Crea un fine-grained token</a></li>
-   <li>Repository access: solo <b>situazione-flotta-data</b></li><li>Permissions → Contents: <b>Read and write</b></li></ol>
+  <form class="list" style="padding:14px" id="fr">
+   <p>Frase di accesso (una volta per dispositivo, resta in questo browser).</p>
    ${err ? `<p style="color:var(--ko)">${esc(err)}</p>` : ""}
-   <input type="password" id="tok" placeholder="github_pat_..." autocomplete="off">
-   <p><button class="btn pri" id="ok">Salva</button></p></div>`;
-  $("#ok").onclick = () => { try { localStorage.setItem("sf_pat", $("#tok").value.trim()); } catch (_) {} avvia(); };
+   <input type="password" id="tok" autocomplete="current-password" autocapitalize="none">
+   <p><button class="btn pri">Entra</button></p></form>`;
+  $("#fr").onsubmit = (e) => { e.preventDefault(); ls("sf_frase", $("#tok").value.trim().toLowerCase()); avvia(); };
 }
 function render() {
   const g = S.g;
@@ -164,12 +165,11 @@ function render() {
    <div class="tabs"><button data-t="flotta" class="${S.tab === "flotta" ? "on" : ""}">Flotta</button>
     <button data-t="scad" class="${S.tab === "scad" ? "on" : ""}">Scadenze</button></div>
    <div id="body"></div>
-   <p class="sub" style="text-align:center">Importata ${new Date(g.importata).toLocaleString("it-IT")} · <a href="#" id="tk">token</a></p>`;
+   <p class="sub" style="text-align:center">Importata ${new Date(g.importata).toLocaleString("it-IT")}</p>`;
   $("#body").innerHTML = S.tab === "flotta" ? flotta(g) : scadenze(g);
   document.querySelectorAll(".tabs button").forEach((b) => b.onclick = () => { S.tab = b.dataset.t; render(); });
   document.querySelectorAll("[data-s]").forEach((e) => e.onclick = () => dettaglio(e.dataset.s));
   $("#file").onchange = importa;
-  $("#tk").onclick = (e) => { e.preventDefault(); vistaToken(); };
 }
 function flotta(g) {
   return g.linee.map((l) => {
@@ -247,11 +247,23 @@ async function importa(ev) {
   } catch (e) { toast(e.message); }
   ev.target.value = "";
 }
+async function sblocca(frase) { // stesso schema di cifra.mjs: PBKDF2-SHA256 → AES-GCM
+  const b = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(frase), "PBKDF2", false, ["deriveKey"]);
+  const k = await crypto.subtle.deriveKey({ name: "PBKDF2", hash: "SHA-256", salt: b(SF_PAT.s), iterations: SF_PAT.n },
+    base, { name: "AES-GCM", length: 256 }, false, ["decrypt"]);
+  return new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b(SF_PAT.iv) }, k, b(SF_PAT.c)));
+}
 async function avvia() {
-  if (!pat()) return vistaToken();
-  try { await carica(); render(); } catch (e) { vistaToken(e.message); }
+  const frase = ls("sf_frase");
+  if (!frase) return vistaFrase();
+  if (!window.SF_PAT) { $("#app").innerHTML = `<p class="empty">Configurazione da completare: manca la chiave di accesso ai dati.</p>`; return; }
+  if (!PAT) try { PAT = await sblocca(frase); } catch (_) { ls("sf_frase", ""); return vistaFrase("Frase errata"); }
+  try { await carica(); render(); }
+  catch (e) { $("#app").innerHTML = `<p class="empty">${esc(e.message)}<br><br><button class="btn" onclick="avvia()">Riprova</button></p>`; }
 }
 avvia();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 </script>
 </body>
 </html>
