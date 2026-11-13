@@ -18,6 +18,8 @@ h1{font-size:20px;margin:0 0 4px}
 .gantt th,.gantt td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
 .gantt th:first-child{position:sticky;left:0;background:var(--card);text-align:left}
 .gantt small{display:block;color:var(--mu);font-weight:400;font-size:11px}
+.gantt td.ko{background:#ff5a5a66;font-weight:700}
+.gantt td.fe{background:#6b728033;color:var(--mu)}
 button{font:inherit;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:#f3f4f6;cursor:pointer}
 @media print{button{display:none}@page{size:landscape}}
 </style>
@@ -33,7 +35,8 @@ button{font:inherit;padding:8px 14px;border-radius:10px;border:1px solid var(--l
     app.innerHTML = `<h1>Tabella di marcia</h1>
       <p class="sub">Piano del ${Piano.fd(s.t)} · ore residue dalla giornaliera del ${Piano.fd(s.d)}. È un'istantanea: vale l'ultimo link ricevuto.</p>
       ${Piano.htmlMarcia(s)}
-      <p class="sub">Per mese: ore da volare al massimo, residuo ripartito fino all'ingresso in ore intere. «Restano» = ore non volate all'ingresso.</p>
+      <p class="sub">Righe PPL: FH programmate per mese (nel mese in corso quelle ancora da volare), in grigio i fermi; «Restano» = ore residue meno le FH della PPL fino al prossimo fermo, in rosso se non bastano. Scost. = volato meno PPL degli stessi mesi.
+       Altre righe: ore da volare al massimo, residuo ripartito fino all'ingresso in ore intere; «Restano» = ore non volate all'ingresso.</p>
       <p><button onclick="print()">Stampa / PDF</button></p>`;
   } catch (_) { app.innerHTML = '<p class="sub">Link non valido o incompleto: chiedi di rimandarlo.</p>'; }
 })();

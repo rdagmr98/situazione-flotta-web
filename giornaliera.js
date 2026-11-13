@@ -1,15 +1,15 @@
-/* Lettura della giornaliera SIT_GIOR_CAAE (.ods) senza librerie:
-   zip via DecompressionStream, content.xml via tokenizer, poi un foglio per linea.
+/* Lettura della giornaliera SIT_GIOR_CAAE (.ods) e delle PPL (.xlsx) senza librerie:
+   zip via DecompressionStream, xml via tokenizer/regex, poi un foglio per linea.
    Gira uguale nel browser e in Node (test.mjs). */
 (function (g) {
   "use strict";
 
-  // --- zip: legge un file dal central directory ---
+  // --- zip: legge un file dal central directory (null se manca) ---
   async function unzip(buf, wanted) {
     var b = new Uint8Array(buf), v = new DataView(b.buffer, b.byteOffset, b.byteLength);
     var e = b.length - 22;
     while (e >= 0 && v.getUint32(e, true) !== 0x06054b50) e--;
-    if (e < 0) throw new Error("Il file non è un .ods valido");
+    if (e < 0) throw new Error("Il file non è un .ods/.xlsx valido");
     var n = v.getUint16(e + 10, true), p = v.getUint32(e + 16, true);
     for (var i = 0; i < n; i++) {
       var method = v.getUint16(p + 10, true), size = v.getUint32(p + 20, true);
@@ -25,7 +25,7 @@
       }
       p += 46 + nl + xl + cl;
     }
-    throw new Error("content.xml mancante: serve la giornaliera in formato .ods");
+    return null;
   }
 
   function unescape(s) {
@@ -130,7 +130,9 @@
   }
 
   async function leggiGiornaliera(buf) {
-    var sh = sheets(await unzip(buf, "content.xml"));
+    var xml = await unzip(buf, "content.xml");
+    if (!xml) throw new Error("content.xml mancante: serve la giornaliera in formato .ods");
+    var sh = sheets(xml);
     var linee = Object.keys(sh).map(function (k) { return parseSheet(sh[k]); })
       .filter(function (l) { return l && l.aerei.length; });
     if (!linee.length) throw new Error("Nessun foglio riconosciuto: è la SIT_GIOR_CAAE?");
@@ -138,6 +140,65 @@
     return { data: data, importata: new Date().toISOString(), linee: linee };
   }
 
-  var api = { leggiGiornaliera: leggiGiornaliera, minuti: minuti, iso: iso };
+  // --- PPL .xlsx: foglio con riga di intestazione "EI" + mesi GEN..DIC (3 colonne per mese = decadi) ---
+  var MESI = ["GEN", "FEB", "MAR", "APR", "MAG", "GIU", "LUG", "AGO", "SET", "OTT", "NOV", "DIC"];
+  var col = function (r) { var n = 0; for (var i = 0; i < r.length && r[i] >= "A"; i++) n = n * 26 + r.charCodeAt(i) - 64; return n; };
+  var attr = function (a, k) { var m = new RegExp("(?:^|\\s)" + k + '="([^"]*)"').exec(a); return m ? unescape(m[1]) : null; };
+  var testi = function (x) { // testo di <si>/<is>: tutti i <t>, senza la fonetica
+    return unescape((x.replace(/<rPh\b[\s\S]*?<\/rPh>/g, "").match(/<t\b[^>]*>[^<]*/g) || [])
+      .map(function (t) { return t.replace(/^<t\b[^>]*>/, ""); }).join(""));
+  };
+  // [{ foglio, anno (dall'intestazione, se c'è), righe: { EI: { "01".."12": minuti | [testo, giorno, minuti?] | null } } }]
+  async function leggiPpl(buf) {
+    var z = function (n) { return unzip(buf, n); };
+    var wb = await z("xl/workbook.xml");
+    if (!wb) throw new Error("Non è un file .xlsx");
+    var rels = (await z("xl/_rels/workbook.xml.rels")) || "", ss = (((await z("xl/sharedStrings.xml")) || "").match(/<si\b[\s\S]*?<\/si>/g) || []).map(testi);
+    var dove = {};
+    (rels.match(/<Relationship\b[^>]*>/g) || []).forEach(function (r) { var t = attr(r, "Target"); dove[attr(r, "Id")] = t[0] === "/" ? t.slice(1) : "xl/" + t; });
+    var out = [], fogli = wb.match(/<sheet\b[^>]*>/g) || [];
+    for (var f = 0; f < fogli.length; f++) {
+      var xml = await z(dove[attr(fogli[f], "r:id")]);
+      if (!xml) continue;
+      var R = {}, re = /<c\b([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g, m;
+      while ((m = re.exec(xml))) { // R = { riga: { colonna: numero | testo } }
+        var ref = attr(m[1], "r"), t = attr(m[1], "t"), x = m[2] || "", v = /<v>([^<]*)<\/v>/.exec(x), val = null;
+        if (t === "s") val = v && ss[+v[1]];
+        else if (t === "inlineStr") val = testi(x);
+        else if (t === "str") val = v && unescape(v[1]);
+        else if (!t || t === "n") val = v ? +v[1] : null;
+        if (val == null || val === "") continue;
+        var rr = +/\d+$/.exec(ref)[0];
+        (R[rr] = R[rr] || {})[col(ref)] = typeof val === "string" ? val.trim() : val;
+      }
+      var hr = Object.keys(R).find(function (r) { var c = R[r], k = Object.keys(c);
+        return k.some(function (j) { return c[j] === "EI"; }) && k.some(function (j) { return MESI.indexOf(c[j]) >= 0; }); });
+      if (!hr) continue;
+      var H = R[hr], ks = Object.keys(H).map(Number).sort(function (a, b) { return a - b; }), cEI = ks.find(function (k) { return H[k] === "EI"; });
+      var mesi = ks.filter(function (k) { return MESI.indexOf(H[k]) >= 0; }).map(function (k) {
+        var dopo = ks.find(function (j) { return j > k; }) || k + 3; // il mese finisce alla prossima intestazione (max 3 decadi)
+        return { mm: String(MESI.indexOf(H[k]) + 1).padStart(2, "0"), c: k, n: Math.min(dopo - k, 3) };
+      });
+      var anno = (R[hr - 1] || {})[mesi[0].c], righe = {};
+      Object.keys(R).filter(function (r) { return +r > +hr && /^\d+$/.test(String(R[r][cEI] || "")); }).forEach(function (r) {
+        var c = R[r], a = righe[String(c[cEI])] = {}; // la riga sotto (volato) non ha EI: si salta da sola
+        mesi.forEach(function (x) {
+          var min = 0, num = false, tx = null, gg = 1;
+          for (var k = 0; k < x.n; k++) {
+            var y = c[x.c + k];
+            // ponytail: celle in formato durata (frazione di giorno); da 4 in su è un numero di ore scritto a mano
+            if (typeof y === "number") { min += Math.round(y < 4 ? y * 1440 : y * 60); num = true; }
+            else if (y && !tx) { tx = y.replace(/\s+/g, " "); gg = 1 + 10 * k; }
+          }
+          a[x.mm] = tx ? (num ? [tx, gg, min] : [tx, gg]) : num ? min : null;
+        });
+      });
+      out.push({ foglio: attr(fogli[f], "name"), anno: typeof anno === "number" && anno > 2000 ? anno : null, righe: righe });
+    }
+    if (!out.length) throw new Error("Nessun foglio PPL riconosciuto (serve la riga con EI e i mesi GEN..DIC)");
+    return out;
+  }
+
+  var api = { leggiGiornaliera: leggiGiornaliera, leggiPpl: leggiPpl, minuti: minuti, iso: iso };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else g.Giornaliera = api;
 })(typeof window !== "undefined" ? window : globalThis);

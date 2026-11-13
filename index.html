@@ -95,6 +95,7 @@ select{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--li
 .gantt th:first-child{position:sticky;left:0;background:var(--card);text-align:left;z-index:1}
 .gantt small{display:block;color:var(--mu);font-weight:400;font-size:10px}
 .gantt td.ko{background:#ff5a5a66;font-weight:700}
+.gantt td.fe{background:#6b728040;color:var(--mu)}
 .gantt tr[data-f]{cursor:pointer}
 .gantt input{width:64px;padding:4px}
 .av{padding:8px 12px;border-bottom:1px solid var(--line);border-left:4px solid var(--lv)}
@@ -186,9 +187,17 @@ async function scrivi(path, data, msg) {
 }
 async function carica() {
   const dir = (await gh("giornaliere")) || [];
-  const ult = dir.map((f) => f.name).filter((n) => /\.json$/.test(n)).sort().pop();
-  const [g, n, s, p] = await Promise.all([ult ? leggi("giornaliere/" + ult) : { data: null }, leggi("note.json"), leggi("stati.json"), leggi("piano.json")]);
-  S.g = g.data; S.note = n.data || {}; S.stati = s.data || {}; S.piano = { ...PIANO0(), ...p.data };
+  const nomi = dir.map((f) => f.name).filter((n) => /\.json$/.test(n)).sort(), ult = nomi[nomi.length - 1];
+  const [g, n, s, p, q] = await Promise.all([ult ? leggi("giornaliere/" + ult) : { data: null }, leggi("note.json"), leggi("stati.json"), leggi("piano.json"), leggi("ppl.json")]);
+  S.g = g.data; S.note = n.data || {}; S.stati = s.data || {}; S.piano = { ...PIANO0(), ...p.data }; S.ppl = q.data || {}; S.vol = {};
+  if (!S.g) return;
+  // volato per lo scostamento dalla PPL: ore mese dell'ultima giornaliera di ogni mese, dal primo anno di PPL
+  const a0 = Object.keys(S.ppl).map((k) => k.split("|")[1]).sort()[0], m1 = S.g.data.slice(0, 7), um = {};
+  for (const x of nomi) um[x.slice(0, 7)] = x;
+  const ore = (g) => ({ d: g.data, o: Object.fromEntries(g.linee.flatMap((l) => l.aerei.map((a) => [a.sigla, a.oreMese || 0]))) });
+  const mesi = Object.keys(um).filter((m) => a0 && m >= a0 && m < m1);
+  S.vol = Object.fromEntries(await Promise.all(mesi.map(async (m) => [m, ore((await leggi("giornaliere/" + um[m])).data)])));
+  S.vol[m1] = ore(S.g);
 }
 async function aggiorna(file, sigla, fn) { // rilegge, modifica, scrive: le modifiche dell'altro dispositivo non si perdono
   const cur = (await leggi(file + ".json")).data || {};
@@ -259,14 +268,37 @@ function residuo(a) { // ore alla prossima scadenza a ore e quale
   const s = a.scadenze.filter((x) => x.ore != null).sort((x, y) => x.ore - y.ore)[0];
   return s ? [Math.max(s.ore, 0), s.tipo] : [null, ""];
 }
-function righeMarcia(fs) {
-  return fs.filter((f) => f.a && f.in > S.g.data).map((f) => {
-    const [res, sc] = residuo(f.a), t = +S.piano.tetti[f.sigla] || 0, m = Piano.marcia(S.g.data, f.in, res || 0, t);
-    return { s: f.sigla, tipo: f.tipo, isp: f.i.nome || "", in: f.in, out: f.out, res, sc, mesi: m.mesi, resto: m.resto, tetto: t || null };
-  });
+function fermiTutti() { // a mano + dalla PPL; un fermo a mano che si sovrappone vince su quello della PPL (e ne prende la fine se non ha durata)
+  const P = S.piano, man = P.fermi.map(fermo).filter((f) => f.in), out = [...man];
+  for (const [s, mesi] of Object.entries(Piano.pplMesi(S.ppl))) {
+    const [tipo, a] = aereo(s); if (!a) continue;
+    const offs = [...new Set(P.ispezioni.filter((i) => i.tipo === tipo && i.off).map((i) => i.off))];
+    for (const p of Piano.fermiPpl(mesi)) {
+      const inz = Piano.lunedi(Piano.settimana(p.in)), mie = man.filter((f) => f.sigla === s && f.in < p.out && inz < f.out);
+      mie.forEach((f) => { if (!f.durata && p.out > f.in) { f.out = p.out; f.durata = true; } });
+      // ponytail: officina della PPL = l'unica del catalogo per quel tipo, nessuna per attese e TBD
+      if (!mie.length) out.push({ id: "ppl:" + s + ":" + p.in, ppl: p, sigla: s, a, tipo, i: { nome: p.testo }, durata: !p.tbd,
+        off: p.tbd || /ATTESA/i.test(p.testo) || offs.length !== 1 ? "" : offs[0], in: inz, out: p.out });
+    }
+  }
+  return out.sort((x, y) => x.tipo.localeCompare(y.tipo) || x.in.localeCompare(y.in));
+}
+function righeMarcia(fs) { // con la PPL del mese in corso: FH della PPL e scostamento; senza: residuo ripartito fino al fermo a mano
+  const PM = Piano.pplMesi(S.ppl), m0 = S.g.data.slice(0, 7);
+  return S.g.linee.flatMap((l) => l.aerei.flatMap((a) => {
+    const [res, sc] = residuo(a), mesi = PM[a.sigla] || [];
+    if (mesi.some((x) => x[0] === m0)) {
+      const m = Piano.marciaPpl(mesi, S.g.data, a.oreMese || 0, res), p = m.prossimo || {}, k = Piano.scostamento(mesi, S.vol, a.sigla) || {};
+      return [{ s: a.sigla, tipo: l.tipo, isp: p.testo || "", in: p.in, out: p.aperto ? null : p.out, res, sc, mesi: m.mesi, resto: m.resto, ppl: true, vol: k.vol, pv: k.pv }];
+    }
+    return fs.filter((f) => f.sigla === a.sigla && !f.ppl && f.in > S.g.data).map((f) => {
+      const t = +S.piano.tetti[f.sigla] || 0, m = Piano.marcia(S.g.data, f.in, res || 0, t);
+      return { s: f.sigla, tipo: f.tipo, isp: f.i.nome || "", in: f.in, out: f.out, res, sc, mesi: m.mesi, resto: m.resto, tetto: t || null };
+    });
+  }));
 }
 function renderPiano() {
-  const P = S.piano, fs = P.fermi.map(fermo).filter((f) => f.in).sort((x, y) => x.tipo.localeCompare(y.tipo) || x.in.localeCompare(y.in));
+  const P = S.piano, fs = fermiTutti();
   const w0 = Piano.lunedi(Piano.settimana(giornoIso())), W = [];
   const fine = fs.reduce((m, f) => f.out > m ? f.out : m, Piano.addG(w0, 7 * 16));
   for (let d = w0; d < fine && W.length < 104; d = Piano.addG(d, 7)) W.push(d);
@@ -282,15 +314,17 @@ function renderPiano() {
   const av = [];
   for (const o of officine) { const k = W.filter((w) => occ(o, w) > max(o)); if (k.length) av.push(["ko", `${o}: più di ${max(o)} in ispezione insieme nelle ${k.map(wl).join(", ")}`]); }
   for (const t of tipiG) { const mn = P.minimi[t] || 0, k = W.filter((w) => effic(t, w) < mn); if (k.length) av.push(["ko", `${t}: meno di ${mn} efficienti nelle ${k.map(wl).join(", ")}`]); }
+  const finite = new Set();
   for (const f of vis) {
     const nota = f.i.nota ? ` (${f.i.nota})` : "", tol = +f.i.tolGg || 0, oltre = f.scad ? Piano.diffG(f.scad, f.in) : 0;
+    if (f.ppl) { if (f.in > S.g.data && residuo(f.a)[0] === 0 && !finite.has(f.sigla)) { finite.add(f.sigla); av.push(["ko", `${f.sigla}: ore finite (${residuo(f.a)[1]}), resta a terra fino al fermo PPL del ${fd(f.in)}`]); } continue; }
     if (oltre > 0) av.push(tol && oltre <= tol ? ["warn", `${f.sigla}: ingresso ${oltre} gg dopo la scadenza del ${fd(f.scad)}, in tolleranza${nota}`]
       : ["ko", `${f.sigla}: ingresso ${oltre} gg dopo la scadenza del ${fd(f.scad)}, ${tol ? `oltre la tolleranza di ${tol} gg` : "tolleranza non inserita"}${nota}`]);
     if (!f.durata) av.push(["warn", `${f.sigla}: durata del fermo da inserire (nel Gantt vale 1 settimana)`]);
     if (f.a && f.in > S.g.data && residuo(f.a)[0] === 0) av.push(["ko", `${f.sigla}: ore finite (${residuo(f.a)[1]}), resta a terra fino all'ingresso`]);
   }
   const testa = `<tr><th>Fermo</th>${W.map((w) => `<th>${wl(w).slice(2)}<small>${fd(w).slice(0, 5)}</small></th>`).join("")}</tr>`;
-  const riga = (f) => `<tr data-f="${f.id}"><th>${esc(f.sigla)} <small>${esc(f.tipo)} · ${esc(f.i.nome || "?")}</small></th>${W.map((w) => {
+  const riga = (f) => `<tr data-f="${esc(f.id)}"><th>${esc(f.sigla)} <small>${esc(f.tipo)} · ${esc(f.i.nome || "?")}${f.ppl ? " · PPL" : ""}</small></th>${W.map((w) => {
     const sc = f.scad && f.scad >= w && f.scad < Piano.addG(w, 7) ? "◆" : "";
     return `<td${att(f, w) ? ` style="background:${col(f.off)};color:#fff${f.durata ? "" : ";opacity:.45"}"` : ""}>${sc}</td>`; }).join("")}</tr>`;
   const conto = (n, fn, ko) => `<tr><th>${n}</th>${W.map((w) => { const v = fn(w); return `<td class="${ko(v) ? "ko" : ""}">${v}</td>`; }).join("")}</tr>`;
@@ -304,7 +338,13 @@ function renderPiano() {
     ${tipiG.map((t) => conto(`${t} <small>efficienti${P.minimi[t] ? ", min " + P.minimi[t] : ""}</small>`, (w) => effic(t, w), (v) => v < (P.minimi[t] || 0))).join("")}
    </tbody></table></div></section>
    <section class="list"><h2>Tabella di marcia</h2>${Piano.htmlMarcia({ r: marcia }, true)}
-    <p class="sub" style="padding:0 12px">Per mese: ore da volare al massimo, residuo ripartito fino all'ingresso in ore intere. Il tetto (FH/mese) si scrive a mano; «Restano» = ore non volate all'ingresso.</p></section>
+    <p class="sub" style="padding:0 12px">Righe PPL: FH programmate per mese (nel mese in corso quelle ancora da volare), in grigio i fermi; «Restano» = residuo meno le FH della PPL fino al prossimo fermo, in rosso se la PPL chiede più ore di quante ne restano. Scost. = volato dalle giornaliere meno PPL degli stessi mesi (il mese in corso in proporzione ai giorni).
+     Altre righe: residuo ripartito fino all'ingresso del fermo a mano in ore intere, tetto FH/mese scritto a mano; «Restano» = ore non volate all'ingresso.</p></section>
+   <section class="list noprint"><h2>PPL <label class="btn" style="float:right;padding:2px 10px">Importa PPL<input type="file" accept=".xlsx" id="fp" hidden></label></h2>
+    ${Object.keys(S.ppl).sort().map((k) => { const x = S.ppl[k]; return `<div class="row" style="--lv:var(--ind)"><div class="a"><b>${esc(k.split("|")[1])}</b><span class="sub">${esc(k.split("|")[0])}</span></div>
+      <div class="m">${esc(x.file)} · ${esc(x.foglio)}<div class="sub">${Object.keys(x.righe).length} macchine · importata ${new Date(x.importata).toLocaleDateString("it-IT")}</div></div>
+      <div class="v"><button class="btn" data-xp="${esc(k)}">Togli</button></div></div>`; }).join("")
+      || '<p class="empty">Nessuna PPL: importa i file .xlsx (fogli RH-206C, 169B, 169D). Sono la fonte dei fermi e delle FH per mese.</p>'}</section>
    <section class="list noprint"><h2>Fermi <button class="btn" data-nf style="float:right;padding:2px 10px">+ Fermo</button></h2>
     ${P.fermi.map(fermo).sort((x, y) => (x.in || "").localeCompare(y.in || "")).map((f) => `<div class="row" data-f="${f.id}" style="--lv:${col(f.off)}"><div class="a"><b>${esc(f.sigla)}</b><span class="sub">${esc(f.tipo)}</span></div>
       <div class="m">${esc(f.i.nome || "ispezione?")} · ${f.in ? wl(f.in) + " (" + fd(f.in).slice(0, 5) + ")" : "settimana?"} · ${esc(f.off || "officina?")}${f.nota ? `<div class="sub">${esc(f.nota)}</div>` : ""}</div>
@@ -320,7 +360,11 @@ function renderPiano() {
   $("#fl").onclick = () => vai("");
   $("#st").onclick = () => print();
   $("#lk").onclick = async () => linkPiloti(await Piano.codifica({ d: S.g.data, t: giornoIso(), r: marcia }));
-  document.querySelectorAll("[data-f]").forEach((e) => e.onclick = () => dlgFermo(e.dataset.f));
+  document.querySelectorAll("[data-f]").forEach((e) => e.onclick = () => { const p = fs.find((f) => f.id === e.dataset.f && f.ppl);
+    if (!p) return dlgFermo(e.dataset.f); // fermo PPL: si apre come nuovo fermo a mano già compilato, che poi vince sulla PPL
+    dlgFermo(null, { sigla: p.sigla, wk: Piano.settimana(p.in), sett: p.ppl.aperto || p.ppl.tbd ? null : Math.round(Piano.diffG(p.in, p.out) / 7), off: p.off, nota: "da PPL: " + p.ppl.testo }); });
+  $("#fp").onchange = importaPpl;
+  document.querySelectorAll("[data-xp]").forEach((b) => b.onclick = () => salvaPpl("tolta " + b.dataset.xp, (p) => { delete p[b.dataset.xp]; }));
   document.querySelectorAll("[data-i]").forEach((e) => e.onclick = () => dlgIsp(e.dataset.i));
   $("[data-nf]").onclick = () => dlgFermo(); $("[data-ni]").onclick = () => dlgIsp();
   document.querySelectorAll("[data-tetto]").forEach((e) => e.onchange = () => { const s = e.dataset.tetto, v = +e.value;
@@ -336,8 +380,8 @@ function linkPiloti(h) {
   $("#cp").onclick = async () => { try { await navigator.clipboard.writeText(url); toast("Link copiato"); } catch (_) { $("#ul").select(); toast("Copia con Ctrl+C"); } };
   d.showModal();
 }
-function dlgFermo(id) {
-  const f = S.piano.fermi.find((x) => x.id === id) || { id: nuovoId() }, nuovo = !id, d = $("#dlg");
+function dlgFermo(id, pre) {
+  const f = S.piano.fermi.find((x) => x.id === id) || { id: nuovoId(), ...pre }, nuovo = !id, d = $("#dlg");
   const sigle = S.g.linee.flatMap((l) => l.aerei.filter(vive).map((a) => a.sigla));
   const off = [...new Set(S.piano.ispezioni.map((i) => i.off).filter(Boolean))];
   d.innerHTML = `<div class="dh"><div class="t"><b>${nuovo ? "Nuovo fermo" : "Fermo " + esc(f.sigla)}</b></div><button class="btn" id="cl">Chiudi</button></div>
@@ -471,6 +515,32 @@ async function importa(ev) {
     d.showModal();
   } catch (e) { toast(e.message); }
   ev.target.value = "";
+}
+async function importaPpl(ev) {
+  const f = ev.target.files[0]; ev.target.value = ""; if (!f) return;
+  try {
+    const y = +(/20\d\d/.exec(f.name) || [])[0] || "", n = (s) => s.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    const fg = (await Giornaliera.leggiPpl(await f.arrayBuffer())).map((x) => ({ ...x, tipo: S.g.linee.map((l) => l.tipo).find((t) => n(t).endsWith(n(x.foglio))) }));
+    const d = $("#dlg");
+    d.innerHTML = `<div class="dh"><div class="t"><b>Importa PPL</b><div class="sub">${esc(f.name)}</div></div><button class="btn" id="cl">Chiudi</button></div>
+     <form class="db" id="fpp"><table>${fg.map((x, k) => `<tr><td><label><input type="checkbox" name="k${k}" style="width:auto"${x.tipo ? " checked" : " disabled"}> ${esc(x.foglio)}</label></td>
+      <td>${x.tipo ? `${esc(x.tipo)} · ${Object.keys(x.righe).length} macchine` : "tipo non in flotta"}</td>
+      <td><input name="a${k}" type="number" min="2020" max="2099" value="${y || x.anno || ""}" style="width:90px"${x.tipo ? " required" : ""}>${x.anno && x.anno !== y ? `<small class="sub"> nel foglio: ${x.anno}</small>` : ""}</td></tr>`).join("")}</table>
+      <p class="sub">Anno preso dal nome del file: correggilo se serve. La PPL già importata per lo stesso tipo e anno viene sostituita.</p>
+      <p><button class="btn pri">Salva</button></p></form>`;
+    $("#cl").onclick = () => d.close();
+    $("#fpp").onsubmit = (e) => { e.preventDefault(); const v = Object.fromEntries(new FormData(e.target)), ora = new Date().toISOString();
+      const sel = fg.map((x, k) => [x, v["a" + k]]).filter((_, k) => v["k" + k]);
+      if (!sel.length) return d.close();
+      salvaPpl(f.name, (p) => { for (const [x, a] of sel) p[x.tipo + "|" + a] = { file: f.name, foglio: x.foglio, importata: ora, righe: x.righe }; }); };
+    d.showModal();
+  } catch (e) { toast(e.message); }
+}
+async function salvaPpl(msg, fn) { // come salvaPiano, su ppl.json; poi ricarica per il volato dei mesi nuovi
+  document.querySelectorAll("#dlg button, #app button").forEach((b) => b.disabled = true);
+  try { const p = (await leggi("ppl.json")).data || {}; fn(p); await scrivi("ppl.json", p, "ppl: " + msg); $("#dlg").close(); await carica(); toast("PPL salvata"); }
+  catch (e) { toast(e.message); }
+  render();
 }
 async function sblocca(frase) { // stesso schema di cifra.mjs: PBKDF2-SHA256 → AES-GCM
   const b = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
