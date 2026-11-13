@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Tabella di marcia</title>
+<link rel="icon" href="icon-192.png">
+<style>
+/* sola lettura per i piloti: i dati arrivano nel frammento del link, la pagina non legge il repo */
+:root{--card:#fff;--line:#d0d5dd;--tx:#111;--mu:#555}
+body{margin:0;background:#fff;color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+main{max-width:1100px;margin:0 auto;padding:12px 16px}
+h1{font-size:20px;margin:0 0 4px}
+.sub{color:var(--mu);font-size:13px}
+.gw{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin:12px 0}
+.gantt{border-collapse:separate;border-spacing:0;font-size:13px;width:100%}
+.gantt th,.gantt td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums}
+.gantt th:first-child{position:sticky;left:0;background:var(--card);text-align:left}
+.gantt small{display:block;color:var(--mu);font-weight:400;font-size:11px}
+button{font:inherit;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:#f3f4f6;cursor:pointer}
+@media print{button{display:none}@page{size:landscape}}
+</style>
+</head>
+<body>
+<main id="app"><p class="sub">Caricamento...</p></main>
+<script src="piano.js"></script>
+<script>
+(async () => {
+  const app = document.getElementById("app");
+  try {
+    const s = await Piano.decodifica(location.hash.slice(1));
+    app.innerHTML = `<h1>Tabella di marcia</h1>
+      <p class="sub">Piano del ${Piano.fd(s.t)} · ore residue dalla giornaliera del ${Piano.fd(s.d)}. È un'istantanea: vale l'ultimo link ricevuto.</p>
+      ${Piano.htmlMarcia(s)}
+      <p class="sub">Per mese: ore da volare al massimo, residuo ripartito fino all'ingresso in ore intere. «Restano» = ore non volate all'ingresso.</p>
+      <p><button onclick="print()">Stampa / PDF</button></p>`;
+  } catch (_) { app.innerHTML = '<p class="sub">Link non valido o incompleto: chiedi di rimandarlo.</p>'; }
+})();
+</script>
+</body>
+</html>

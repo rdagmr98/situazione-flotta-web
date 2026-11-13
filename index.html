@@ -86,6 +86,27 @@ textarea{min-height:70px;resize:vertical}
 .msg{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222c44;border:1px solid var(--line);padding:9px 14px;border-radius:10px;max-width:calc(100vw - 32px)}
 .empty{color:var(--mu);text-align:center;padding:40px 10px}
 a{color:#7aa2ff}
+select{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:9px;font:inherit}
+.fm label{display:block;margin:8px 0;color:var(--mu);font-size:13px}
+.fm label input,.fm label select{margin-top:3px}
+.gw{overflow-x:auto}
+.gantt{border-collapse:separate;border-spacing:0;font-size:12px;width:100%}
+.gantt th,.gantt td{border-bottom:1px solid var(--line);padding:4px 5px;text-align:center;white-space:nowrap;font-variant-numeric:tabular-nums;vertical-align:middle}
+.gantt th:first-child{position:sticky;left:0;background:var(--card);text-align:left;z-index:1}
+.gantt small{display:block;color:var(--mu);font-weight:400;font-size:10px}
+.gantt td.ko{background:#ff5a5a66;font-weight:700}
+.gantt tr[data-f]{cursor:pointer}
+.gantt input{width:64px;padding:4px}
+.av{padding:8px 12px;border-bottom:1px solid var(--line);border-left:4px solid var(--lv)}
+.g2{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0 12px}
+.fm .g2 label{margin:4px 0}
+@media print{
+:root{--bg:#fff;--card:#fff;--card2:#f3f4f6;--line:#ccc;--tx:#000;--mu:#555}
+.noprint,header .btn{display:none!important}
+.gw{overflow:visible}
+body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+@page{size:landscape}
+}
 </style>
 </head>
 <body>
@@ -93,6 +114,7 @@ a{color:#7aa2ff}
 <dialog id="dlg"></dialog>
 <script src="giornaliera.js"></script>
 <script src="pat.js"></script>
+<script src="piano.js"></script>
 <script>
 "use strict";
 const API = "https://api.github.com/repos/rdagmr98/situazione-flotta-data/contents/";
@@ -112,6 +134,9 @@ let PAT = ""; // in chiaro solo in memoria: nella pagina pubblica c'è cifrato (
 const ls = (k, v) => { try { return v === undefined ? localStorage.getItem(k) || "" : localStorage.setItem(k, v); } catch (_) { return ""; } };
 // stati.json = { sigla: { e: efficiente?, m: motivo, d: giorno } }: correzione a mano, vale finché non arriva una giornaliera più recente
 const S = { g: null, note: {}, stati: {}, vista: "macchine", flotta: ls("sf_flotta"), filtro: ls("sf_filtro") || "tutti", info: false };
+// piano.json: ispezioni per tipo, fermi con settimana di induzione, limiti (officine: max contemporanee, minimi: efficienti per tipo), tetti FH/mese
+const PIANO0 = () => ({ ispezioni: [], fermi: [], officine: {}, minimi: {}, tetti: {} });
+S.piano = PIANO0(); S.pag = ls("sf_pag");
 
 // --- formati ---
 const fh = (m) => m == null ? "–" : (m < 0 ? "-" : "") + Math.floor(Math.abs(m) / 60) + ":" + String(Math.abs(m) % 60).padStart(2, "0");
@@ -162,8 +187,8 @@ async function scrivi(path, data, msg) {
 async function carica() {
   const dir = (await gh("giornaliere")) || [];
   const ult = dir.map((f) => f.name).filter((n) => /\.json$/.test(n)).sort().pop();
-  const [g, n, s] = await Promise.all([ult ? leggi("giornaliere/" + ult) : { data: null }, leggi("note.json"), leggi("stati.json")]);
-  S.g = g.data; S.note = n.data || {}; S.stati = s.data || {};
+  const [g, n, s, p] = await Promise.all([ult ? leggi("giornaliere/" + ult) : { data: null }, leggi("note.json"), leggi("stati.json"), leggi("piano.json")]);
+  S.g = g.data; S.note = n.data || {}; S.stati = s.data || {}; S.piano = { ...PIANO0(), ...p.data };
 }
 async function aggiorna(file, sigla, fn) { // rilegge, modifica, scrive: le modifiche dell'altro dispositivo non si perdono
   const cur = (await leggi(file + ".json")).data || {};
@@ -192,11 +217,12 @@ function render() {
       <p class="empty">Nessuna giornaliera ancora. Dal PC: «Importa giornaliera» e scegli il file SIT_GIOR_CAAE .ods.</p>`;
     $("#file").onchange = importa; return;
   }
+  if (S.pag === "piano") return renderPiano();
   const [E, T, P] = conta(g.linee.flatMap((l) => l.aerei));
   const pag = ["note", ...g.linee.map((l) => l.tipo)], k0 = pag.indexOf(S.flotta), i = k0 < 0 ? 1 : k0;
   const N = nascoste(), tutte = g.linee.flatMap((l) => l.aerei.filter((a) => S.note[a.sigla] || eff(a).man).map((a) => [l, a]));
   const ann = tutte.filter(([, a]) => N[a.sigla] !== firma(a.sigla)), nn = tutte.length - ann.length;
-  $("#app").innerHTML = `<header><h1>Situazione flotta</h1>${imp}
+  $("#app").innerHTML = `<header><h1>Situazione flotta</h1><button class="btn" id="pi">Piano</button>${imp}
     <div class="sub" style="flex-basis:100%">Giornaliera del <b>${fd(g.data)}</b> · efficienti ${E} su ${T} (${P}%)</div></header>
    <nav class="tabs"><button data-p="0" style="--c:#7aa2ff"><b>Note</b>${ann.length}</button>${g.linee.map((x, k) => { const [a, b] = conta(x.aerei);
      return `<button data-p="${k + 1}" style="--c:${tipo(x.tipo)[1]}"><b>${esc(x.tipo)}</b>${a}/${b}</button>`; }).join("")}</nav>
@@ -215,6 +241,141 @@ function render() {
     const N = nascoste(); N[b.dataset.h] = firma(b.dataset.h); ls("sf_nascoste", JSON.stringify(N)); render(); });
   if ($("#rn")) $("#rn").onclick = () => { ls("sf_nascoste", "{}"); render(); };
   $("#file").onchange = importa;
+  $("#pi").onclick = () => vai("piano");
+}
+const vai = (p) => { S.pag = p; ls("sf_pag", p); scrollTo(0, 0); render(); };
+
+// --- pagina Piano: Gantt a settimane, avvisi sui limiti, tabella di marcia ---
+const COL_OFF = ["#2b5cff", "#e8590c", "#9c36b5", "#2f9e44", "#c2255c", "#0c8599"];
+const nuovoId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+const wl = (w) => "wk" + Piano.settimana(w).slice(6);
+const campo = (l, n, v, a = "") => `<label>${l}<input name="${esc(n)}" value="${esc(v ?? "")}" ${a}></label>`;
+function aereo(s) { for (const l of S.g.linee) { const a = l.aerei.find((x) => x.sigla === s); if (a) return [l.tipo, a]; } return [null, null]; }
+function fermo(f) { // valori effettivi: quelli del fermo, altrimenti quelli dell'ispezione
+  const i = S.piano.ispezioni.find((x) => x.id === f.isp) || {}, [tipo, a] = aereo(f.sigla), n = +f.sett || +i.sett || 0, inz = Piano.lunedi(f.wk);
+  return { ...f, i, a, tipo: tipo || i.tipo || "esterno", durata: n > 0, off: f.off || i.off || "", in: inz, out: inz && Piano.addG(inz, 7 * (n || 1)) };
+}
+function residuo(a) { // ore alla prossima scadenza a ore e quale
+  const s = a.scadenze.filter((x) => x.ore != null).sort((x, y) => x.ore - y.ore)[0];
+  return s ? [Math.max(s.ore, 0), s.tipo] : [null, ""];
+}
+function righeMarcia(fs) {
+  return fs.filter((f) => f.a && f.in > S.g.data).map((f) => {
+    const [res, sc] = residuo(f.a), t = +S.piano.tetti[f.sigla] || 0, m = Piano.marcia(S.g.data, f.in, res || 0, t);
+    return { s: f.sigla, tipo: f.tipo, isp: f.i.nome || "", in: f.in, out: f.out, res, sc, mesi: m.mesi, resto: m.resto, tetto: t || null };
+  });
+}
+function renderPiano() {
+  const P = S.piano, fs = P.fermi.map(fermo).filter((f) => f.in).sort((x, y) => x.tipo.localeCompare(y.tipo) || x.in.localeCompare(y.in));
+  const w0 = Piano.lunedi(Piano.settimana(giornoIso())), W = [];
+  const fine = fs.reduce((m, f) => f.out > m ? f.out : m, Piano.addG(w0, 7 * 16));
+  for (let d = w0; d < fine && W.length < 104; d = Piano.addG(d, 7)) W.push(d);
+  const att = (f, w) => f.in <= w && w < f.out, vis = fs.filter((f) => f.out > w0);
+  const officine = [...new Set([...P.ispezioni.map((i) => i.off), ...fs.map((f) => f.off), ...Object.keys(P.officine)].filter(Boolean))].sort();
+  const max = (o) => P.officine[o] ?? 1, col = (o) => COL_OFF[officine.indexOf(o) % COL_OFF.length] || "var(--off)";
+  const tipi = S.g.linee.map((l) => l.tipo), tipiG = tipi.filter((t) => vis.some((f) => f.tipo === t) || P.minimi[t] > 0);
+  const effic = (t, w) => S.g.linee.find((l) => l.tipo === t).aerei.filter(vive).filter((a) => { // fuori fermo: efficienti oggi o rientrate
+    const mie = fs.filter((f) => f.sigla === a.sigla);
+    return !mie.some((f) => att(f, w)) && (eff(a).c === "eff" || mie.some((f) => f.out <= w));
+  }).length;
+  const occ = (o, w) => fs.filter((f) => f.off === o && att(f, w)).length;
+  const av = [];
+  for (const o of officine) { const k = W.filter((w) => occ(o, w) > max(o)); if (k.length) av.push(["ko", `${o}: più di ${max(o)} in ispezione insieme nelle ${k.map(wl).join(", ")}`]); }
+  for (const t of tipiG) { const mn = P.minimi[t] || 0, k = W.filter((w) => effic(t, w) < mn); if (k.length) av.push(["ko", `${t}: meno di ${mn} efficienti nelle ${k.map(wl).join(", ")}`]); }
+  for (const f of vis) {
+    const nota = f.i.nota ? ` (${f.i.nota})` : "", tol = +f.i.tolGg || 0, oltre = f.scad ? Piano.diffG(f.scad, f.in) : 0;
+    if (oltre > 0) av.push(tol && oltre <= tol ? ["warn", `${f.sigla}: ingresso ${oltre} gg dopo la scadenza del ${fd(f.scad)}, in tolleranza${nota}`]
+      : ["ko", `${f.sigla}: ingresso ${oltre} gg dopo la scadenza del ${fd(f.scad)}, ${tol ? `oltre la tolleranza di ${tol} gg` : "tolleranza non inserita"}${nota}`]);
+    if (!f.durata) av.push(["warn", `${f.sigla}: durata del fermo da inserire (nel Gantt vale 1 settimana)`]);
+    if (f.a && f.in > S.g.data && residuo(f.a)[0] === 0) av.push(["ko", `${f.sigla}: ore finite (${residuo(f.a)[1]}), resta a terra fino all'ingresso`]);
+  }
+  const testa = `<tr><th>Fermo</th>${W.map((w) => `<th>${wl(w).slice(2)}<small>${fd(w).slice(0, 5)}</small></th>`).join("")}</tr>`;
+  const riga = (f) => `<tr data-f="${f.id}"><th>${esc(f.sigla)} <small>${esc(f.tipo)} · ${esc(f.i.nome || "?")}</small></th>${W.map((w) => {
+    const sc = f.scad && f.scad >= w && f.scad < Piano.addG(w, 7) ? "◆" : "";
+    return `<td${att(f, w) ? ` style="background:${col(f.off)};color:#fff${f.durata ? "" : ";opacity:.45"}"` : ""}>${sc}</td>`; }).join("")}</tr>`;
+  const conto = (n, fn, ko) => `<tr><th>${n}</th>${W.map((w) => { const v = fn(w); return `<td class="${ko(v) ? "ko" : ""}">${v}</td>`; }).join("")}</tr>`;
+  const marcia = righeMarcia(fs);
+  $("#app").innerHTML = `<header><h1>Piano fermi</h1><button class="btn" id="fl">Flotta</button><button class="btn" id="st">Stampa</button><button class="btn pri" id="lk">Link piloti</button>
+    <div class="sub" style="flex-basis:100%">Ore residue dalla giornaliera del <b>${fd(S.g.data)}</b> · ◆ = scadenza nominale</div></header>
+   ${av.length ? `<section class="list"><h2>Avvisi</h2>${av.map(([c, t]) => `<div class="av" style="--lv:var(--${c})">${esc(t)}</div>`).join("")}</section>` : ""}
+   <section class="list"><h2>Gantt a settimane</h2><div class="gw"><table class="gantt"><thead>${testa}</thead><tbody>
+    ${vis.map(riga).join("") || `<tr><th>Nessun fermo</th>${W.map(() => "<td></td>").join("")}</tr>`}
+    ${officine.map((o) => conto(`<span class="dot" style="background:${col(o)}"></span>${esc(o)} <small>max ${max(o)}</small>`, (w) => occ(o, w), (v) => v > max(o))).join("")}
+    ${tipiG.map((t) => conto(`${t} <small>efficienti${P.minimi[t] ? ", min " + P.minimi[t] : ""}</small>`, (w) => effic(t, w), (v) => v < (P.minimi[t] || 0))).join("")}
+   </tbody></table></div></section>
+   <section class="list"><h2>Tabella di marcia</h2>${Piano.htmlMarcia({ r: marcia }, true)}
+    <p class="sub" style="padding:0 12px">Per mese: ore da volare al massimo, residuo ripartito fino all'ingresso in ore intere. Il tetto (FH/mese) si scrive a mano; «Restano» = ore non volate all'ingresso.</p></section>
+   <section class="list noprint"><h2>Fermi <button class="btn" data-nf style="float:right;padding:2px 10px">+ Fermo</button></h2>
+    ${P.fermi.map(fermo).sort((x, y) => (x.in || "").localeCompare(y.in || "")).map((f) => `<div class="row" data-f="${f.id}" style="--lv:${col(f.off)}"><div class="a"><b>${esc(f.sigla)}</b><span class="sub">${esc(f.tipo)}</span></div>
+      <div class="m">${esc(f.i.nome || "ispezione?")} · ${f.in ? wl(f.in) + " (" + fd(f.in).slice(0, 5) + ")" : "settimana?"} · ${esc(f.off || "officina?")}${f.nota ? `<div class="sub">${esc(f.nota)}</div>` : ""}</div>
+      <div class="v sub">${f.scad ? "scad. " + fd(f.scad) : ""}</div></div>`).join("") || '<p class="empty">Nessun fermo</p>'}</section>
+   <section class="list noprint"><h2>Ispezioni per tipo <button class="btn" data-ni style="float:right;padding:2px 10px">+ Ispezione</button></h2>
+    ${P.ispezioni.map((i) => `<div class="row" data-i="${i.id}" style="--lv:${col(i.off)}"><div class="a"><b>${esc(i.nome)}</b><span class="sub">${esc(i.tipo)}</span></div>
+      <div class="m">${[i.fh && i.fh + " FH", i.mesi && i.mesi + " mesi"].filter(Boolean).join(" / ") || "intervallo?"} · toll. ${[i.tolFh && i.tolFh + " FH", i.tolGg && i.tolGg + " gg"].filter(Boolean).join(" / ") || "?"} · ${i.sett ? i.sett + " sett." : "durata?"} · ${esc(i.off || "officina?")}</div></div>`).join("")
+      || '<p class="empty">Nessuna: aggiungi le ispezioni di ogni tipo (intervallo, tolleranza, durata del fermo, officina).</p>'}</section>
+   <section class="list noprint"><h2>Limiti</h2><form class="db fm" id="lim">
+    <p class="sub">Ispezioni contemporanee per officina</p><div class="g2">${officine.map((o) => campo(esc(o), "o:" + o, max(o), 'type="number" min="0"')).join("") || '<p class="sub">Nessuna officina ancora.</p>'}</div>
+    <p class="sub">Minimo di efficienti per tipo</p><div class="g2">${tipi.map((t) => campo(t, "m:" + t, P.minimi[t] || 0, 'type="number" min="0"')).join("")}</div>
+    <p><button class="btn pri">Salva limiti</button></p></form></section>`;
+  $("#fl").onclick = () => vai("");
+  $("#st").onclick = () => print();
+  $("#lk").onclick = async () => linkPiloti(await Piano.codifica({ d: S.g.data, t: giornoIso(), r: marcia }));
+  document.querySelectorAll("[data-f]").forEach((e) => e.onclick = () => dlgFermo(e.dataset.f));
+  document.querySelectorAll("[data-i]").forEach((e) => e.onclick = () => dlgIsp(e.dataset.i));
+  $("[data-nf]").onclick = () => dlgFermo(); $("[data-ni]").onclick = () => dlgIsp();
+  document.querySelectorAll("[data-tetto]").forEach((e) => e.onchange = () => { const s = e.dataset.tetto, v = +e.value;
+    salvaPiano("tetto " + s, (p) => { if (v > 0) p.tetti[s] = v; else delete p.tetti[s]; }); });
+  $("#lim").onsubmit = (e) => { e.preventDefault(); const v = [...new FormData(e.target)];
+    salvaPiano("limiti", (p) => { for (const [k, x] of v) (k[0] === "o" ? p.officine : p.minimi)[k.slice(2)] = +x || 0; }); };
+}
+function linkPiloti(h) {
+  const url = new URL("marcia.html#" + h, location.href).href, d = $("#dlg");
+  d.innerHTML = `<div class="dh"><div class="t"><b>Link per i piloti</b><div class="sub">Sola lettura, senza frase. È un'istantanea: rimandalo a ogni cambio del piano.</div></div><button class="btn" id="cl">Chiudi</button></div>
+   <div class="db"><p><input id="ul" readonly value="${esc(url)}"></p><p><button class="btn pri" id="cp">Copia</button> <a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Apri</a></p></div>`;
+  $("#cl").onclick = () => d.close();
+  $("#cp").onclick = async () => { try { await navigator.clipboard.writeText(url); toast("Link copiato"); } catch (_) { $("#ul").select(); toast("Copia con Ctrl+C"); } };
+  d.showModal();
+}
+function dlgFermo(id) {
+  const f = S.piano.fermi.find((x) => x.id === id) || { id: nuovoId() }, nuovo = !id, d = $("#dlg");
+  const sigle = S.g.linee.flatMap((l) => l.aerei.filter(vive).map((a) => a.sigla));
+  const off = [...new Set(S.piano.ispezioni.map((i) => i.off).filter(Boolean))];
+  d.innerHTML = `<div class="dh"><div class="t"><b>${nuovo ? "Nuovo fermo" : "Fermo " + esc(f.sigla)}</b></div><button class="btn" id="cl">Chiudi</button></div>
+   <form class="db fm" id="ff">${campo("Elicottero (o sigla esterna che occupa l'officina)", "sigla", f.sigla, 'list="dl-s" required')}<datalist id="dl-s">${sigle.map((s) => `<option value="${s}">`).join("")}</datalist>
+    <label>Ispezione<select name="isp"><option value="">–</option>${S.piano.ispezioni.map((i) => `<option value="${i.id}"${i.id === f.isp ? " selected" : ""}>${esc(i.tipo + " · " + i.nome)}</option>`).join("")}</select></label>
+    ${campo("Scadenza nominale", "scad", f.scad, 'type="date"')}${campo("Settimana di induzione", "wk", f.wk, 'type="week" required placeholder="2027-W06" pattern="\\d{4}-W\\d{2}"')}
+    ${campo("Durata in settimane (vuoto = dall'ispezione)", "sett", f.sett, 'type="number" min="1"')}
+    ${campo("Officina (vuoto = dall'ispezione)", "off", f.off, 'list="dl-o"')}<datalist id="dl-o">${off.map((o) => `<option value="${esc(o)}">`).join("")}</datalist>
+    ${campo("Nota", "nota", f.nota)}
+    <p><button class="btn pri">Salva</button> ${nuovo ? "" : '<button type="button" class="btn" id="el">Elimina</button>'}</p></form>`;
+  $("#cl").onclick = () => d.close();
+  $("#ff").onsubmit = (e) => { e.preventDefault(); const v = Object.fromEntries(new FormData(e.target));
+    const x = { id: f.id, sigla: v.sigla.trim(), isp: v.isp, scad: v.scad, wk: v.wk, sett: +v.sett || null, off: v.off.trim(), nota: v.nota.trim() };
+    salvaPiano("fermo " + x.sigla, (p) => { p.fermi = p.fermi.filter((y) => y.id !== x.id).concat(x); }); };
+  if ($("#el")) $("#el").onclick = () => salvaPiano("fermo " + f.sigla + " tolto", (p) => { p.fermi = p.fermi.filter((y) => y.id !== f.id); });
+  if (!d.open) d.showModal();
+}
+function dlgIsp(id) {
+  const i = S.piano.ispezioni.find((x) => x.id === id) || { id: nuovoId() }, nuovo = !id, d = $("#dlg"), n = 'type="number" min="0"';
+  d.innerHTML = `<div class="dh"><div class="t"><b>${nuovo ? "Nuova ispezione" : esc(i.tipo + " · " + i.nome)}</b></div><button class="btn" id="cl">Chiudi</button></div>
+   <form class="db fm" id="fi"><label>Tipo<select name="tipo">${S.g.linee.map((l) => `<option${l.tipo === i.tipo ? " selected" : ""}>${esc(l.tipo)}</option>`).join("")}</select></label>
+    ${campo("Nome", "nome", i.nome, 'required placeholder="es. 1Y, 800FH/2Y, ISP. MAGG."')}${campo("Ogni FH", "fh", i.fh, n)}${campo("Ogni mesi", "mesi", i.mesi, n)}
+    ${campo("Tolleranza FH", "tolFh", i.tolFh, n)}${campo("Tolleranza giorni", "tolGg", i.tolGg, n)}${campo("Durata del fermo (settimane)", "sett", i.sett, n)}
+    ${campo("Officina", "off", i.off, 'placeholder="es. Leonardo, PTL 1° IDRA, sede"')}${campo("Nota (es. cosa resta inefficiente in tolleranza)", "nota", i.nota)}
+    <p><button class="btn pri">Salva</button> ${nuovo ? "" : '<button type="button" class="btn" id="el">Elimina</button>'}</p></form>`;
+  $("#cl").onclick = () => d.close();
+  $("#fi").onsubmit = (e) => { e.preventDefault(); const v = Object.fromEntries(new FormData(e.target)), num = (k) => +v[k] || null;
+    const x = { id: i.id, tipo: v.tipo, nome: v.nome.trim(), fh: num("fh"), mesi: num("mesi"), tolFh: num("tolFh"), tolGg: num("tolGg"), sett: num("sett"), off: v.off.trim(), nota: v.nota.trim() };
+    salvaPiano("ispezione " + x.tipo + " " + x.nome, (p) => { p.ispezioni = p.ispezioni.filter((y) => y.id !== x.id).concat(x); }); };
+  if ($("#el")) $("#el").onclick = () => S.piano.fermi.some((f) => f.isp === i.id) ? toast("Usata da un fermo: cambia prima quel fermo")
+    : salvaPiano("ispezione tolta", (p) => { p.ispezioni = p.ispezioni.filter((y) => y.id !== i.id); });
+  if (!d.open) d.showModal();
+}
+async function salvaPiano(msg, fn) { // rilegge, modifica, scrive: niente modifiche perse tra dispositivi
+  document.querySelectorAll("#dlg button, #app button").forEach((b) => b.disabled = true);
+  try { const p = { ...PIANO0(), ...(await leggi("piano.json")).data }; fn(p); await scrivi("piano.json", p, "piano: " + msg); S.piano = p; $("#dlg").close(); }
+  catch (e) { toast(e.message); document.querySelectorAll("#dlg button").forEach((b) => b.disabled = false); }
+  render();
 }
 function pagina(l) { // una pagina dello swipe per ogni flotta
   const [img, col] = tipo(l.tipo), [e, t, pc] = conta(l.aerei), cats = l.aerei.map((a) => eff(a).c);
