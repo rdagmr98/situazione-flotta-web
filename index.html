@@ -317,7 +317,7 @@ function renderPiano() {
   const finite = new Set();
   for (const f of vis) {
     const nota = f.i.nota ? ` (${f.i.nota})` : "", tol = +f.i.tolGg || 0, oltre = f.scad ? Piano.diffG(f.scad, f.in) : 0;
-    if (f.ppl) { if (f.in > S.g.data && residuo(f.a)[0] === 0 && !finite.has(f.sigla)) { finite.add(f.sigla); av.push(["ko", `${f.sigla}: ore finite (${residuo(f.a)[1]}), resta a terra fino al fermo PPL del ${fd(f.in)}`]); } continue; }
+    if (f.ppl) { if (f.in > S.g.data && residuo(f.a)[0] === 0 && !finite.has(f.sigla)) { finite.add(f.sigla); av.push(["ko", `${f.sigla}: ore finite (${residuo(f.a)[1]}), resta a terra fino al fermo PPL del ${fd(f.ppl.in)}`]); } continue; }
     if (oltre > 0) av.push(tol && oltre <= tol ? ["warn", `${f.sigla}: ingresso ${oltre} gg dopo la scadenza del ${fd(f.scad)}, in tolleranza${nota}`]
       : ["ko", `${f.sigla}: ingresso ${oltre} gg dopo la scadenza del ${fd(f.scad)}, ${tol ? `oltre la tolleranza di ${tol} gg` : "tolleranza non inserita"}${nota}`]);
     if (!f.durata) av.push(["warn", `${f.sigla}: durata del fermo da inserire (nel Gantt vale 1 settimana)`]);
