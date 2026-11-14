@@ -101,7 +101,54 @@ select{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--li
 .av{padding:8px 12px;border-bottom:1px solid var(--line);border-left:4px solid var(--lv)}
 .g2{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0 12px}
 .fm .g2 label{margin:4px 0}
+/* Briefing: tema chiaro da proiettore, stile delle lastrine (blu notte, riga oro), tutto in una schermata */
+body.chiaro{background:#fff}
+.chiaro main{max-width:none;padding:0}
+.bf{--n:#0b2a55;--o:#c9a227;--t:#13213a;--m:#5b6680;--l:#d5dbe6;--v:#1b8f4c;--r:#d23c3c;--a:#e08a00;--p:#7c4dcc;
+color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;font-size:clamp(13px,1vw,20px)}
+.bf .ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 20px;background:#f2f4f8;border-bottom:1px solid var(--l)}
+.bf .ctl button{border:1px solid var(--l);background:#fff;color:var(--t);padding:6px 12px;border-radius:8px;font:inherit;font-size:14px;cursor:pointer}
+.bf .ctl button.on{background:var(--n);border-color:var(--n);color:#fff}
+.bf .ctl .sp{flex:1}
+.bf .tt{display:flex;align-items:center;gap:18px;background:var(--n);color:#fff;padding:6px 20px;border-bottom:5px solid var(--o)}
+.bf .tt img{height:2.2em;filter:drop-shadow(0 0 2px #0008)}
+.bf .tt h1{font-size:1.6em;letter-spacing:.03em;margin:0;flex:1}
+.bf .tt div{text-align:right;line-height:1.25}
+.bf .tt div b{font-size:1.3em;color:var(--o)}
+.bf .kp{display:flex;flex-wrap:wrap;gap:12px;align-items:stretch;padding:10px 20px}
+.bf .torta{width:4.4em;height:4.4em;border-radius:50%;display:grid;place-items:center;flex:none}
+.bf .torta b{background:#fff;width:70%;height:70%;border-radius:50%;display:grid;place-items:center;font-size:1.2em}
+.bf .k{border:1px solid var(--l);border-radius:10px;padding:6px 16px;display:flex;flex-direction:column;justify-content:center;min-width:9em}
+.bf .k small{color:var(--m);font-size:.72em;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.bf .k b{font-size:1.5em;font-variant-numeric:tabular-nums;line-height:1.15}
+.bf .k i{font-style:normal;color:var(--m);font-size:.8em}
+.bf .tl{flex:1;display:grid;grid-template-columns:minmax(15em,24%) 1fr;padding:0 20px;min-height:0;overflow:auto}
+.bf .sg{display:flex;align-items:center;gap:10px;padding:0 10px;border-bottom:1px solid var(--l);border-left:6px solid var(--lv,var(--l));cursor:pointer;min-width:0;line-height:1.1;overflow:hidden}
+.bf .sg b{font-size:1.2em;min-width:2.4em}
+.bf .sg.hd{min-height:2.4em;cursor:default}
+.bf .sg span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.78em;color:var(--m)}
+.bf .sg u{text-decoration:none;font-weight:700;color:var(--t)}
+.bf .sg em{font-style:normal;font-weight:700;font-variant-numeric:tabular-nums;text-align:right;line-height:1.1;white-space:nowrap}
+.bf .sg em small{font-weight:400;font-size:.7em;color:var(--m)}
+.bf .tr{position:relative;border-bottom:1px solid var(--l);overflow:hidden}
+.bf .cl{position:absolute;inset:0;display:grid}
+.bf .cl>i{border-left:1px solid var(--l);font-style:normal;display:flex;align-items:center;justify-content:center;gap:1px;font-size:.85em;color:var(--m);font-variant-numeric:tabular-nums}
+.bf .cl>i b{color:var(--t)}
+.bf .cl>i.we{background:#f3f5f9}
+.bf .cl>i.og{background:#fff4cc}
+.bf .hd{background:#f7f8fb}
+.bf .hd .cl>i{flex-direction:column;font-weight:700;color:var(--t);line-height:1.1}
+.bf .hd .cl>i small{font-weight:400;color:var(--m);font-size:.8em}
+.bf .fz{position:absolute;top:50%;height:min(68%,2em);transform:translateY(-50%);border-radius:6px;color:#fff;font-size:.8em;font-weight:700;padding:0 8px;display:flex;align-items:center;overflow:hidden;white-space:nowrap;z-index:1}
+.bf .fz.ap{border-radius:6px 0 0 6px;-webkit-mask-image:linear-gradient(90deg,#000 80%,#0003);mask-image:linear-gradient(90deg,#000 80%,#0003)}
+.bf .mk{position:absolute;top:0;bottom:0;z-index:2;display:flex;align-items:center;gap:3px;font-size:.78em;font-weight:700;white-space:nowrap;transform:translateX(-.5em)}
+.bf .mk span{background:#fffe;border-radius:4px;padding:0 4px;box-shadow:0 0 0 1px #0001}
+.bf .mk.dx{transform:translateX(calc(-100% + .5em));flex-direction:row-reverse}
+.bf .oggi{position:absolute;top:0;bottom:0;width:2px;background:var(--r);z-index:3;opacity:.7}
+.bf .lg{display:flex;flex-wrap:wrap;gap:6px 18px;padding:8px 20px;color:var(--m);font-size:.78em;align-items:center}
+.bf .lg i{display:inline-block;width:1.4em;height:.8em;border-radius:3px;vertical-align:middle;margin-right:4px}
 @media print{
+.bf{height:auto;font-size:11px}
 :root{--bg:#fff;--card:#fff;--card2:#f3f4f6;--line:#ccc;--tx:#000;--mu:#555}
 .noprint,header .btn{display:none!important}
 .gw{overflow:visible}
@@ -226,12 +273,14 @@ function render() {
       <p class="empty">Nessuna giornaliera ancora. Dal PC: «Importa giornaliera» e scegli il file SIT_GIOR_CAAE .ods.</p>`;
     $("#file").onchange = importa; return;
   }
+  document.body.classList.toggle("chiaro", S.pag === "brief");
+  if (S.pag === "brief") return renderBrief();
   if (S.pag === "piano") return renderPiano();
   const [E, T, P] = conta(g.linee.flatMap((l) => l.aerei));
   const pag = ["note", ...g.linee.map((l) => l.tipo)], k0 = pag.indexOf(S.flotta), i = k0 < 0 ? 1 : k0;
   const N = nascoste(), tutte = g.linee.flatMap((l) => l.aerei.filter((a) => S.note[a.sigla] || eff(a).man).map((a) => [l, a]));
   const ann = tutte.filter(([, a]) => N[a.sigla] !== firma(a.sigla)), nn = tutte.length - ann.length;
-  $("#app").innerHTML = `<header><h1>Situazione flotta</h1><button class="btn" id="pi">Piano</button>${imp}
+  $("#app").innerHTML = `<header><h1>Situazione flotta</h1><button class="btn pri" id="bb">Briefing</button><button class="btn" id="pi">Piano</button>${imp}
     <div class="sub" style="flex-basis:100%">Giornaliera del <b>${fd(g.data)}</b> · efficienti ${E} su ${T} (${P}%)</div></header>
    <nav class="tabs"><button data-p="0" style="--c:#7aa2ff"><b>Note</b>${ann.length}</button>${g.linee.map((x, k) => { const [a, b] = conta(x.aerei);
      return `<button data-p="${k + 1}" style="--c:${tipo(x.tipo)[1]}"><b>${esc(x.tipo)}</b>${a}/${b}</button>`; }).join("")}</nav>
@@ -251,8 +300,115 @@ function render() {
   if ($("#rn")) $("#rn").onclick = () => { ls("sf_nascoste", "{}"); render(); };
   $("#file").onchange = importa;
   $("#pi").onclick = () => vai("piano");
+  $("#bb").onclick = () => vai("brief");
 }
 const vai = (p) => { S.pag = p; ls("sf_pag", p); scrollTo(0, 0); render(); };
+
+// --- pagina Briefing: una flotta per schermata da proiettare, macchine × tempo (settimana, mese, anno) ---
+const MESI_L = ["GENNAIO", "FEBBRAIO", "MARZO", "APRILE", "MAGGIO", "GIUGNO", "LUGLIO", "AGOSTO", "SETTEMBRE", "OTTOBRE", "NOVEMBRE", "DICEMBRE"];
+const GS = ["LUN", "MAR", "MER", "GIO", "VEN", "SAB", "DOM"], LVB = ["var(--v)", "var(--a)", "var(--r)"];
+const gruppo = (t) => t.replace(/^(UH-169)[BD]$/, "$1 B+D"); // B e D insieme, come nelle lastrine
+const gruppi = () => [...new Set(S.g.linee.map((l) => gruppo(l.tipo)))];
+const dIt = (s) => { const m = /^(\d\d)\/(\d\d)\/(\d{4})$/.exec(s || ""); return m ? m[3] + "-" + m[2] + "-" + m[1] : null; };
+S.zoom = ls("sf_zoom") || "mese"; S.bf = ls("sf_bf"); S.rif = null; // rif = giorno mostrato, null = oggi
+function finestra(z, rif) { // → { da, a, n giorni, col: [{ t, s, d, n, we }], tit }
+  const col = [], add = (t, s, d, n, we) => col.push({ t, s, d, n, we });
+  let da, a, tit;
+  if (z === "anno") {
+    const ms = (d) => MESI_L[+d.slice(5, 7) - 1].slice(0, 3); // 12 mesi dal mese mostrato: al briefing serve il davanti
+    da = rif.slice(0, 7) + "-01"; a = da;
+    for (let i = 0; i < 12; i++) { const n = Piano.primoDopo(a.slice(0, 7)); add(ms(a), !i || a.slice(5, 7) === "01" ? a.slice(0, 4) : "", a, Piano.diffG(a, n), false); a = n; }
+    tit = ms(da) + " " + da.slice(0, 4) + " – " + ms(Piano.addG(a, -1)) + " " + Piano.addG(a, -1).slice(0, 4);
+  } else if (z === "mese") {
+    da = rif.slice(0, 7) + "-01"; a = Piano.primoDopo(rif.slice(0, 7)); tit = MESI_L[+rif.slice(5, 7) - 1] + " " + rif.slice(0, 4);
+    for (let d = da; d < a; d = Piano.addG(d, 1)) { const w = (new Date(d + "T00:00:00Z").getUTCDay() + 6) % 7; add(+d.slice(8), "LMMGVSD"[w], d, 1, w > 4); }
+  } else {
+    da = Piano.lunedi(Piano.settimana(rif)); a = Piano.addG(da, 7);
+    tit = "SETTIMANA " + +Piano.settimana(rif).slice(6) + " · " + fd(da).slice(0, 5) + " – " + fd(Piano.addG(a, -1));
+    GS.forEach((x, i) => { const d = Piano.addG(da, i); add(x, fd(d).slice(0, 5), d, 1, i > 4); });
+  }
+  return { da, a, n: Piano.diffG(da, a), col, tit };
+}
+function sposta(k) { // k = -1 / +1 periodo, 0 = oggi
+  const r = S.rif || giornoIso();
+  S.rif = !k ? null : S.zoom === "sett" ? Piano.addG(r, 7 * k) : S.zoom === "anno" ? (+r.slice(0, 4) + k) + r.slice(4, 8) + "01"
+    : k > 0 ? Piano.primoDopo(r.slice(0, 7)) : Piano.addG(r.slice(0, 7) + "-01", -1).slice(0, 7) + "-01";
+  render();
+}
+function renderBrief() {
+  const g = S.g, PM = Piano.pplMesi(S.ppl), fs = fermiTutti(), oggiD = giornoIso(), grp = gruppi(), fl = grp.includes(S.bf) ? S.bf : grp[0];
+  const linee = g.linee.filter((l) => gruppo(l.tipo) === fl), tutti = linee.flatMap((l) => l.aerei), [E, T, P] = conta(tutti);
+  const rif = S.rif || oggiD, W = finestra(S.zoom, rif), tpl = W.col.map((c) => c.n + "fr").join(" "), m0 = g.data.slice(0, 7);
+  const pos = (d) => Math.min(Math.max(Piano.diffG(W.da, d) / W.n, 0), 1) * 100;
+  const ogg = oggiD >= W.da && oggiD < W.a ? `<div class="oggi" style="left:${pos(oggiD) + 50 / W.n}%"></div>` : "";
+  const riga = (a, sub) => {
+    const e = eff(a), [res, rt] = residuo(a), lo = res == null ? -1 : livello({ ore: res }), lv = Math.max(-1, ...a.scadenze.map(livello)), z = [], ppl = PM[a.sigla] || [];
+    const mie = fs.filter((f) => f.sigla === a.sigla), ora = mie.some((f) => f.in <= g.data && g.data < f.out);
+    const pross = mie.map((f) => f.in).filter((d) => d > g.data).sort()[0];
+    const bz = [], barra = (i, o, t, c, ap) => { if (o <= W.da || i >= W.a) return; const l = pos(i); bz.push([l, pos(o)]);
+      z.push(`<div class="fz${ap ? " ap" : ""}" style="left:${l}%;width:${pos(o) - l}%;background:${c}" title="${esc(t)}">${esc(t)}</div>`); };
+    const lib = (x0, x1) => x0 >= 0 && x1 <= 100 && !bz.some(([l, r]) => l < x1 && r > x0);
+    const mk = (d, sim, t, c) => { if (d < W.da || d >= W.a) return; const x = pos(d) + 50 / W.n, w = (t.length + 3) * 0.6, k = lib(x, x + w) ? "" : lib(x - w, x) ? " dx" : " no"; // ponytail: larghezza etichetta stimata dai caratteri
+      z.push(`<div class="mk${k}" style="left:${x}%;color:${c}" title="${esc(t)} ${fd(d)}"><span>${sim}${k === " no" ? "" : " " + esc(t)}</span></div>`); };
+    if (e.c !== "eff" && !ora) { // inefficienza della giornaliera: fino alla fine prevista, altrimenti fino al prossimo fermo o al primo mese con FH in PPL
+      let f = dIt(a.fine); const ap = !(f && f >= oggiD);
+      if (ap) { const pv = ppl.find((x) => x[0] > m0 && !Array.isArray(x[1]) && Piano.pm(x[1]) > 0); f = [pross, pv && pv[0] + "-01", W.a].filter(Boolean).sort()[0]; }
+      barra(a.inizio || g.data, f, [a.inizio && "dal " + fd(a.inizio), a.perc, a.fine && "fine " + a.fine].filter(Boolean).join(" · ") || e.m || a.stato, e.c === "ind" ? "var(--p)" : "var(--r)", ap);
+    }
+    for (const f of mie) barra(f.in, f.out, [f.i.nome, f.off].filter(Boolean).join(" · ") || "fermo", f.in <= g.data && e.c !== "eff" ? "var(--r)" : "var(--a)", !f.durata);
+    for (const s of a.scadenze) if (s.data) mk(s.data, "◆", s.tipo, LVB[Math.max(livello(s), 0)]);
+    for (const f of mie) if (f.scad) mk(f.scad, "◆", "scad.", LVB[Math.max(livello({ data: f.scad }), 0)]);
+    const fo = e.c === "eff" && res > 0 && Piano.fineOre(ppl, g.data, a.oreMese || 0, res);
+    if (fo && !(pross && pross <= fo)) mk(fo, "▼", "fine ore", "var(--r)");
+    const celle = W.col.map((c) => { let t = "";
+      if (S.zoom === "anno") { // mesi: volato (grassetto) / FH della PPL
+        const m = c.d.slice(0, 7), x = ppl.find((y) => y[0] === m), p = x && typeof x[1] === "number" ? Math.round(x[1] / 60) : null, o = S.vol[m] && S.vol[m].o[a.sigla];
+        t = o != null ? `<b>${Math.round(o / 60)}</b>${p != null ? "/" + p : ""}` : p != null ? p : ""; }
+      return `<i class="${c.we ? "we" : ""}${c.d <= oggiD && oggiD < Piano.addG(c.d, c.n) ? " og" : ""}">${t}</i>`; }).join("");
+    const bg = { eff: "#e7f6ed", ineff: "#fde9e9", ind: "#f0e9fc" }[e.c], col = { eff: "var(--v)", ind: "var(--p)" }[e.c] || "var(--r)";
+    return `<div class="sg" data-s="${esc(a.sigla)}" style="background:${bg};--lv:${lv >= 0 ? LVB[lv] : "var(--l)"}"><b style="color:${col}">${esc(a.sigla)}</b>
+      <span>${sub ? `<u>${sub}</u> ` : ""}${esc(e.c === "eff" ? "IN LINEA" : e.m || a.stato)}</span><em style="color:${lo >= 0 ? LVB[lo] : "inherit"}">${fh(res)} <small>${esc(rt)}</small></em></div>
+     <div class="tr"><div class="cl" style="grid-template-columns:${tpl}">${celle}</div>${z.join("")}${ogg}</div>`;
+  };
+  const righe = linee.flatMap((l) => l.aerei.filter(vive).map((a) => riga(a, linee.length > 1 ? l.tipo.slice(-1) : "")));
+  // ore del periodo: volato dalle giornaliere contro la PPL degli stessi mesi (il mese della giornaliera in proporzione ai giorni)
+  const mesi = S.zoom === "anno" ? MESI_L.map((x, i) => rif.slice(0, 4) + "-" + String(i + 1).padStart(2, "0")) : [rif.slice(0, 7)];
+  let v = 0, p = 0, pt = 0, cp = false, cv = false;
+  for (const m of mesi) { const gv = S.vol[m], fr = gv ? Math.min(+gv.d.slice(8) / Piano.diffG(m + "-01", Piano.primoDopo(m)), 1) : 0; cv = cv || !!gv;
+    for (const a of tutti) { const x = (PM[a.sigla] || []).find((y) => y[0] === m), q = x ? Piano.pm(x[1]) : 0;
+      if (x && x[1] != null) cp = true; pt += q; p += q * fr; if (gv) v += gv.o[a.sigla] || 0; } }
+  p = Math.round(p);
+  const per = S.zoom === "anno" ? rif.slice(0, 4) : MESI_L[+rif.slice(5, 7) - 1], sc = v - p, al = tutti.length - T;
+  const img = [...new Set(linee.map((l) => tipo(l.tipo)[0]))].map((f) => `<img src="img/${f}.webp" alt="">`).join("");
+  $("#app").innerHTML = `<div class="bf">
+   <div class="ctl noprint">${grp.map((x) => `<button data-fl="${esc(x)}" class="${x === fl ? "on" : ""}">${esc(x)}</button>`).join("")}<span class="sp"></span>
+    ${[["sett", "Settimana"], ["mese", "Mese"], ["anno", "Anno"]].map(([k, t]) => `<button data-z="${k}" class="${k === S.zoom ? "on" : ""}">${t}</button>`).join("")}
+    <button data-sp="-1" title="Periodo prima (←)">‹</button><button data-sp="0">Oggi</button><button data-sp="1" title="Periodo dopo (→)">›</button><span class="sp"></span>
+    <button id="fs">Schermo intero</button><button id="gp">Gestione piano</button><button id="fv">Flotta</button></div>
+   <div class="tt">${img}<h1>EFFICIENZA ${esc(fl)}</h1><div><b>${W.tit}</b><br>situazione al ${fd(g.data)}</div></div>
+   <div class="kp"><div class="torta" style="background:conic-gradient(var(--v) ${P}%,var(--r) 0)"><b>${P}%</b></div>
+    <div class="k"><small>In linea</small><b style="color:var(--v)">${E} <i>su ${T}</i></b></div>
+    <div class="k"><small>In manutenzione</small><b style="color:var(--r)">${T - E} <i>su ${T}</i></b>${al ? `<i>+${al} in alienazione</i>` : ""}</div>
+    <div class="k"><small>Volate ${per}</small><b>${cv ? fh(v) : "–"}</b></div>
+    <div class="k"><small>PPL ${per} a oggi</small><b>${cp ? fh(p) : "–"}</b>${cp ? `<i>su ${fh(pt)} programmate</i>` : ""}</div>
+    <div class="k"><small>Scostamento</small><b style="color:${sc < 0 ? "var(--r)" : "var(--v)"}">${cp && cv ? (sc > 0 ? "+" : "") + fh(sc) : "–"}</b></div></div>
+   <div class="tl" style="grid-template-rows:auto repeat(${righe.length},minmax(1.3em,1fr))"><div class="sg hd">Macchina<span></span><em>Residuo</em></div>
+    <div class="tr hd"><div class="cl" style="grid-template-columns:${tpl}">${W.col.map((c) => `<i class="${c.we ? "we" : ""}">${c.t}${c.s ? `<small>${c.s}</small>` : ""}</i>`).join("")}</div></div>${righe.join("")}</div>
+   <div class="lg"><span><i style="background:var(--r)"></i>in manutenzione ora</span><span><i style="background:var(--p)"></i>in industria</span><span><i style="background:var(--a)"></i>fermo programmato (PPL o a mano)</span>
+    <span>◆ scadenza a data</span><span style="color:var(--r)">▼ fine ore stimata (PPL, o ritmo del mese se manca)</span>${S.zoom === "anno" ? "<span><b>volate</b>/PPL in ore per mese</span>" : ""}<span style="color:var(--r)">│ oggi</span></div></div>`;
+  document.querySelectorAll("[data-fl]").forEach((b) => b.onclick = () => { S.bf = b.dataset.fl; ls("sf_bf", S.bf); render(); });
+  document.querySelectorAll("[data-z]").forEach((b) => b.onclick = () => { S.zoom = b.dataset.z; ls("sf_zoom", S.zoom); render(); });
+  document.querySelectorAll("[data-sp]").forEach((b) => b.onclick = () => sposta(+b.dataset.sp));
+  document.querySelectorAll("[data-s]").forEach((e) => e.onclick = () => dettaglio(e.dataset.s));
+  $("#fs").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
+  $("#gp").onclick = () => vai("piano"); $("#fv").onclick = () => vai("");
+}
+addEventListener("keydown", (e) => { // frecce: ← → periodo, ↑ ↓ flotta (col telecomando del proiettore o la tastiera)
+  if (S.pag !== "brief" || !S.g || $("#dlg").open || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
+  const k = { ArrowLeft: -1, ArrowRight: 1, PageUp: -1, PageDown: 1 }[e.key], f = { ArrowUp: -1, ArrowDown: 1 }[e.key];
+  if (k) { e.preventDefault(); sposta(k); }
+  if (f) { e.preventDefault(); const gr = gruppi(), i = Math.max(gr.indexOf(S.bf), 0); S.bf = gr[(i + f + gr.length) % gr.length]; ls("sf_bf", S.bf); render(); }
+});
 
 // --- pagina Piano: Gantt a settimane, avvisi sui limiti, tabella di marcia ---
 const COL_OFF = ["#2b5cff", "#e8590c", "#9c36b5", "#2f9e44", "#c2255c", "#0c8599"];
@@ -329,7 +485,7 @@ function renderPiano() {
     return `<td${att(f, w) ? ` style="background:${col(f.off)};color:#fff${f.durata ? "" : ";opacity:.45"}"` : ""}>${sc}</td>`; }).join("")}</tr>`;
   const conto = (n, fn, ko) => `<tr><th>${n}</th>${W.map((w) => { const v = fn(w); return `<td class="${ko(v) ? "ko" : ""}">${v}</td>`; }).join("")}</tr>`;
   const marcia = righeMarcia(fs);
-  $("#app").innerHTML = `<header><h1>Piano fermi</h1><button class="btn" id="fl">Flotta</button><button class="btn" id="st">Stampa</button><button class="btn pri" id="lk">Link piloti</button>
+  $("#app").innerHTML = `<header><h1>Piano fermi</h1><button class="btn" id="bb">Briefing</button><button class="btn" id="fl">Flotta</button><button class="btn" id="st">Stampa</button><button class="btn pri" id="lk">Link piloti</button>
     <div class="sub" style="flex-basis:100%">Ore residue dalla giornaliera del <b>${fd(S.g.data)}</b> · ◆ = scadenza nominale</div></header>
    ${av.length ? `<section class="list"><h2>Avvisi</h2>${av.map(([c, t]) => `<div class="av" style="--lv:var(--${c})">${esc(t)}</div>`).join("")}</section>` : ""}
    <section class="list"><h2>Gantt a settimane</h2><div class="gw"><table class="gantt"><thead>${testa}</thead><tbody>
@@ -357,7 +513,7 @@ function renderPiano() {
     <p class="sub">Ispezioni contemporanee per officina</p><div class="g2">${officine.map((o) => campo(esc(o), "o:" + o, max(o), 'type="number" min="0"')).join("") || '<p class="sub">Nessuna officina ancora.</p>'}</div>
     <p class="sub">Minimo di efficienti per tipo</p><div class="g2">${tipi.map((t) => campo(t, "m:" + t, P.minimi[t] || 0, 'type="number" min="0"')).join("")}</div>
     <p><button class="btn pri">Salva limiti</button></p></form></section>`;
-  $("#fl").onclick = () => vai("");
+  $("#fl").onclick = () => vai(""); $("#bb").onclick = () => vai("brief");
   $("#st").onclick = () => print();
   $("#lk").onclick = async () => linkPiloti(await Piano.codifica({ d: S.g.data, t: giornoIso(), r: marcia }));
   document.querySelectorAll("[data-f]").forEach((e) => e.onclick = () => { const p = fs.find((f) => f.id === e.dataset.f && f.ppl);

@@ -95,6 +95,24 @@
     });
     return { mesi: out, resto: ora || res == null ? null : res - usate, prossimo: fe.find(function (f) { return f.out > da; }) || null };
   }
+  // giorno in cui finiscono le ore residue `res` alla giornaliera `da` volando la PPL (nel mese in corso le FH ancora
+  // da volare, spalmate sui giorni rimasti); nei mesi senza PPL vale il ritmo del mese della giornaliera.
+  // null se prima arriva un fermo della PPL o se in 24 mesi non finiscono
+  function fineOre(mesi, da, oreMese, res) {
+    if (res == null) return null;
+    if (res <= 0) return da;
+    var mappa = {}, m = da.slice(0, 7), passo = (oreMese || 0) / +da.slice(8), r = res;
+    mesi.forEach(function (x) { mappa[x[0]] = x[1]; });
+    for (var k = 0; k < 24; k++, m = primoDopo(m).slice(0, 7)) {
+      var v = mappa[m], d0 = k ? m + "-01" : addG(da, 1), stop = Array.isArray(v) ? m + "-" + String(v[1]).padStart(2, "0") : primoDopo(m);
+      if (v === null) return null; // dentro un fermo della PPL: l'ispezione arriva prima
+      var n = diffG(d0, stop), h = v === undefined ? passo * n : k ? pm(v) : Math.max(pm(v) - oreMese, 0);
+      if (n > 0 && h >= r) return addG(d0, Math.max(Math.ceil(n * r / h) - 1, 0));
+      if (Array.isArray(v)) return null; // il fermo arriva prima della fine ore
+      r -= h;
+    }
+    return null;
+  }
   // volato (oreMese dell'ultima giornaliera di ogni mese, vol = { "AAAA-MM": { d, o: { sigla: minuti } } }) contro la PPL
   // degli stessi mesi, ciascuno in proporzione al giorno di quella giornaliera; i mesi senza PPL non contano
   function scostamento(mesi, vol, sigla) {
@@ -150,7 +168,7 @@
   }
 
   var api = { lunedi: lunedi, settimana: settimana, addG: addG, diffG: diffG, ripartisci: ripartisci, marcia: marcia,
-    pplMesi: pplMesi, fermiPpl: fermiPpl, marciaPpl: marciaPpl, scostamento: scostamento,
+    pplMesi: pplMesi, fermiPpl: fermiPpl, marciaPpl: marciaPpl, scostamento: scostamento, fineOre: fineOre, pm: pm, primoDopo: primoDopo,
     codifica: codifica, decodifica: decodifica, htmlMarcia: htmlMarcia, fd: fd };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else g.Piano = api;
 })(typeof window !== "undefined" ? window : globalThis);
