@@ -95,23 +95,23 @@
     });
     return { mesi: out, resto: ora || res == null ? null : res - usate, prossimo: fe.find(function (f) { return f.out > da; }) || null };
   }
-  // giorno in cui finiscono le ore residue `res` alla giornaliera `da` volando la PPL (nel mese in corso le FH ancora
-  // da volare, spalmate sui giorni rimasti); nei mesi senza PPL vale il ritmo del mese della giornaliera.
-  // null se prima arriva un fermo della PPL o se in 24 mesi non finiscono
-  function fineOre(mesi, da, oreMese, res) {
-    if (res == null) return null;
-    if (res <= 0) return da;
-    var mappa = {}, m = da.slice(0, 7), passo = (oreMese || 0) / +da.slice(8), r = res;
-    mesi.forEach(function (x) { mappa[x[0]] = x[1]; });
-    for (var k = 0; k < 24; k++, m = primoDopo(m).slice(0, 7)) {
-      var v = mappa[m], d0 = k ? m + "-01" : addG(da, 1), stop = Array.isArray(v) ? m + "-" + String(v[1]).padStart(2, "0") : primoDopo(m);
-      if (v === null) return null; // dentro un fermo della PPL: l'ispezione arriva prima
-      var n = diffG(d0, stop), h = v === undefined ? passo * n : k ? pm(v) : Math.max(pm(v) - oreMese, 0);
-      if (n > 0 && h >= r) return addG(d0, Math.max(Math.ceil(n * r / h) - 1, 0));
-      if (Array.isArray(v)) return null; // il fermo arriva prima della fine ore
-      r -= h;
+  function piuMesi(m, k) { return new Date(Date.UTC(+m.slice(0, 4), +m.slice(5, 7) - 1 + k, 1)).toISOString().slice(0, 7); }
+  // riga programmata dei 12 mesi da "AAAA-MM" come nella PPL: 36 decadi (3 per mese), le lavorazioni unite su più decadi/mesi →
+  // [{ i decade iniziale, n decadi, testo } | { i, n, min: minuti del mese o null }]
+  function celle(mesi, da) {
+    var dec = function (g) { return g < 11 ? 0 : g < 21 ? 1 : 2; };
+    var ix = function (d) { var n = (d.slice(0, 4) - da.slice(0, 4)) * 12 + (d.slice(5, 7) - da.slice(5, 7)); return n < 0 ? 0 : n > 11 ? 36 : n * 3 + dec(+d.slice(8, 10)); };
+    var bl = fermiPpl(mesi).map(function (f) {
+      return { a: ix(f.in), z: ix(f.out), t: f.testo + (f.in >= da && f.in.slice(8) !== "01" ? " dal " + fd(f.in).slice(0, 5) : "") };
+    });
+    var val = {}, out = [];
+    mesi.forEach(function (x) { val[x[0]] = x[1]; });
+    for (var i = 0; i < 36; i++) {
+      var b = bl.find(function (x) { return x.a <= i && i < x.z; }), m = piuMesi(da, Math.floor(i / 3)), u = out[out.length - 1], v = val[m];
+      if (u && (b ? u.b === b : !u.b && u.m === m)) { u.n++; continue; }
+      out.push(b ? { i: i, n: 1, b: b, testo: b.t } : { i: i, n: 1, m: m, min: v == null || (Array.isArray(v) && !v[2]) ? null : pm(v) });
     }
-    return null;
+    return out;
   }
   // volato (oreMese dell'ultima giornaliera di ogni mese, vol = { "AAAA-MM": { d, o: { sigla: minuti } } }) contro la PPL
   // degli stessi mesi, ciascuno in proporzione al giorno di quella giornaliera; i mesi senza PPL non contano
@@ -168,7 +168,7 @@
   }
 
   var api = { lunedi: lunedi, settimana: settimana, addG: addG, diffG: diffG, ripartisci: ripartisci, marcia: marcia,
-    pplMesi: pplMesi, fermiPpl: fermiPpl, marciaPpl: marciaPpl, scostamento: scostamento, fineOre: fineOre, pm: pm, primoDopo: primoDopo,
+    pplMesi: pplMesi, fermiPpl: fermiPpl, marciaPpl: marciaPpl, scostamento: scostamento, celle: celle, piuMesi: piuMesi, pm: pm, primoDopo: primoDopo,
     codifica: codifica, decodifica: decodifica, htmlMarcia: htmlMarcia, fd: fd };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else g.Piano = api;
 })(typeof window !== "undefined" ? window : globalThis);

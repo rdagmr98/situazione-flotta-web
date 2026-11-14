@@ -101,52 +101,42 @@ select{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--li
 .av{padding:8px 12px;border-bottom:1px solid var(--line);border-left:4px solid var(--lv)}
 .g2{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0 12px}
 .fm .g2 label{margin:4px 0}
-/* Briefing: tema chiaro da proiettore, stile delle lastrine (blu notte, riga oro), tutto in una schermata */
+/* Briefing: la PPL a schermo, tema chiaro da proiettore (blu notte, riga oro) */
 body.chiaro{background:#fff}
 .chiaro main{max-width:none;padding:0}
-.bf{--n:#0b2a55;--o:#c9a227;--t:#13213a;--m:#5b6680;--l:#d5dbe6;--v:#1b8f4c;--r:#d23c3c;--a:#e08a00;--p:#7c4dcc;
-color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;font-size:clamp(13px,1vw,20px)}
-.bf .ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:8px 20px;background:#f2f4f8;border-bottom:1px solid var(--l)}
-.bf .ctl button{border:1px solid var(--l);background:#fff;color:var(--t);padding:6px 12px;border-radius:8px;font:inherit;font-size:14px;cursor:pointer}
+.bf{--n:#0b2a55;--o:#c9a227;--t:#13213a;--l:#b9c2d0;
+color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;font-size:clamp(10px,min(.72vw,1.22vh),17px)}
+.bf .ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 12px;background:#f2f4f8;border-bottom:1px solid var(--l);font-size:14px}
+.bf .ctl button{border:1px solid var(--l);background:#fff;color:var(--t);padding:6px 12px;border-radius:8px;font:inherit;cursor:pointer}
 .bf .ctl button.on{background:var(--n);border-color:var(--n);color:#fff}
+.bf .ctl b{font-size:16px;min-width:3em;text-align:center}
+.bf .ctl i{font-style:normal;color:#5b6680}
 .bf .ctl .sp{flex:1}
-.bf .tt{display:flex;align-items:center;gap:18px;background:var(--n);color:#fff;padding:6px 20px;border-bottom:5px solid var(--o)}
-.bf .tt img{height:2.2em;filter:drop-shadow(0 0 2px #0008)}
-.bf .tt h1{font-size:1.6em;letter-spacing:.03em;margin:0;flex:1}
-.bf .tt div{text-align:right;line-height:1.25}
-.bf .tt div b{font-size:1.3em;color:var(--o)}
-.bf .kp{display:flex;flex-wrap:wrap;gap:12px;align-items:stretch;padding:10px 20px}
-.bf .torta{width:4.4em;height:4.4em;border-radius:50%;display:grid;place-items:center;flex:none}
-.bf .torta b{background:#fff;width:70%;height:70%;border-radius:50%;display:grid;place-items:center;font-size:1.2em}
-.bf .k{border:1px solid var(--l);border-radius:10px;padding:6px 16px;display:flex;flex-direction:column;justify-content:center;min-width:9em}
-.bf .k small{color:var(--m);font-size:.72em;font-weight:700;letter-spacing:.05em;text-transform:uppercase}
-.bf .k b{font-size:1.5em;font-variant-numeric:tabular-nums;line-height:1.15}
-.bf .k i{font-style:normal;color:var(--m);font-size:.8em}
-.bf .tl{flex:1;display:grid;grid-template-columns:minmax(15em,24%) 1fr;padding:0 20px;min-height:0;overflow:auto}
-.bf .sg{display:flex;align-items:center;gap:10px;padding:0 10px;border-bottom:1px solid var(--l);border-left:6px solid var(--lv,var(--l));cursor:pointer;min-width:0;line-height:1.1;overflow:hidden}
-.bf .sg b{font-size:1.2em;min-width:2.4em}
-.bf .sg.hd{min-height:2.4em;cursor:default}
-.bf .sg span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.78em;color:var(--m)}
-.bf .sg u{text-decoration:none;font-weight:700;color:var(--t)}
-.bf .sg em{font-style:normal;font-weight:700;font-variant-numeric:tabular-nums;text-align:right;line-height:1.1;white-space:nowrap}
-.bf .sg em small{font-weight:400;font-size:.7em;color:var(--m)}
-.bf .tr{position:relative;border-bottom:1px solid var(--l);overflow:hidden}
-.bf .cl{position:absolute;inset:0;display:grid}
-.bf .cl>i{border-left:1px solid var(--l);font-style:normal;display:flex;align-items:center;justify-content:center;gap:1px;font-size:.85em;color:var(--m);font-variant-numeric:tabular-nums}
-.bf .cl>i b{color:var(--t)}
-.bf .cl>i.we{background:#f3f5f9}
-.bf .cl>i.og{background:#fff4cc}
-.bf .hd{background:#f7f8fb}
-.bf .hd .cl>i{flex-direction:column;font-weight:700;color:var(--t);line-height:1.1}
-.bf .hd .cl>i small{font-weight:400;color:var(--m);font-size:.8em}
-.bf .fz{position:absolute;top:50%;height:min(68%,2em);transform:translateY(-50%);border-radius:6px;color:#fff;font-size:.8em;font-weight:700;padding:0 8px;display:flex;align-items:center;overflow:hidden;white-space:nowrap;z-index:1}
-.bf .fz.ap{border-radius:6px 0 0 6px;-webkit-mask-image:linear-gradient(90deg,#000 80%,#0003);mask-image:linear-gradient(90deg,#000 80%,#0003)}
-.bf .mk{position:absolute;top:0;bottom:0;z-index:2;display:flex;align-items:center;gap:3px;font-size:.78em;font-weight:700;white-space:nowrap;transform:translateX(-.5em)}
-.bf .mk span{background:#fffe;border-radius:4px;padding:0 4px;box-shadow:0 0 0 1px #0001}
-.bf .mk.dx{transform:translateX(calc(-100% + .5em));flex-direction:row-reverse}
-.bf .oggi{position:absolute;top:0;bottom:0;width:2px;background:var(--r);z-index:3;opacity:.7}
-.bf .lg{display:flex;flex-wrap:wrap;gap:6px 18px;padding:8px 20px;color:var(--m);font-size:.78em;align-items:center}
-.bf .lg i{display:inline-block;width:1.4em;height:.8em;border-radius:3px;vertical-align:middle;margin-right:4px}
+.bf .ctl .nav{display:flex;align-items:center;gap:6px}
+@media (max-width:700px){.bf .tt h1{font-size:1.2em}.bf .tt div,.bf .ctl i{display:none}}
+.bf .tt{display:flex;align-items:center;gap:16px;background:var(--n);color:#fff;padding:4px 12px;border-bottom:4px solid var(--o)}
+.bf .tt img{height:2.4em;filter:drop-shadow(0 0 2px #0008)}
+.bf .tt h1{font-size:1.6em;letter-spacing:.02em;margin:0;flex:1}
+.bf .tt div{text-align:right;font-size:1.1em;line-height:1.25}
+.bf .tt b{color:var(--o)}
+.bf .tw{flex:1;overflow:auto;min-height:0}
+.bf table{border-collapse:collapse;width:100%;min-width:120em;height:100%;table-layout:fixed;font-variant-numeric:tabular-nums}
+.bf th,.bf td{border:1px solid var(--l);padding:0 2px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;vertical-align:middle;height:1.25em}
+.bf thead th{background:var(--n);color:#fff;position:sticky;top:0;z-index:2;padding:3px 2px}
+.bf thead th.og{background:var(--o);color:var(--n)}
+.bf .s{position:sticky;left:0;z-index:1;color:#fff;font-size:1.3em;cursor:pointer}
+.bf thead .s{z-index:3;font-size:1em}
+.bf .s small{display:block;font-size:.5em;font-weight:400}
+.bf tbody tr:not(.v)>*{border-top:2px solid #7d8aa0}
+.bf .p{cursor:pointer;font-weight:600}
+.bf .lav{white-space:normal;line-height:1.05;font-size:.88em}
+.bf .p:hover{box-shadow:inset 0 0 0 2px var(--n)}
+.bf .v td{background:#f3f5f9;color:#3a4660}
+.bf .nt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;text-align:left;font-size:.85em;line-height:1.15}
+.bf tfoot td,.bf tfoot th{background:#e7ebf2;font-weight:700}
+.bf tfoot .s{background:var(--n);font-size:.9em;cursor:default}
+.bf tfoot tr:first-child>*{border-top:3px solid var(--n)}
+.bf .neg{color:#c62828}
 @media print{
 .bf{height:auto;font-size:11px}
 :root{--bg:#fff;--card:#fff;--card2:#f3f4f6;--line:#ccc;--tx:#000;--mu:#555}
@@ -304,106 +294,79 @@ function render() {
 }
 const vai = (p) => { S.pag = p; ls("sf_pag", p); scrollTo(0, 0); render(); };
 
-// --- pagina Briefing: una flotta per schermata da proiettare, macchine × tempo (settimana, mese, anno) ---
+// --- pagina Briefing: la PPL a schermo, una flotta per volta: sopra ore programmate e lavorazioni (modificabili), sotto le volate ---
 const MESI_L = ["GENNAIO", "FEBBRAIO", "MARZO", "APRILE", "MAGGIO", "GIUGNO", "LUGLIO", "AGOSTO", "SETTEMBRE", "OTTOBRE", "NOVEMBRE", "DICEMBRE"];
-const GS = ["LUN", "MAR", "MER", "GIO", "VEN", "SAB", "DOM"], LVB = ["var(--v)", "var(--a)", "var(--r)"];
 const gruppo = (t) => t.replace(/^(UH-169)[BD]$/, "$1 B+D"); // B e D insieme, come nelle lastrine
 const gruppi = () => [...new Set(S.g.linee.map((l) => gruppo(l.tipo)))];
-const dIt = (s) => { const m = /^(\d\d)\/(\d\d)\/(\d{4})$/.exec(s || ""); return m ? m[3] + "-" + m[2] + "-" + m[1] : null; };
-S.zoom = ls("sf_zoom") || "mese"; S.bf = ls("sf_bf"); S.rif = null; // rif = giorno mostrato, null = oggi
-function finestra(z, rif) { // → { da, a, n giorni, col: [{ t, s, d, n, we }], tit }
-  const col = [], add = (t, s, d, n, we) => col.push({ t, s, d, n, we });
-  let da, a, tit;
-  if (z === "anno") {
-    const ms = (d) => MESI_L[+d.slice(5, 7) - 1].slice(0, 3); // 12 mesi dal mese mostrato: al briefing serve il davanti
-    da = rif.slice(0, 7) + "-01"; a = da;
-    for (let i = 0; i < 12; i++) { const n = Piano.primoDopo(a.slice(0, 7)); add(ms(a), !i || a.slice(5, 7) === "01" ? a.slice(0, 4) : "", a, Piano.diffG(a, n), false); a = n; }
-    tit = ms(da) + " " + da.slice(0, 4) + " – " + ms(Piano.addG(a, -1)) + " " + Piano.addG(a, -1).slice(0, 4);
-  } else if (z === "mese") {
-    da = rif.slice(0, 7) + "-01"; a = Piano.primoDopo(rif.slice(0, 7)); tit = MESI_L[+rif.slice(5, 7) - 1] + " " + rif.slice(0, 4);
-    for (let d = da; d < a; d = Piano.addG(d, 1)) { const w = (new Date(d + "T00:00:00Z").getUTCDay() + 6) % 7; add(+d.slice(8), "LMMGVSD"[w], d, 1, w > 4); }
-  } else {
-    da = Piano.lunedi(Piano.settimana(rif)); a = Piano.addG(da, 7);
-    tit = "SETTIMANA " + +Piano.settimana(rif).slice(6) + " · " + fd(da).slice(0, 5) + " – " + fd(Piano.addG(a, -1));
-    GS.forEach((x, i) => { const d = Piano.addG(da, i); add(x, fd(d).slice(0, 5), d, 1, i > 4); });
-  }
-  return { da, a, n: Piano.diffG(da, a), col, tit };
-}
-function sposta(k) { // k = -1 / +1 periodo, 0 = oggi
-  const r = S.rif || giornoIso();
-  S.rif = !k ? null : S.zoom === "sett" ? Piano.addG(r, 7 * k) : S.zoom === "anno" ? (+r.slice(0, 4) + k) + r.slice(4, 8) + "01"
-    : k > 0 ? Piano.primoDopo(r.slice(0, 7)) : Piano.addG(r.slice(0, 7) + "-01", -1).slice(0, 7) + "-01";
-  render();
-}
+const COL_EFF = { eff: "#1e9e4a", ineff: "#e0262b", ind: "#7c4dcc", alien: "#8793a8" };
+const colLav = (t) => /TBD/i.test(t) ? ["#a6a6a6", "#13213a"] : /ATTESA/i.test(t) ? ["#e46c0a", "#fff"] : /MAGG/i.test(t) ? ["#e8262a", "#fff"] : ["#f5b800", "#13213a"];
+const nMese = (m) => MESI_L[+m.slice(5) - 1].slice(0, 3) + " " + m.slice(0, 4);
+S.bf = ls("sf_bf"); S.da = null; // primo dei 12 mesi a schermo, null = il mese prima della giornaliera (per vedere le ore volate)
+const sposta = (k) => { S.da = Piano.piuMesi(S.da || Piano.piuMesi(S.g.data, -1), k); render(); };
 function renderBrief() {
-  const g = S.g, PM = Piano.pplMesi(S.ppl), fs = fermiTutti(), oggiD = giornoIso(), grp = gruppi(), fl = grp.includes(S.bf) ? S.bf : grp[0];
-  const linee = g.linee.filter((l) => gruppo(l.tipo) === fl), tutti = linee.flatMap((l) => l.aerei), [E, T, P] = conta(tutti);
-  const rif = S.rif || oggiD, W = finestra(S.zoom, rif), tpl = W.col.map((c) => c.n + "fr").join(" "), m0 = g.data.slice(0, 7);
-  const pos = (d) => Math.min(Math.max(Piano.diffG(W.da, d) / W.n, 0), 1) * 100;
-  const ogg = oggiD >= W.da && oggiD < W.a ? `<div class="oggi" style="left:${pos(oggiD) + 50 / W.n}%"></div>` : "";
-  const riga = (a, sub) => {
-    const e = eff(a), [res, rt] = residuo(a), lo = res == null ? -1 : livello({ ore: res }), lv = Math.max(-1, ...a.scadenze.map(livello)), z = [], ppl = PM[a.sigla] || [];
-    const mie = fs.filter((f) => f.sigla === a.sigla), ora = mie.some((f) => f.in <= g.data && g.data < f.out);
-    const pross = mie.map((f) => f.in).filter((d) => d > g.data).sort()[0];
-    const bz = [], barra = (i, o, t, c, ap) => { if (o <= W.da || i >= W.a) return; const l = pos(i); bz.push([l, pos(o)]);
-      z.push(`<div class="fz${ap ? " ap" : ""}" style="left:${l}%;width:${pos(o) - l}%;background:${c}" title="${esc(t)}">${esc(t)}</div>`); };
-    const lib = (x0, x1) => x0 >= 0 && x1 <= 100 && !bz.some(([l, r]) => l < x1 && r > x0);
-    const mk = (d, sim, t, c) => { if (d < W.da || d >= W.a) return; const x = pos(d) + 50 / W.n, w = (t.length + 3) * 0.6, k = lib(x, x + w) ? "" : lib(x - w, x) ? " dx" : " no"; // ponytail: larghezza etichetta stimata dai caratteri
-      z.push(`<div class="mk${k}" style="left:${x}%;color:${c}" title="${esc(t)} ${fd(d)}"><span>${sim}${k === " no" ? "" : " " + esc(t)}</span></div>`); };
-    if (e.c !== "eff" && !ora) { // inefficienza della giornaliera: fino alla fine prevista, altrimenti fino al prossimo fermo o al primo mese con FH in PPL
-      let f = dIt(a.fine); const ap = !(f && f >= oggiD);
-      if (ap) { const pv = ppl.find((x) => x[0] > m0 && !Array.isArray(x[1]) && Piano.pm(x[1]) > 0); f = [pross, pv && pv[0] + "-01", W.a].filter(Boolean).sort()[0]; }
-      barra(a.inizio || g.data, f, [a.inizio && "dal " + fd(a.inizio), a.perc, a.fine && "fine " + a.fine].filter(Boolean).join(" · ") || e.m || a.stato, e.c === "ind" ? "var(--p)" : "var(--r)", ap);
-    }
-    for (const f of mie) barra(f.in, f.out, [f.i.nome, f.off].filter(Boolean).join(" · ") || "fermo", f.in <= g.data && e.c !== "eff" ? "var(--r)" : "var(--a)", !f.durata);
-    for (const s of a.scadenze) if (s.data) mk(s.data, "◆", s.tipo, LVB[Math.max(livello(s), 0)]);
-    for (const f of mie) if (f.scad) mk(f.scad, "◆", "scad.", LVB[Math.max(livello({ data: f.scad }), 0)]);
-    const fo = e.c === "eff" && res > 0 && Piano.fineOre(ppl, g.data, a.oreMese || 0, res);
-    if (fo && !(pross && pross <= fo)) mk(fo, "▼", "fine ore", "var(--r)");
-    const celle = W.col.map((c) => { let t = "";
-      if (S.zoom === "anno") { // mesi: volato (grassetto) / FH della PPL
-        const m = c.d.slice(0, 7), x = ppl.find((y) => y[0] === m), p = x && typeof x[1] === "number" ? Math.round(x[1] / 60) : null, o = S.vol[m] && S.vol[m].o[a.sigla];
-        t = o != null ? `<b>${Math.round(o / 60)}</b>${p != null ? "/" + p : ""}` : p != null ? p : ""; }
-      return `<i class="${c.we ? "we" : ""}${c.d <= oggiD && oggiD < Piano.addG(c.d, c.n) ? " og" : ""}">${t}</i>`; }).join("");
-    const bg = { eff: "#e7f6ed", ineff: "#fde9e9", ind: "#f0e9fc" }[e.c], col = { eff: "var(--v)", ind: "var(--p)" }[e.c] || "var(--r)";
-    return `<div class="sg" data-s="${esc(a.sigla)}" style="background:${bg};--lv:${lv >= 0 ? LVB[lv] : "var(--l)"}"><b style="color:${col}">${esc(a.sigla)}</b>
-      <span>${sub ? `<u>${sub}</u> ` : ""}${esc(e.c === "eff" ? "IN LINEA" : e.m || a.stato)}</span><em style="color:${lo >= 0 ? LVB[lo] : "inherit"}">${fh(res)} <small>${esc(rt)}</small></em></div>
-     <div class="tr"><div class="cl" style="grid-template-columns:${tpl}">${celle}</div>${z.join("")}${ogg}</div>`;
-  };
-  const righe = linee.flatMap((l) => l.aerei.filter(vive).map((a) => riga(a, linee.length > 1 ? l.tipo.slice(-1) : "")));
-  // ore del periodo: volato dalle giornaliere contro la PPL degli stessi mesi (il mese della giornaliera in proporzione ai giorni)
-  const mesi = S.zoom === "anno" ? MESI_L.map((x, i) => rif.slice(0, 4) + "-" + String(i + 1).padStart(2, "0")) : [rif.slice(0, 7)];
-  let v = 0, p = 0, pt = 0, cp = false, cv = false;
-  for (const m of mesi) { const gv = S.vol[m], fr = gv ? Math.min(+gv.d.slice(8) / Piano.diffG(m + "-01", Piano.primoDopo(m)), 1) : 0; cv = cv || !!gv;
-    for (const a of tutti) { const x = (PM[a.sigla] || []).find((y) => y[0] === m), q = x ? Piano.pm(x[1]) : 0;
-      if (x && x[1] != null) cp = true; pt += q; p += q * fr; if (gv) v += gv.o[a.sigla] || 0; } }
-  p = Math.round(p);
-  const per = S.zoom === "anno" ? rif.slice(0, 4) : MESI_L[+rif.slice(5, 7) - 1], sc = v - p, al = tutti.length - T;
+  const g = S.g, PM = Piano.pplMesi(S.ppl), grp = gruppi(), fl = grp.includes(S.bf) ? S.bf : grp[0], da = S.da || Piano.piuMesi(g.data, -1);
+  const linee = g.linee.filter((l) => gruppo(l.tipo) === fl), tutti = linee.flatMap((l) => l.aerei.filter(vive).map((a) => [l, a]));
+  const [E, T] = conta(tutti.map(([, a]) => a)), mY = MESI_L.map((_, i) => Piano.piuMesi(da, i)), m0 = g.data.slice(0, 7);
+  const vol = (s, m) => S.vol[m] ? S.vol[m].o[s] : null;
+  const sc = (v, p) => `<span class="${v < p ? "neg" : ""}">${v > p ? "+" : ""}${fh(v - p)}</span>`;
+  const pc = (v, p) => p ? `<span class="${v < p ? "neg" : ""}">${Math.round(100 * (v - p) / p)}%</span>` : "";
+  const tp = mY.map(() => 0), tv = mY.map(() => null); let TA = 0, TP = 0, TV = 0, tk = false;
+  const righe = tutti.map(([l, a]) => {
+    const s = a.sigla, mesi = PM[s] || [], val = Object.fromEntries(mesi), x = eff(a);
+    const k = Piano.scostamento(mesi.filter((y) => mY.includes(y[0])), S.vol, s), fa = mY.reduce((t, m) => t + Piano.pm(val[m]), 0);
+    mY.forEach((m, i) => { tp[i] += Piano.pm(val[m]); const o = vol(s, m); if (o != null) tv[i] = (tv[i] || 0) + o; });
+    TA += fa; if (k) { TP += k.pv; TV += k.vol; tk = true; }
+    const nota = [x.c !== "eff" && x.m, ((S.note[s] || []).slice(-1)[0] || {}).t].filter(Boolean).join(" · ");
+    const cel = (c) => { const [bg, tx] = c.testo ? colLav(c.testo) : [];
+      return `<td class="p${c.testo ? " lav" : ""}" colspan="${c.n}" data-c="${esc(s)}" data-i="${c.i}"${c.testo ? ` style="background:${bg};color:${tx}" title="${esc(c.testo)}">${esc(c.testo)}` : `>${c.min == null ? "" : fh(c.min)}`}</td>`; };
+    return `<tr><th class="s" rowspan="2" data-s="${esc(s)}" style="background:${COL_EFF[x.c]}">${esc(s)}${linee.length > 1 ? `<small>${esc(l.tipo)}</small>` : ""}</th>
+      ${Piano.celle(mesi, da).map(cel).join("")}<td rowspan="2">${fa ? fh(fa) : ""}</td><td>${k ? fh(k.pv) : ""}</td><td>${k ? sc(k.vol, k.pv) : ""}</td><td rowspan="2" title="${esc(nota)}"><div class="nt">${esc(nota)}</div></td></tr>
+     <tr class="v">${mY.map((m) => `<td colspan="3">${vol(s, m) != null ? fh(vol(s, m)) : ""}</td>`).join("")}<td>${k ? fh(k.vol) : ""}</td><td>${k ? pc(k.vol, k.pv) : ""}</td></tr>`;
+  });
   const img = [...new Set(linee.map((l) => tipo(l.tipo)[0]))].map((f) => `<img src="img/${f}.webp" alt="">`).join("");
   $("#app").innerHTML = `<div class="bf">
    <div class="ctl noprint">${grp.map((x) => `<button data-fl="${esc(x)}" class="${x === fl ? "on" : ""}">${esc(x)}</button>`).join("")}<span class="sp"></span>
-    ${[["sett", "Settimana"], ["mese", "Mese"], ["anno", "Anno"]].map(([k, t]) => `<button data-z="${k}" class="${k === S.zoom ? "on" : ""}">${t}</button>`).join("")}
-    <button data-sp="-1" title="Periodo prima (←)">‹</button><button data-sp="0">Oggi</button><button data-sp="1" title="Periodo dopo (→)">›</button><span class="sp"></span>
-    <button id="fs">Schermo intero</button><button id="gp">Gestione piano</button><button id="fv">Flotta</button></div>
-   <div class="tt">${img}<h1>EFFICIENZA ${esc(fl)}</h1><div><b>${W.tit}</b><br>situazione al ${fd(g.data)}</div></div>
-   <div class="kp"><div class="torta" style="background:conic-gradient(var(--v) ${P}%,var(--r) 0)"><b>${P}%</b></div>
-    <div class="k"><small>In linea</small><b style="color:var(--v)">${E} <i>su ${T}</i></b></div>
-    <div class="k"><small>In manutenzione</small><b style="color:var(--r)">${T - E} <i>su ${T}</i></b>${al ? `<i>+${al} in alienazione</i>` : ""}</div>
-    <div class="k"><small>Volate ${per}</small><b>${cv ? fh(v) : "–"}</b></div>
-    <div class="k"><small>PPL ${per} a oggi</small><b>${cp ? fh(p) : "–"}</b>${cp ? `<i>su ${fh(pt)} programmate</i>` : ""}</div>
-    <div class="k"><small>Scostamento</small><b style="color:${sc < 0 ? "var(--r)" : "var(--v)"}">${cp && cv ? (sc > 0 ? "+" : "") + fh(sc) : "–"}</b></div></div>
-   <div class="tl" style="grid-template-rows:auto repeat(${righe.length},minmax(1.3em,1fr))"><div class="sg hd">Macchina<span></span><em>Residuo</em></div>
-    <div class="tr hd"><div class="cl" style="grid-template-columns:${tpl}">${W.col.map((c) => `<i class="${c.we ? "we" : ""}">${c.t}${c.s ? `<small>${c.s}</small>` : ""}</i>`).join("")}</div></div>${righe.join("")}</div>
-   <div class="lg"><span><i style="background:var(--r)"></i>in manutenzione ora</span><span><i style="background:var(--p)"></i>in industria</span><span><i style="background:var(--a)"></i>fermo programmato (PPL o a mano)</span>
-    <span>◆ scadenza a data</span><span style="color:var(--r)">▼ fine ore stimata (PPL, o ritmo del mese se manca)</span>${S.zoom === "anno" ? "<span><b>volate</b>/PPL in ore per mese</span>" : ""}<span style="color:var(--r)">│ oggi</span></div></div>`;
+    <span class="nav"><button data-y="-1" title="Mese prima (←)">‹</button><b>${nMese(da)} – ${nMese(mY[11])}</b><button data-y="1" title="Mese dopo (→)">›</button></span><span class="sp"></span>
+    <i>Riga sopra: ore programmate (tocca per cambiarle) · riga sotto: ore volate</i><button id="fs">Schermo intero</button><button id="gp">Gestione piano</button><button id="fv">Flotta</button></div>
+   <div class="tt">${img}<h1>PROGRAMMAZIONE PRINCIPALI LAVORAZIONI · ${esc(fl)}</h1><div><b>${nMese(da)} – ${nMese(mY[11])}</b><br>efficienti ${E} su ${T} · giornaliera del ${fd(g.data)}</div></div>
+   <div class="tw"><table><colgroup><col style="width:5.5em">${"<col>".repeat(36)}<col style="width:5em"><col style="width:5em"><col style="width:5em"><col style="width:15em"></colgroup>
+    <thead><tr><th class="s">EI</th>${mY.map((m) => `<th colspan="3" class="${m === m0 ? "og" : ""}">${nMese(m).replace(" 20", " ")}</th>`).join("")}<th>Totale<br>PPL</th><th>PPL<br>volate</th><th>Scost.</th><th>Note</th></tr></thead>
+    <tbody>${righe.join("")}</tbody>
+    <tfoot><tr><th class="s">PPL</th>${tp.map((p) => `<td colspan="3">${p ? fh(p) : ""}</td>`).join("")}<td rowspan="2">${fh(TA)}</td><td>${tk ? fh(TP) : ""}</td><td>${tk ? sc(TV, TP) : ""}</td><td rowspan="2"></td></tr>
+     <tr><th class="s">Volate</th>${tv.map((v) => `<td colspan="3">${v != null ? fh(v) : ""}</td>`).join("")}<td>${tk ? fh(TV) : ""}</td><td>${tk ? pc(TV, TP) : ""}</td></tr></tfoot></table></div></div>`;
   document.querySelectorAll("[data-fl]").forEach((b) => b.onclick = () => { S.bf = b.dataset.fl; ls("sf_bf", S.bf); render(); });
-  document.querySelectorAll("[data-z]").forEach((b) => b.onclick = () => { S.zoom = b.dataset.z; ls("sf_zoom", S.zoom); render(); });
-  document.querySelectorAll("[data-sp]").forEach((b) => b.onclick = () => sposta(+b.dataset.sp));
+  document.querySelectorAll("[data-y]").forEach((b) => b.onclick = () => sposta(+b.dataset.y));
   document.querySelectorAll("[data-s]").forEach((e) => e.onclick = () => dettaglio(e.dataset.s));
+  // cella unita su più mesi: si modifica il mese toccato
+  document.querySelectorAll("[data-c]").forEach((e) => e.onclick = (ev) => { const k = +e.dataset.i + Math.min(Math.floor(ev.offsetX / e.offsetWidth * e.colSpan), e.colSpan - 1);
+    dlgPpl(e.dataset.c, mY[Math.floor(k / 3)]); });
   $("#fs").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
   $("#gp").onclick = () => vai("piano"); $("#fv").onclick = () => vai("");
 }
-addEventListener("keydown", (e) => { // frecce: ← → periodo, ↑ ↓ flotta (col telecomando del proiettore o la tastiera)
+function dlgPpl(s, m) { // un mese di una macchina: ore, inizio di una lavorazione o continuazione di quella prima
+  const y = m.slice(0, 4), mm = m.slice(5), k = Object.keys(S.ppl).find((x) => x.endsWith("|" + y) && S.ppl[x].righe[s]) || aereo(s)[0] + "|" + y;
+  const r = ((S.ppl[k] || {}).righe || {})[s] || {}, v = r[mm], lav = Array.isArray(v), d = $("#dlg");
+  const testi = [...new Set(Object.values(S.ppl).flatMap((x) => Object.values(x.righe).flatMap((z) => Object.values(z).filter(Array.isArray).map((w) => w[0]))))].sort();
+  const sel = mm in r && v === null ? "c" : lav ? "l" : "o", h = typeof v === "number" ? v : lav ? v[2] || 0 : null;
+  d.innerHTML = `<div class="dh"><div class="t"><b>${esc(s)} · ${MESI_L[+mm - 1]} ${y}</b></div><button class="btn" id="cl">Chiudi</button></div>
+   <form class="db fm" id="fq"><label>Nel mese<select name="k">${[["o", "Ore di volo"], ["l", "Inizia una lavorazione"], ["c", "Continua la lavorazione del mese prima"]]
+     .map(([a, b]) => `<option value="${a}"${a === sel ? " selected" : ""}>${b}</option>`).join("")}</select></label>
+    <label data-q="l">Lavorazione<input name="t" list="dl-t" value="${esc(lav ? v[0] : "")}" placeholder="es. ISP. MAGGIORE, URBE, TBD"></label>
+    <datalist id="dl-t">${testi.map((t) => `<option value="${esc(t)}">`).join("")}</datalist>
+    <label data-q="l">Dal giorno<input name="g" type="number" min="1" max="31" value="${lav ? v[1] : 1}"></label>
+    <label data-q="ol"><span data-q="o">Ore programmate</span><span data-q="l">Ore volate prima dell'inizio</span><input name="h" type="number" min="0" step="0.5" value="${h == null ? "" : +(h / 60).toFixed(2)}"></label>
+    <p><button class="btn pri">Salva</button></p></form>`;
+  const f = $("#fq"), vedi = () => d.querySelectorAll("[data-q]").forEach((e) => e.style.display = e.dataset.q.includes(f.k.value) ? "" : "none");
+  f.k.onchange = vedi; vedi();
+  $("#cl").onclick = () => d.close();
+  f.onsubmit = (e) => { e.preventDefault(); const x = Object.fromEntries(new FormData(f)), t = x.t.trim(), min = Math.round((+x.h || 0) * 60), gg = Math.min(Math.max(+x.g || 1, 1), 31);
+    if (x.k === "l" && !t) return toast("Scrivi la lavorazione");
+    const nv = x.k === "c" ? null : x.k === "l" ? (min ? [t, gg, min] : [t, gg]) : min;
+    salvaPpl(s + " " + m, (p) => { const q = p[k] = p[k] || { file: "a mano", foglio: k.split("|")[0], importata: new Date().toISOString(), righe: {} };
+      (q.righe[s] = q.righe[s] || {})[mm] = nv; }); };
+  if (!d.open) d.showModal();
+}
+addEventListener("keydown", (e) => { // frecce: ← → anno, ↑ ↓ flotta (col telecomando del proiettore o la tastiera)
   if (S.pag !== "brief" || !S.g || $("#dlg").open || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
   const k = { ArrowLeft: -1, ArrowRight: 1, PageUp: -1, PageDown: 1 }[e.key], f = { ArrowUp: -1, ArrowDown: 1 }[e.key];
   if (k) { e.preventDefault(); sposta(k); }
