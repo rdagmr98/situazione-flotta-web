@@ -97,17 +97,20 @@
   }
   function piuMesi(m, k) { return new Date(Date.UTC(+m.slice(0, 4), +m.slice(5, 7) - 1 + k, 1)).toISOString().slice(0, 7); }
   // riga programmata dei 12 mesi da "AAAA-MM" come nella PPL: 36 decadi (3 per mese), le lavorazioni unite su più decadi/mesi →
-  // [{ i decade iniziale, n decadi, testo } | { i, n, min: minuti del mese o null }]
-  function celle(mesi, da) {
-    var dec = function (g) { return g < 11 ? 0 : g < 21 ? 1 : 2; };
-    var ix = function (d) { var n = (d.slice(0, 4) - da.slice(0, 4)) * 12 + (d.slice(5, 7) - da.slice(5, 7)); return n < 0 ? 0 : n > 11 ? 36 : n * 3 + dec(+d.slice(8, 10)); };
+  // [{ i decade iniziale, n decadi, testo } | { i, n, min: minuti del mese o null }].
+  // Con nG: da è un giorno "AAAA-MM-GG" e le celle sono nG giorni (viste settimana e mese)
+  function celle(mesi, da, nG) {
+    var dec = function (g) { return g < 11 ? 0 : g < 21 ? 1 : 2; }, N = nG || 36;
+    var ix = nG ? function (d) { var k = diffG(da, d); return k < 0 ? 0 : k > N ? N : k; }
+      : function (d) { var n = (d.slice(0, 4) - da.slice(0, 4)) * 12 + (d.slice(5, 7) - da.slice(5, 7)); return n < 0 ? 0 : n > 11 ? 36 : n * 3 + dec(+d.slice(8, 10)); };
+    var mese = function (i) { return nG ? addG(da, i).slice(0, 7) : piuMesi(da, Math.floor(i / 3)); };
     var bl = fermiPpl(mesi).map(function (f) {
       return { a: ix(f.in), z: ix(f.out), t: f.testo + (f.in >= da && f.in.slice(8) !== "01" ? " dal " + fd(f.in).slice(0, 5) : "") };
     });
     var val = {}, out = [];
     mesi.forEach(function (x) { val[x[0]] = x[1]; });
-    for (var i = 0; i < 36; i++) {
-      var b = bl.find(function (x) { return x.a <= i && i < x.z; }), m = piuMesi(da, Math.floor(i / 3)), u = out[out.length - 1], v = val[m];
+    for (var i = 0; i < N; i++) {
+      var b = bl.find(function (x) { return x.a <= i && i < x.z; }), m = mese(i), u = out[out.length - 1], v = val[m];
       if (u && (b ? u.b === b : !u.b && u.m === m)) { u.n++; continue; }
       out.push(b ? { i: i, n: 1, b: b, testo: b.t } : { i: i, n: 1, m: m, min: v == null || (Array.isArray(v) && !v[2]) ? null : pm(v) });
     }
