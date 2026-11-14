@@ -89,60 +89,52 @@ a{color:#7aa2ff}
 select{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:9px;font:inherit}
 .fm label{display:block;margin:8px 0;color:var(--mu);font-size:13px}
 .fm label input,.fm label select{margin-top:3px}
-.pc h2 .sub{font-weight:400}
-.pc.mod{border-color:var(--warn)}
-.pc:not(.mod) .sv{display:none}
-.pc input{color-scheme:dark}
-.ver{padding:8px 12px;border-bottom:1px solid var(--line);border-left:4px solid var(--lv)}
-.mg{display:grid;grid-template-columns:repeat(auto-fill,minmax(62px,1fr));gap:6px;padding:10px 12px}
-.mc{border:1px solid var(--line);border-radius:8px;padding:4px;text-align:center;min-width:0;font-size:12px}
-.mc small{display:block;color:var(--mu);font-size:11px}
-.mc input{text-align:center;padding:5px 2px;margin:2px 0}
-.mc.l small{color:inherit;opacity:.8}
-.mc span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700;padding:6px 0}
-.mc .lt{border-radius:4px;padding:1px 2px;font-size:11px}
-.lr{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 10px;padding:4px 12px;border-top:1px solid var(--line)}
+.lr{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 10px;padding:4px 0;border-top:1px solid var(--line)}
 .lr label{flex:1 1 150px;margin:6px 0}
 .lr label.lt1{flex:2 1 220px}
 .lr .btn{margin:6px 0}
-.lr .sp{flex:1}
-.lr .sv{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-/* Briefing: la PPL a schermo, tema chiaro da proiettore (blu notte, riga oro) */
+.lr input{color-scheme:dark}
+/* Briefing: tema chiaro da proiettore (blu notte, riga oro); la stessa resa va nelle immagini per PowerPoint */
 body.chiaro{background:#fff}
 .chiaro main{max-width:none;padding:0}
 .bf{--n:#0b2a55;--o:#c9a227;--t:#13213a;--l:#b9c2d0;
-color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;font-size:clamp(10px,min(.72vw,1.22vh),17px)}
+color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.3}
 .bf .ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 12px;background:#f2f4f8;border-bottom:1px solid var(--l);font-size:14px}
-.bf .ctl button{border:1px solid var(--l);background:#fff;color:var(--t);padding:6px 12px;border-radius:8px;font:inherit;cursor:pointer}
+.bf .ctl button,.bf .ctl label{border:1px solid var(--l);background:#fff;color:var(--t);padding:6px 12px;border-radius:8px;font:inherit;cursor:pointer}
 .bf .ctl button.on{background:var(--n);border-color:var(--n);color:#fff}
-.bf .ctl b{font-size:16px;min-width:3em;text-align:center}
+.bf .ctl b{font-size:16px;min-width:5.5em;text-align:center}
 .bf .ctl i{font-style:normal;color:#5b6680}
 .bf .ctl .sp{flex:1}
 .bf .ctl .nav{display:flex;align-items:center;gap:6px}
 @media (max-width:700px){.bf .tt h1{font-size:1.2em}.bf .tt div,.bf .ctl i{display:none}}
 .bf .tt{display:flex;align-items:center;gap:16px;background:var(--n);color:#fff;padding:4px 12px;border-bottom:4px solid var(--o)}
 .bf .tt img{height:2.4em;filter:drop-shadow(0 0 2px #0008)}
-.bf .tt h1{font-size:1.6em;letter-spacing:.02em;margin:0;flex:1}
-.bf .tt div{text-align:right;font-size:1.1em;line-height:1.25}
-.bf .tt b{color:var(--o)}
+.bf .tt h1{font-size:1.5em;letter-spacing:.02em;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bf .tt div{text-align:right;font-size:.9em;line-height:1.25}
+.bf .tt b{color:var(--o);font-size:1.2em}
 .bf .tw{flex:1;overflow:auto;min-height:0}
-.bf table{border-collapse:collapse;width:100%;min-width:120em;height:100%;table-layout:fixed;font-variant-numeric:tabular-nums}
-.bf th,.bf td{border:1px solid var(--l);padding:0 2px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.25;vertical-align:middle;height:1.25em}
-.bf thead th{background:var(--n);color:#fff;position:sticky;top:0;z-index:2;padding:3px 2px}
+.bf table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:inherit;font-variant-numeric:tabular-nums}
+.bf th,.bf td{border:1px solid var(--l);padding:.25em .3em;text-align:center;vertical-align:middle;line-height:1.2;overflow-wrap:anywhere}
+.bf thead th{background:var(--n);color:#fff;position:sticky;top:0;z-index:2}
 .bf thead th.og{background:var(--o);color:var(--n)}
-.bf thead th.fe{background:#4a5873}
-.bf .s{position:sticky;left:0;z-index:1;color:#fff;font-size:1.3em;cursor:pointer}
+.bf .s{position:sticky;left:0;z-index:1;color:#fff;font-size:1.25em}
+.bf [data-d]{cursor:pointer}
 .bf thead .s{z-index:3;font-size:1em}
-.bf .s small{display:block;font-size:.5em;font-weight:400}
+.bf .s small{display:block;font-size:.55em;font-weight:400}
+.bf .s button{display:block;margin:.3em auto 0;font:inherit;font-size:.5em;padding:.2em .5em;border-radius:6px;border:1px solid #fff;background:#fff3;color:#fff;cursor:pointer}
 .bf tbody tr:not(.v)>*{border-top:2px solid #7d8aa0}
-.bf .p{cursor:pointer;font-weight:600}
-.bf .lav{white-space:normal;line-height:1.05;font-size:.88em}
-.bf .p:hover{box-shadow:inset 0 0 0 2px var(--n)}
+.bf .p{font-weight:600}
+.bf .lav{font-weight:700;font-size:.85em;line-height:1.1}
+.bf .ed{cursor:pointer}
+.bf .ed:hover{box-shadow:inset 0 0 0 2px var(--n)}
+.bf .nx{color:#5b6680;font-size:.85em}
 .bf .v td{background:#f3f5f9;color:#3a4660}
-.bf .nt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;white-space:normal;text-align:left;font-size:.85em;line-height:1.15}
+.bf td small{display:block;font-size:.7em;color:#5b6680}
+.bf .nt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:left;font-size:.85em;line-height:1.15}
+.bf td input{width:100%;min-width:0;padding:.2em;margin:0;text-align:center;font:inherit;font-weight:600;color:var(--t);background:#fffbe6;border:1px solid var(--o);border-radius:4px;color-scheme:light}
 .bf tfoot{position:sticky;bottom:0;z-index:2}
 .bf tfoot td,.bf tfoot th{background:#e7ebf2;font-weight:700}
-.bf tfoot .s{background:var(--n);font-size:.9em;cursor:default}
+.bf tfoot .s{background:var(--n);font-size:.9em}
 .bf tfoot tr:first-child>*{border-top:3px solid var(--n)}
 .bf .neg{color:#c62828}
 @media print{
@@ -232,29 +224,15 @@ async function carica() {
   const nomi = dir.map((f) => f.name).filter((n) => /\.json$/.test(n)).sort(), ult = nomi[nomi.length - 1];
   const [g, n, s, q] = await Promise.all([ult ? leggi("giornaliere/" + ult) : { data: null }, leggi("note.json"), leggi("stati.json"), leggi("ppl.json")]);
   S.g = g.data; S.note = n.data || {}; S.stati = s.data || {}; S.ppl = q.data || {}; S.vol = {};
-  S.nomi = nomi.map((x) => x.slice(0, 10)); S.gg = {};
   if (!S.g) return;
-  // volato per lo scostamento dalla PPL: ore mese dell'ultima giornaliera di ogni mese, dal primo anno di PPL
+  // volato per il Briefing: ore mese dell'ultima giornaliera di ogni mese, dal primo anno di PPL
   const a0 = Object.keys(S.ppl).map((k) => k.split("|")[1]).sort()[0], m1 = S.g.data.slice(0, 7), um = {};
   for (const x of nomi) um[x.slice(0, 7)] = x;
   const mesi = Object.keys(um).filter((m) => a0 && m >= a0 && m < m1);
   S.vol = Object.fromEntries(await Promise.all(mesi.map(async (m) => [m, oreG((await leggi("giornaliere/" + um[m])).data)])));
   S.vol[m1] = oreG(S.g);
-  for (const v of Object.values(S.vol)) S.gg[v.d] = v.o;
 }
 const oreG = (g) => ({ d: g.data, o: Object.fromEntries(g.linee.flatMap((l) => l.aerei.map((a) => [a.sigla, a.oreMese || 0]))) });
-function giornate(d0, d1) { // viste a giorni: carica le giornaliere fra d0 e d1 più quella prima (serve per la differenza), poi ridisegna
-  const ve = S.nomi.filter((d, i) => d <= d1 && (d >= d0 || (S.nomi[i + 1] || "") >= d0) && !(d in S.gg));
-  if (!ve.length || S.carGg) return;
-  S.carGg = true;
-  Promise.all(ve.map(async (d) => { try { S.gg[d] = oreG((await leggi("giornaliere/" + d + ".json")).data).o; } catch { S.gg[d] = {}; } }))
-    .finally(() => { S.carGg = false; if (S.pag === "brief") render(); });
-}
-function volGiorno(s, d) { // ore volate nel giorno: oreMese della giornaliera meno quella della giornaliera prima, se dello stesso mese
-  const o = S.gg[d], p = S.nomi[S.nomi.indexOf(d) - 1];
-  if (!o || o[s] == null) return null;
-  return Math.max(o[s] - (p && p.slice(0, 7) === d.slice(0, 7) && S.gg[p] ? S.gg[p][s] || 0 : 0), 0);
-}
 async function aggiorna(file, sigla, fn) { // rilegge, modifica, scrive: le modifiche dell'altro dispositivo non si perdono
   const cur = (await leggi(file + ".json")).data || {};
   const v = fn(cur[sigla]);
@@ -284,12 +262,11 @@ function render() {
   }
   document.body.classList.toggle("chiaro", S.pag === "brief");
   if (S.pag === "brief") return renderBrief();
-  if (S.pag === "piano") return renderPiano();
   const [E, T, P] = conta(g.linee.flatMap((l) => l.aerei));
   const pag = ["note", ...g.linee.map((l) => l.tipo)], k0 = pag.indexOf(S.flotta), i = k0 < 0 ? 1 : k0;
   const N = nascoste(), tutte = g.linee.flatMap((l) => l.aerei.filter((a) => S.note[a.sigla] || eff(a).man).map((a) => [l, a]));
   const ann = tutte.filter(([, a]) => N[a.sigla] !== firma(a.sigla)), nn = tutte.length - ann.length;
-  $("#app").innerHTML = `<header><h1>Situazione flotta</h1><button class="btn pri" id="bb">Briefing</button><button class="btn" id="pi">Gestione piano</button>${imp}
+  $("#app").innerHTML = `<header><h1>Situazione flotta</h1><button class="btn pri" id="bb">Briefing</button>${imp}
     <div class="sub" style="flex-basis:100%">Giornaliera del <b>${fd(g.data)}</b> · efficienti ${E} su ${T} (${P}%)</div></header>
    <nav class="tabs"><button data-p="0" style="--c:#7aa2ff"><b>Note</b>${ann.length}</button>${g.linee.map((x, k) => { const [a, b] = conta(x.aerei);
      return `<button data-p="${k + 1}" style="--c:${tipo(x.tipo)[1]}"><b>${esc(x.tipo)}</b>${a}/${b}</button>`; }).join("")}</nav>
@@ -308,112 +285,147 @@ function render() {
     const N = nascoste(); N[b.dataset.h] = firma(b.dataset.h); ls("sf_nascoste", JSON.stringify(N)); render(); });
   if ($("#rn")) $("#rn").onclick = () => { ls("sf_nascoste", "{}"); render(); };
   $("#file").onchange = importa;
-  $("#pi").onclick = () => vai("piano");
   $("#bb").onclick = () => vai("brief");
 }
 const vai = (p) => { S.pag = p; ls("sf_pag", p); scrollTo(0, 0); render(); };
 
-// --- pagina Briefing: la PPL a schermo, una flotta per volta: sopra ore programmate e lavorazioni (modificabili), sotto le volate ---
+// --- Briefing: per flotta le ore programmate (PPL) e le volate. Mese = una riga per macchina, Anno = la PPL dell'anno solare.
+// In sola lettura si proietta; «Modifica» apre ore e lavorazioni in bozza e «Salva» le scrive tutte insieme in ppl.json ---
 const MESI_L = ["GENNAIO", "FEBBRAIO", "MARZO", "APRILE", "MAGGIO", "GIUGNO", "LUGLIO", "AGOSTO", "SETTEMBRE", "OTTOBRE", "NOVEMBRE", "DICEMBRE"];
 const gruppo = (t) => t.replace(/^(UH-169)[BD]$/, "$1 B+D"); // B e D insieme, come nelle lastrine
 const gruppi = () => [...new Set(S.g.linee.map((l) => gruppo(l.tipo)))];
 const COL_EFF = { eff: "#1e9e4a", ineff: "#e0262b", ind: "#7c4dcc", alien: "#8793a8" };
 const colLav = (t) => /TBD/i.test(t) ? ["#a6a6a6", "#13213a"] : /ATTESA/i.test(t) ? ["#e46c0a", "#fff"] : /MAGG/i.test(t) ? ["#e8262a", "#fff"] : ["#f5b800", "#13213a"];
 const nMese = (m) => MESI_L[+m.slice(5) - 1].slice(0, 3) + " " + m.slice(0, 4);
-const GS = ["DO", "LU", "MA", "ME", "GI", "VE", "SA"], ZOOM = [["settimana", "Settimana"], ["mese", "Mese"], ["anno", "12 mesi"]];
-// S.da: primo dei 12 mesi, null = il mese prima della giornaliera (per vedere le ore volate); S.dg: un giorno della settimana o del mese a schermo, null = la giornaliera
-S.bf = ls("sf_bf"); S.zoom = ls("sf_zoom"); S.da = null; S.dg = null;
-const zoom = () => ZOOM.some((x) => x[0] === S.zoom) ? S.zoom : "anno";
-const sposta = (k) => { const z = zoom(), a = S.dg || S.g.data;
-  if (z === "anno") S.da = Piano.piuMesi(S.da || Piano.piuMesi(S.g.data, -1), k);
-  else S.dg = z === "settimana" ? Piano.addG(a, 7 * k) : Piano.piuMesi(a, k) + "-01";
-  render(); };
+const ZOOM = [["mese", "Mese"], ["anno", "Anno"]];
+// S.mm: mese a schermo (null = quello della giornaliera); S.bozza: sigla -> { ore, lav } modificati e non ancora salvati
+S.bf = ls("sf_bf"); S.zoom = ls("sf_zoom"); S.mm = null; S.mod = false; S.bozza = {};
+const zoom = () => S.zoom === "anno" ? "anno" : "mese";
+const mese = () => S.mm || S.g.data.slice(0, 7);
+const sposta = (k) => { S.mm = Piano.piuMesi(mese(), zoom() === "anno" ? 12 * k : k); render(); };
+function aereo(s) { for (const l of S.g.linee) { const a = l.aerei.find((x) => x.sigla === s); if (a) return [l.tipo, a]; } return [null, null]; }
+function residuo(a) { // ore alla prossima scadenza a ore e quale
+  const s = a.scadenze.filter((x) => x.ore != null).sort((x, y) => x.ore - y.ore)[0];
+  return s ? [Math.max(s.ore, 0), s.tipo] : [null, ""];
+}
+const bozza = (s) => S.bozza[s] = S.bozza[s] || structuredClone(Piano.modello(Piano.pplMesi(S.ppl)[s] || []));
+function tuttiMesi(s) { // mesi consecutivi che la riga della bozza può toccare: PPL, anno a schermo, ore e lavorazioni
+  const b = S.bozza[s], y = mese().slice(0, 4), mm = [];
+  const xs = [...(Piano.pplMesi(S.ppl)[s] || []).map((x) => x[0]), y + "-01", y + "-12", ...Object.keys(b.ore),
+    ...b.lav.flatMap((l) => [l.da.slice(0, 7), l.al && Piano.piuMesi(l.al, 1)])].filter((m) => /^\d{4}-\d\d$/.test(m)).sort();
+  for (let m = xs[0]; m <= xs[xs.length - 1]; m = Piano.piuMesi(m, 1)) mm.push(m);
+  return mm;
+}
+const rigaS = (s, ed) => ed && S.bozza[s] ? Piano.riga(S.bozza[s], tuttiMesi(s)) : Piano.pplMesi(S.ppl)[s] || [];
+function adatta(bf, z, min) { // carattere più grande (fino a 30 px) con la tabella intera a schermo o nell'immagine, ma non sotto min
+  const tw = bf.querySelector(".tw"); let px = Math.max(min, Math.min(30, Math.round(bf.clientWidth * (z === "anno" ? 1.15 : 1.6) / 100)));
+  do bf.style.fontSize = px + "px"; while (tw.scrollHeight > tw.clientHeight && --px >= min);
+}
+addEventListener("resize", () => { const b = $(".bf"); if (b) adatta(b, zoom(), 12); });
+function tavola(fl, z, m, ed, img) { // Briefing di una flotta: z "mese" | "anno", m "AAAA-MM", ed = ore e lavorazioni modificabili → { tt, tab }
+  const g = S.g, m0 = g.data.slice(0, 7), y = m.slice(0, 4), linee = g.linee.filter((l) => gruppo(l.tipo) === fl);
+  const tutti = linee.flatMap((l) => l.aerei.filter(vive).map((a) => [l, a])), [E, T] = conta(tutti.map(([, a]) => a));
+  const vol = (s, k) => S.vol[k] ? S.vol[k].o[s] ?? null : null, hh = (v) => v ? fh(v) : "", som = (xs) => xs.reduce((t, x) => t + (x || 0), 0);
+  const inp = (s, k, v) => `<input type="number" min="0" step="any" inputmode="decimal" data-s="${esc(s)}" data-m="${k}" value="${v == null ? "" : +(v / 60).toFixed(2)}" aria-label="Ore ${esc(s)} ${nMese(k)}">`;
+  const cOre = (s, c) => ed && (!c.lav || +(c.dal || "").slice(8) > 1) ? inp(s, c.m, c.ore) : hh(c.ore); // nella lavorazione da un giorno > 1: le ore prima
+  const lv = (s) => ed ? ` data-lv="${esc(s)}"` : "", lc = (t) => { const [bg, fg] = colLav(t); return `background:${bg};color:${fg}`; };
+  const th = (l, a, rs) => `<th class="s" rowspan="${rs}" style="background:${COL_EFF[eff(a).c]}"${ed ? "" : ` data-d="${esc(a.sigla)}"`}>${esc(a.sigla)}${linee.length > 1 ? `<small>${esc(l.tipo)}</small>` : ""}${ed ? `<button data-lv="${esc(a.sigla)}">Lavorazioni</button>` : ""}</th>`;
+  const nota = (a, rs) => { const x = eff(a), t = [x.c !== "eff" && x.m, ((S.note[a.sigla] || []).slice(-1)[0] || {}).t].filter(Boolean).join(" · ");
+    return `<td rowspan="${rs}" title="${esc(t)}"><div class="nt">${esc(t)}</div></td>`; };
+  let head, righe, foot, cols;
+  if (z === "anno") { // per macchina due righe: sopra programmate e lavorazioni (celle unite sui mesi in cui continuano), sotto volate
+    const mY = MESI_L.map((_, i) => y + "-" + String(i + 1).padStart(2, "0")), tp = mY.map(() => 0), tv = mY.map(() => null);
+    righe = tutti.map(([l, a]) => {
+      const s = a.sigla, r = rigaS(s, ed), v = Object.fromEntries(r), pr = mY.map((k) => Piano.pm(v[k])), vo = mY.map((k) => vol(s, k));
+      mY.forEach((_, i) => { tp[i] += pr[i]; if (vo[i] != null) tv[i] = (tv[i] || 0) + vo[i]; });
+      const cel = (c) => { const ore = cOre(s, c), gd = +(c.dal || "").slice(8);
+        return !c.lav ? `<td class="p">${ore}</td>` : `<td colspan="${c.n}" class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(c.lav)}" title="${esc(c.lav)}">${ore}${ore ? "<br>" : ""}${esc(c.lav.toUpperCase())}${gd > 1 ? " dal " + gd : ""}</td>`; };
+      return `<tr>${th(l, a, 2)}${Piano.celleMesi(r, mY).map(cel).join("")}<td class="p">${hh(som(pr))}</td>${nota(a, 2)}</tr>
+       <tr class="v">${vo.map((x) => `<td>${x == null ? "" : fh(x)}</td>`).join("")}<td>${hh(som(vo))}</td></tr>`;
+    });
+    cols = `<col style="width:6.5em">${"<col>".repeat(12)}<col style="width:5.5em"><col style="width:12em">`;
+    head = `<th class="s">EI</th>${mY.map((k) => `<th class="${k === m0 ? "og" : ""}">${MESI_L[+k.slice(5) - 1].slice(0, 3)}</th>`).join("")}<th>Totale</th><th>Note</th>`;
+    foot = `<tr><th class="s">Programmate</th>${tp.map((x) => `<td>${hh(x)}</td>`).join("")}<td>${hh(som(tp))}</td><td rowspan="2"></td></tr>
+      <tr><th class="s">Volate</th>${tv.map((x) => `<td>${x == null ? "" : fh(x)}</td>`).join("")}<td>${hh(som(tv))}</td></tr>`;
+  } else { // una riga per macchina: programmate, volate, da volare (nei mesi passati la differenza), residuo, lavorazione
+    const pas = m < m0, fm = Piano.primoDopo(m), T3 = [0, 0, 0];
+    const mp = (d) => nMese(d.slice(0, 7)).toLowerCase(), per = (f) => { const a = mp(f.in), b = f.aperto ? "" : mp(Piano.addG(f.out, -1));
+      return " da " + (+f.in.slice(8) > 1 ? fd(f.in) : a) + (b && b !== a ? " a " + b : ""); }; // da 23/11/2026 a dic 2026, da gen 2027 a feb 2027
+    righe = tutti.map(([l, a]) => {
+      const s = a.sigla, r = rigaS(s, ed), c = Piano.celleMesi(r, [m])[0], p = Piano.pm(Object.fromEntries(r)[m]), w = vol(s, m), [rs, rt] = residuo(a);
+      const dv = pas ? (w == null ? null : w - p) : Math.max(p - (w || 0), 0), fe = Piano.fermiPpl(r);
+      const f = fe.find((x) => x.in < fm && x.out > m + "-01"), nx = !f && fe.find((x) => x.in >= fm);
+      T3[0] += p; T3[1] += w || 0; T3[2] += dv || 0;
+      return `<tr>${th(l, a, 1)}<td class="p">${cOre(s, { ...c, ore: c.lav ? c.ore : p })}</td><td>${w == null ? "" : fh(w)}</td>
+        <td class="${dv < 0 ? "neg" : ""}">${dv == null ? "" : pas ? fh(dv) : hh(dv)}</td><td>${rs == null ? "" : fh(rs) + `<small>${esc(rt)}</small>`}</td>
+        ${f ? `<td class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(f.testo)}">${esc(f.testo.toUpperCase()) + per(f)}</td>` : `<td class="nx${ed ? " ed" : ""}"${lv(s)}>${nx ? "prossima: " + esc(nx.testo.toUpperCase()) + per(nx) : ""}</td>`}${nota(a, 1)}</tr>`;
+    });
+    cols = `<col style="width:6.5em">${'<col style="width:8em">'.repeat(4)}<col style="width:22em"><col>`;
+    head = `<th class="s">EI</th><th>Programmate</th><th>Volate</th><th>${pas ? "Differenza" : "Da volare"}</th><th>Residuo ore oggi</th><th>Lavorazione</th><th>Note</th>`;
+    foot = `<tr><th class="s">Totale</th><td>${hh(T3[0])}</td><td>${m > m0 ? "" : fh(T3[1])}</td><td class="${T3[2] < 0 ? "neg" : ""}">${pas ? fh(T3[2]) : hh(T3[2])}</td><td></td><td></td><td></td></tr>`;
+  }
+  const tt = `<div class="tt">${img ? [...new Set(linee.map((l) => tipo(l.tipo)[0]))].map((f) => `<img src="img/${f}.webp" alt="">`).join("") : ""}<h1>PROGRAMMAZIONE ORE DI VOLO · ${esc(fl)}</h1>
+    <div><b>${z === "anno" ? "ANNO " + y : MESI_L[+m.slice(5) - 1] + " " + y}</b><br>efficienti ${E} su ${T} · giornaliera del ${fd(g.data)}${z === "anno" ? "<br>riga sopra: programmate · riga sotto: volate" : ""}</div></div>`;
+  return { tt, tab: `<table style="min-width:${z === "anno" ? 58 : 50}em"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${righe.join("")}</tbody><tfoot>${foot}</tfoot></table>` };
+}
 function renderBrief() {
-  const g = S.g, PM = Piano.pplMesi(S.ppl), grp = gruppi(), fl = grp.includes(S.bf) ? S.bf : grp[0], da = S.da || Piano.piuMesi(g.data, -1);
-  const z = zoom(), an = z === "anno", ag = S.dg || g.data, d0 = z === "settimana" ? Piano.lunedi(Piano.settimana(ag)) : ag.slice(0, 7) + "-01";
-  const nG = z === "settimana" ? 7 : Piano.diffG(d0, Piano.piuMesi(d0, 1) + "-01"), gg = Array.from({ length: nG }, (_, i) => Piano.addG(d0, i)), mc = gg[3].slice(0, 7);
-  if (!an) giornate(d0, gg[nG - 1]);
-  const linee = g.linee.filter((l) => gruppo(l.tipo) === fl), tutti = linee.flatMap((l) => l.aerei.filter(vive).map((a) => [l, a]));
-  const [E, T] = conta(tutti.map(([, a]) => a)), mY = MESI_L.map((_, i) => Piano.piuMesi(da, i)), m0 = g.data.slice(0, 7);
-  const vol = (s, m) => S.vol[m] ? S.vol[m].o[s] : null;
-  const sc = (v, p) => `<span class="${v < p ? "neg" : ""}">${v > p ? "+" : ""}${fh(v - p)}</span>`;
-  const pc = (v, p) => p ? `<span class="${v < p ? "neg" : ""}">${Math.round(100 * (v - p) / p)}%</span>` : "";
-  const tp = mY.map(() => 0), tv = mY.map(() => null); let TA = 0, TP = 0, TV = 0, tk = false;
-  const tg = gg.map(() => null), TG = [0, 0, 0]; // viste a giorni: volate per giorno; PPL, volate e da volare del mese mc
-  const righe = tutti.map(([l, a]) => {
-    const s = a.sigla, mesi = PM[s] || [], val = Object.fromEntries(mesi), x = eff(a);
-    const k = Piano.scostamento(mesi.filter((y) => mY.includes(y[0])), S.vol, s), fa = mY.reduce((t, m) => t + Piano.pm(val[m]), 0);
-    mY.forEach((m, i) => { tp[i] += Piano.pm(val[m]); const o = vol(s, m); if (o != null) tv[i] = (tv[i] || 0) + o; });
-    TA += fa; if (k) { TP += k.pv; TV += k.vol; tk = true; }
-    const nota = [x.c !== "eff" && x.m, ((S.note[s] || []).slice(-1)[0] || {}).t].filter(Boolean).join(" · ");
-    const cel = (c) => { const [bg, tx] = c.testo ? colLav(c.testo) : [];
-      return `<td class="p${c.testo ? " lav" : ""}" colspan="${c.n}" data-c="${esc(s)}" data-i="${c.i}"${c.testo ? ` style="background:${bg};color:${tx}" title="${esc(c.testo)}">${esc(c.testo)}`
-        : `>${c.min == null ? "" : fh(c.min) + (z === "settimana" ? " in " + MESI_L[+c.m.slice(5) - 1].toLowerCase() : "")}`}</td>`; };
-    const th = `<th class="s" rowspan="2" data-s="${esc(s)}" style="background:${COL_EFF[x.c]}">${esc(s)}${linee.length > 1 ? `<small>${esc(l.tipo)}</small>` : ""}</th>`;
-    if (!an) { // sopra la PPL a giorni (le ore sono del mese), sotto le volate di ogni giorno
-      const p = Piano.pm(val[mc]), v = vol(s, mc), [r, rt] = residuo(a), vg = gg.map((d) => volGiorno(s, d)), dv = p && v != null ? Math.max(p - v, 0) : null;
-      vg.forEach((w, i) => { if (w != null) tg[i] = (tg[i] || 0) + w; }); TG[0] += p; TG[1] += v || 0; TG[2] += dv || 0;
-      return `<tr>${th}${Piano.celle(mesi, d0, nG).map(cel).join("")}<td rowspan="2">${p ? fh(p) : ""}</td><td rowspan="2">${v != null ? fh(v) : ""}</td>
-        <td rowspan="2">${dv != null ? fh(dv) : ""}</td><td rowspan="2" title="${esc(rt)}">${r != null ? fh(r) : ""}</td><td rowspan="2" title="${esc(nota)}"><div class="nt">${esc(nota)}</div></td></tr>
-       <tr class="v">${vg.map((w) => `<td>${w ? fh(w) : ""}</td>`).join("")}</tr>`;
-    }
-    return `<tr>${th}
-      ${Piano.celle(mesi, da).map(cel).join("")}<td rowspan="2">${fa ? fh(fa) : ""}</td><td>${k ? fh(k.pv) : ""}</td><td>${k ? sc(k.vol, k.pv) : ""}</td><td rowspan="2" title="${esc(nota)}"><div class="nt">${esc(nota)}</div></td></tr>
-     <tr class="v">${mY.map((m) => `<td colspan="3">${vol(s, m) != null ? fh(vol(s, m)) : ""}</td>`).join("")}<td>${k ? fh(k.vol) : ""}</td><td>${k ? pc(k.vol, k.pv) : ""}</td></tr>`;
-  });
-  const img = [...new Set(linee.map((l) => tipo(l.tipo)[0]))].map((f) => `<img src="img/${f}.webp" alt="">`).join("");
-  const nm = MESI_L[+mc.slice(5) - 1], per = an ? `${nMese(da)} – ${nMese(mY[11])}` : z === "mese" ? `${nm} ${mc.slice(0, 4)}`
-    : `SETTIMANA ${+Piano.settimana(d0).slice(6)} · ${fd(d0).slice(0, 5)} – ${fd(gg[6])}`;
-  const tab = an ? `<colgroup><col style="width:5.5em">${"<col>".repeat(36)}<col style="width:5em"><col style="width:5em"><col style="width:5em"><col style="width:15em"></colgroup>
-    <thead><tr><th class="s">EI</th>${mY.map((m) => `<th colspan="3" class="${m === m0 ? "og" : ""}">${nMese(m).replace(" 20", " ")}</th>`).join("")}<th>Totale<br>PPL</th><th>PPL<br>volate</th><th>Scost.</th><th>Note</th></tr></thead>
-    <tbody>${righe.join("")}</tbody>
-    <tfoot><tr><th class="s">PPL</th>${tp.map((p) => `<td colspan="3">${p ? fh(p) : ""}</td>`).join("")}<td rowspan="2">${fh(TA)}</td><td>${tk ? fh(TP) : ""}</td><td>${tk ? sc(TV, TP) : ""}</td><td rowspan="2"></td></tr>
-     <tr><th class="s">Volate</th>${tv.map((v) => `<td colspan="3">${v != null ? fh(v) : ""}</td>`).join("")}<td>${tk ? fh(TV) : ""}</td><td>${tk ? pc(TV, TP) : ""}</td></tr></tfoot>`
-   : `<colgroup><col style="width:5.5em">${"<col>".repeat(nG)}${'<col style="width:5em">'.repeat(4)}<col style="width:15em"></colgroup>
-    <thead><tr><th class="s">EI</th>${gg.map((d) => { const w = new Date(d + "T12:00:00Z").getUTCDay();
-      return `<th class="${d === g.data ? "og" : w % 6 ? "" : "fe"}">${GS[w]}<br>${+d.slice(8)}${z === "settimana" ? " " + MESI_L[+d.slice(5, 7) - 1].slice(0, 3) : ""}</th>`; }).join("")}
-     <th>PPL<br>${nm.slice(0, 3)}</th><th>Volate<br>${nm.slice(0, 3)}</th><th>Da<br>volare</th><th>Residuo<br>ore</th><th>Note</th></tr></thead>
-    <tbody>${righe.join("")}</tbody>
-    <tfoot><tr><th class="s">Volate</th>${tg.map((v) => `<td>${v ? fh(v) : ""}</td>`).join("")}${TG.map((v) => `<td>${v ? fh(v) : ""}</td>`).join("")}<td></td><td></td></tr></tfoot>`;
+  const grp = gruppi(), fl = grp.includes(S.bf) ? S.bf : grp[0], z = zoom(), m = mese(), t = tavola(fl, z, m, S.mod, true);
   $("#app").innerHTML = `<div class="bf">
    <div class="ctl noprint">${grp.map((x) => `<button data-fl="${esc(x)}" class="${x === fl ? "on" : ""}">${esc(x)}</button>`).join("")}<span class="sp"></span>
-    <span class="nav">${ZOOM.map(([k, t]) => `<button data-z="${k}" class="${k === z ? "on" : ""}">${t}</button>`).join("")}
-     <button data-y="-1" title="Prima (←)">‹</button><b>${per}</b><button data-y="1" title="Dopo (→)">›</button></span><span class="sp"></span>
-    <i>Riga sopra: ore programmate (tocca per cambiarle) · riga sotto: ore volate</i><button id="fs">Schermo intero</button><button id="gp">Gestione piano</button><button id="fv">Flotta</button></div>
-   <div class="tt">${img}<h1>PROGRAMMAZIONE PRINCIPALI LAVORAZIONI · ${esc(fl)}</h1><div><b>${per}</b><br>efficienti ${E} su ${T} · giornaliera del ${fd(g.data)}</div></div>
-   <div class="tw"><table style="min-width:${an ? 120 : z === "mese" ? 110 : 60}em">${tab}</table></div></div>`;
+    <span class="nav">${ZOOM.map(([k, n]) => `<button data-z="${k}" class="${k === z ? "on" : ""}">${n}</button>`).join("")}
+     <button data-y="-1" title="Prima (freccia sinistra)">‹</button><b>${z === "anno" ? m.slice(0, 4) : nMese(m)}</b><button data-y="1" title="Dopo (freccia destra)">›</button></span><span class="sp"></span>
+    ${S.mod ? `<i>Scrivi le ore nelle celle gialle, le lavorazioni da «Lavorazioni»</i><label>Importa PPL<input type="file" accept=".xlsx" id="fp" hidden></label><button id="an">Annulla</button><button id="sv" class="on">Salva</button>`
+      : `<button id="fs">Schermo intero</button><button id="ppt">PowerPoint</button><button id="ed">Modifica</button><button id="fv">Flotta</button>`}</div>
+   ${t.tt}<div class="tw">${t.tab}</div></div>`;
   document.querySelectorAll("[data-fl]").forEach((b) => b.onclick = () => { S.bf = b.dataset.fl; ls("sf_bf", S.bf); render(); });
-  document.querySelectorAll("[data-y]").forEach((b) => b.onclick = () => sposta(+b.dataset.y));
-  document.querySelectorAll("[data-s]").forEach((e) => e.onclick = () => dettaglio(e.dataset.s));
-  // cella unita su più mesi: si modifica il mese toccato
-  document.querySelectorAll("[data-c]").forEach((e) => e.onclick = (ev) => { const k = +e.dataset.i + Math.min(Math.floor(ev.offsetX / e.offsetWidth * e.colSpan), e.colSpan - 1);
-    if (an) dlgPpl(e.dataset.c, mY[Math.floor(k / 3)]); else dlgPpl(e.dataset.c, gg[k].slice(0, 7), +gg[k].slice(8)); });
   document.querySelectorAll("[data-z]").forEach((b) => b.onclick = () => { S.zoom = b.dataset.z; ls("sf_zoom", S.zoom); render(); });
+  document.querySelectorAll("[data-y]").forEach((b) => b.onclick = () => sposta(+b.dataset.y));
+  document.querySelectorAll("[data-d]").forEach((e) => e.onclick = () => dettaglio(e.dataset.d));
+  document.querySelectorAll("[data-lv]").forEach((e) => e.onclick = (ev) => { if (ev.target.tagName !== "INPUT") { ev.stopPropagation(); dlgLav(e.dataset.lv); } });
+  document.querySelectorAll("td input[data-m]").forEach((e) => e.oninput = () => { // in bozza, senza ridisegnare: il campo resta attivo
+    const b = bozza(e.dataset.s); if (e.value === "") delete b.ore[e.dataset.m]; else b.ore[e.dataset.m] = Math.round(+e.value * 60); });
+  adatta($(".bf"), z, 12);
+  if (S.mod) { $("#sv").onclick = salvaTutto; $("#an").onclick = () => { S.bozza = {}; S.mod = false; render(); }; $("#fp").onchange = importaPpl; return; }
   $("#fs").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
-  $("#gp").onclick = () => vai("piano"); $("#fv").onclick = () => vai("");
+  $("#ppt").onclick = dlgPpt; $("#ed").onclick = () => { S.mod = true; render(); }; $("#fv").onclick = () => vai("");
 }
-function dlgPpl(s, m, gd) { // un mese di una macchina: ore, inizio di una lavorazione (dal giorno toccato gd) o continuazione di quella prima
-  const y = m.slice(0, 4), mm = m.slice(5), k = Object.keys(S.ppl).find((x) => x.endsWith("|" + y) && S.ppl[x].righe[s]) || aereo(s)[0] + "|" + y;
-  const r = ((S.ppl[k] || {}).righe || {})[s] || {}, v = r[mm], lav = Array.isArray(v), d = $("#dlg");
-  const testi = [...new Set(Object.values(S.ppl).flatMap((x) => Object.values(x.righe).flatMap((z) => Object.values(z).filter(Array.isArray).map((w) => w[0]))))].sort();
-  const sel = mm in r && v === null ? "c" : lav ? "l" : "o", h = typeof v === "number" ? v : lav ? v[2] || 0 : null;
-  d.innerHTML = `<div class="dh"><div class="t"><b>${esc(s)} · ${MESI_L[+mm - 1]} ${y}</b></div><button class="btn" id="cl">Chiudi</button></div>
-   <form class="db fm" id="fq"><label>Nel mese<select name="k">${[["o", "Ore di volo"], ["l", "Inizia una lavorazione"], ["c", "Continua la lavorazione del mese prima"]]
-     .map(([a, b]) => `<option value="${a}"${a === sel ? " selected" : ""}>${b}</option>`).join("")}</select></label>
-    <label data-q="l">Lavorazione<input name="t" list="dl-t" value="${esc(lav ? v[0] : "")}" placeholder="es. ISP. MAGGIORE, URBE, TBD"></label>
-    <datalist id="dl-t">${testi.map((t) => `<option value="${esc(t)}">`).join("")}</datalist>
-    <label data-q="l">Dal giorno<input name="g" type="number" min="1" max="31" value="${lav ? v[1] : gd || 1}"></label>
-    <label data-q="ol"><span data-q="o">Ore programmate</span><span data-q="l">Ore volate prima dell'inizio</span><input name="h" type="number" min="0" step="0.5" value="${h == null ? "" : +(h / 60).toFixed(2)}"></label>
-    <p><button class="btn pri">Salva</button></p></form>`;
-  const f = $("#fq"), vedi = () => d.querySelectorAll("[data-q]").forEach((e) => e.style.display = e.dataset.q.includes(f.k.value) ? "" : "none");
-  f.k.onchange = vedi; vedi();
-  $("#cl").onclick = () => d.close();
-  f.onsubmit = (e) => { e.preventDefault(); const x = Object.fromEntries(new FormData(f)), t = x.t.trim(), min = Math.round((+x.h || 0) * 60), gg = Math.min(Math.max(+x.g || 1, 1), 31);
-    if (x.k === "l" && !t) return toast("Scrivi la lavorazione");
-    const nv = x.k === "c" ? null : x.k === "l" ? (min ? [t, gg, min] : [t, gg]) : min;
-    salvaPpl(s + " " + m, (p) => { const q = p[k] = p[k] || { file: "a mano", foglio: k.split("|")[0], importata: new Date().toISOString(), righe: {} };
-      (q.righe[s] = q.righe[s] || {})[mm] = nv; }); };
-  if (!d.open) d.showModal();
+function dlgLav(s) { // lavorazioni di una macchina, in bozza: si scrivono con «Salva» del Briefing
+  const b = bozza(s), d = $("#dlg"), m0 = S.g.data.slice(0, 7);
+  const testi = [...new Set(Object.values(Piano.pplMesi(S.ppl)).flatMap((ms) => ms.filter((x) => Array.isArray(x[1])).map((x) => x[1][0])))].sort();
+  const disegna = () => {
+    d.innerHTML = `<div class="dh"><div class="t"><b>${esc(s)} · lavorazioni</b><div class="sub">Restano in bozza fino a «Salva» del Briefing</div></div><button class="btn pri" id="cl">Fatto</button></div>
+     <div class="db fm">${b.lav.map((l, i) => [l, i]).filter(([l]) => !l.da || (l.al || "9999") >= m0).map(([l, i]) => `<div class="lr">
+      <label class="lt1">Lavorazione<input data-l="${i}" data-k="t" list="dl-lav" value="${esc(l.t)}" placeholder="es. ISP 200H URBE"></label>
+      <label>Dal giorno<input type="date" data-l="${i}" data-k="da" value="${esc(l.da)}"></label>
+      <label>Fino al mese (vuoto: finché non inizia la successiva)<input type="month" data-l="${i}" data-k="al" value="${esc(l.al)}"></label>
+      <button class="btn" data-x="${i}">Togli</button></div>`).join("") || '<p class="sub">Nessuna lavorazione da questo mese in poi.</p>'}
+      <p><button class="btn" id="nl">+ Lavorazione</button></p><datalist id="dl-lav">${testi.map((t) => `<option value="${esc(t)}">`).join("")}</datalist></div>`;
+    d.querySelectorAll("[data-l]").forEach((e) => e.oninput = () => b.lav[+e.dataset.l][e.dataset.k] = e.dataset.k === "t" ? e.value.trim() : e.value);
+    d.querySelectorAll("[data-x]").forEach((x) => x.onclick = () => { b.lav.splice(+x.dataset.x, 1); disegna(); });
+    $("#nl").onclick = () => { b.lav.push({ t: "", da: "", al: "" }); disegna(); d.querySelector(`[data-l="${b.lav.length - 1}"]`).focus(); };
+    $("#cl").onclick = () => d.close();
+  };
+  disegna(); d.onclose = () => { d.onclose = null; render(); }; d.showModal();
+}
+function salvaTutto() { // tutte le macchine in bozza in una sola scrittura di ppl.json, riga per anno nella chiave che ha già quella sigla
+  const da = [];
+  for (const [s, b] of Object.entries(S.bozza)) {
+    const lav = b.lav.filter((l) => l.t || l.da), anni = {};
+    if (lav.some((l) => !l.t || !l.da)) return toast(s + ": ogni lavorazione vuole il nome e il giorno di inizio");
+    if (lav.some((l) => l.al && l.al < l.da.slice(0, 7))) return toast(s + ": «Fino al mese» viene prima dell'inizio");
+    if (new Set(lav.map((l) => l.da.slice(0, 7))).size < lav.length) return toast(s + ": due lavorazioni iniziano nello stesso mese, nella PPL ce ne sta una per mese");
+    for (const [m, v] of Piano.riga({ ore: b.ore, lav }, tuttiMesi(s))) (anni[m.slice(0, 4)] = anni[m.slice(0, 4)] || []).push([m.slice(5), v]);
+    da.push([s, aereo(s)[0], anni]);
+  }
+  if (!da.length) { S.mod = false; return render(); }
+  salvaPpl(da.map((x) => x[0]).join(" ") + " piano", (p) => {
+    for (const [s, tp, anni] of da) for (const [y, xs] of Object.entries(anni)) {
+      const k = Object.keys(p).find((x) => x.endsWith("|" + y) && p[x].righe[s]) || tp + "|" + y;
+      if (!(p[k] && p[k].righe[s]) && xs.every((x) => x[1] == null)) continue; // un anno senza niente non crea righe nuove
+      const q = p[k] = p[k] || { file: "a mano", foglio: tp, importata: new Date().toISOString(), righe: {} }, rr = q.righe[s] = q.righe[s] || {};
+      for (const [mm, v] of xs) if (v != null || mm in rr) rr[mm] = v; // un mese vuoto che non c'era resta assente
+    }
+  }, () => { S.bozza = {}; S.mod = false; });
 }
 addEventListener("keydown", (e) => { // frecce: ← → periodo, ↑ ↓ flotta (col telecomando del proiettore o la tastiera)
   if (S.pag !== "brief" || !S.g || $("#dlg").open || /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) return;
@@ -422,119 +434,54 @@ addEventListener("keydown", (e) => { // frecce: ← → periodo, ↑ ↓ flotta 
   if (f) { e.preventDefault(); const gr = gruppi(), i = Math.max(gr.indexOf(S.bf), 0); S.bf = gr[(i + f + gr.length) % gr.length]; ls("sf_bf", S.bf); render(); }
 });
 
-// --- Gestione piano: la riga PPL di ogni macchina come modulo (ore per mese + lavorazioni dal/al); ogni macchina si salva da sola ---
-function aereo(s) { for (const l of S.g.linee) { const a = l.aerei.find((x) => x.sigla === s); if (a) return [l.tipo, a]; } return [null, null]; }
-function residuo(a) { // ore alla prossima scadenza a ore e quale
-  const s = a.scadenze.filter((x) => x.ore != null).sort((x, y) => x.ore - y.ore)[0];
-  return s ? [Math.max(s.ore, 0), s.tipo] : [null, ""];
+// --- immagini per PowerPoint: nella slide si inseriscono con «Collega al file» e PowerPoint le ricarica a ogni apertura.
+// La cartella si sceglie una volta (handle in IndexedDB, Edge/Chrome da PC); si riscrivono dopo l'import della giornaliera e il salvataggio della PPL ---
+function idb(fn) { return new Promise((ok, ko) => { const r = indexedDB.open("sf", 1);
+  r.onupgradeneeded = () => r.result.createObjectStore("k"); r.onerror = () => ko(r.error);
+  r.onsuccess = () => { const q = fn(r.result.transaction("k", "readwrite").objectStore("k")); q.onsuccess = () => ok(q.result); q.onerror = () => ko(q.error); }; }); }
+async function cartella(chiedi) { // cartella scelta con il permesso di scrittura, se no null; chiedi solo dentro un clic (apre la richiesta del browser)
+  try { const h = await idb((o) => o.get("ppt")), o = { mode: "readwrite" };
+    return h && ((await h.queryPermission(o)) === "granted" || chiedi && (await h.requestPermission(o)) === "granted") ? h : null; }
+  catch (_) { return null; }
 }
-function righeMarcia() { // Link piloti: macchine con la PPL del mese in corso, FH per mese, residuo contro il prossimo fermo, scostamento
-  const PM = Piano.pplMesi(S.ppl), m0 = S.g.data.slice(0, 7);
-  return S.g.linee.flatMap((l) => l.aerei.filter((a) => (PM[a.sigla] || []).some((x) => x[0] === m0)).map((a) => {
-    const [res, sc] = residuo(a), mesi = PM[a.sigla], m = Piano.marciaPpl(mesi, S.g.data, a.oreMese || 0, res), p = m.prossimo || {}, k = Piano.scostamento(mesi, S.vol, a.sigla) || {};
-    return { s: a.sigla, tipo: l.tipo, isp: p.testo || "", in: p.in, out: p.aperto ? null : p.out, res, sc, mesi: m.mesi, resto: m.resto, ppl: true, vol: k.vol, pv: k.pv };
-  }));
+async function png(t, z) { // Briefing → PNG 1920×1080 via SVG foreignObject, senza immagini esterne (non si caricherebbero)
+  const W = 1920, H = 1080, el = document.createElement("div");
+  el.className = "bf"; el.style.cssText = `width:${W}px;height:${H}px;position:fixed;left:-${2 * W}px;top:0`;
+  el.innerHTML = `<style>${document.querySelector("style").textContent}</style>${t.tt}<div class="tw" style="overflow:hidden">${t.tab}</div>`;
+  document.body.append(el); adatta(el, z, 8); el.remove(); el.style.position = el.style.left = el.style.top = ""; // misurata fuori schermo
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><foreignObject width="100%" height="100%">${new XMLSerializer().serializeToString(el)}</foreignObject></svg>`;
+  const img = new Image();
+  await new Promise((ok, ko) => { img.onload = ok; img.onerror = () => ko(new Error("immagine non generata")); img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); });
+  const c = Object.assign(document.createElement("canvas"), { width: W, height: H });
+  c.getContext("2d").drawImage(img, 0, 0);
+  return new Promise((ok) => c.toBlob(ok, "image/png"));
 }
-S.bozza = {}; // sigla -> modulo modificato e non ancora salvato
-function mesiPiano() { // dal mese della giornaliera alla fine dell'ultimo anno di PPL, almeno 12 mesi
-  const m0 = S.g.data.slice(0, 7), y = Object.keys(S.ppl).map((k) => k.split("|")[1]).sort().pop();
-  const fine = [Piano.piuMesi(m0, 11), y ? y + "-12" : ""].sort().pop(), mm = [];
-  for (let m = m0; m <= fine; m = Piano.piuMesi(m, 1)) mm.push(m);
-  return mm;
-}
-const modPiano = (s) => S.bozza[s] || Piano.modello(Piano.pplMesi(S.ppl)[s] || []);
-const tuttiMesi = (s) => [...new Set([...(Piano.pplMesi(S.ppl)[s] || []).map((x) => x[0]), ...mesiPiano()])].sort();
-const nomeMese = (m) => MESI_L[+m.slice(5) - 1].toLowerCase() + " " + m.slice(0, 4);
-function verifica(s) { // in cima alla card: con le ore programmate arriva al prossimo fermo?
-  const a = aereo(s)[1], [res] = residuo(a), m = Piano.marciaPpl(Piano.riga(modPiano(s), tuttiMesi(s)), S.g.data, a.oreMese || 0, res), p = m.prossimo;
-  let t, c;
-  if (res == null) { t = "Nella giornaliera non c'è un residuo a ore"; c = "off"; }
-  else if (m.resto == null) { t = "Ora in lavorazione: " + (p ? p.testo : ""); c = "ind"; }
-  else {
-    t = (p ? `Fino a ${p.testo} del ${fd(p.in)}` : "Nessuna lavorazione in programma") + `: programmate ${fh(res - m.resto)} su ${fh(res)} di residuo, `
-      + (m.resto >= 0 ? "margine " + fh(m.resto) : `mancano ${fh(-m.resto)} (ore finite a ${nomeMese(m.finite)})`);
-    c = m.resto < 0 ? "ko" : p ? "ok" : "warn";
-  }
-  return `<div class="ver" style="--lv:var(--${c})">${esc(t)}</div>`;
-}
-function griglia(s) { // un riquadro per mese: ore da scrivere, oppure la lavorazione che lo occupa
-  const a = aereo(s)[1], mod = modPiano(s), mm = mesiPiano(), r = Piano.riga(mod, tuttiMesi(s)), v = Object.fromEntries(r), fe = Piano.fermiPpl(r);
-  const ore = (m) => `<input type="number" min="0" step="any" inputmode="decimal" data-m="${m}" value="${mod.ore[m] == null ? "" : +(mod.ore[m] / 60).toFixed(2)}" aria-label="Ore ${nomeMese(m)}">`;
-  return mm.map((m) => {
-    const x = v[m], lab = `<small>${MESI_L[+m.slice(5) - 1].slice(0, 3)} ${m.slice(2, 4)}</small>`, vol = m === mm[0] ? `<small>volate ${fh(a.oreMese || 0)}</small>` : "";
-    if (Array.isArray(x)) { const [bg, fg] = colLav(x[0]);
-      return x[1] > 1 ? `<div class="mc">${lab}${ore(m)}${vol}<span class="lt" style="background:${bg};color:${fg}" title="${esc(x[0])}">${esc(x[0])} dal ${x[1]}</span></div>`
-        : `<div class="mc l" style="background:${bg};color:${fg}" title="${esc(x[0])}">${lab}<span>${esc(x[0])}</span></div>`; }
-    const f = fe.find((f) => f.in.slice(0, 7) < m && f.out > m + "-01");
-    if (f) { const [bg, fg] = colLav(f.testo); return `<div class="mc l" style="background:${bg};color:${fg}" title="${esc(f.testo)}">${lab}<span>${esc(f.testo)}</span></div>`; }
-    return `<div class="mc">${lab}${ore(m)}${vol}</div>`;
-  }).join("");
-}
-function cardPiano(s) {
-  const [tp, a] = aereo(s), [res, sc] = residuo(a), mod = modPiano(s), m0 = S.g.data.slice(0, 7);
-  const lav = mod.lav.map((l, i) => [l, i]).filter(([l]) => !l.da || l.da.slice(0, 7) >= m0 || (l.al || "9999") >= m0).map(([l, i]) => `<div class="lr">
-    <label class="lt1">Lavorazione<input data-l="${i}" data-k="t" list="dl-lav" value="${esc(l.t)}" placeholder="es. ISP 200H URBE"></label>
-    <label>Dal giorno<input type="date" data-l="${i}" data-k="da" value="${esc(l.da)}"></label>
-    <label>Fino al mese (vuoto = senza fine)<input type="month" data-l="${i}" data-k="al" value="${esc(l.al)}" placeholder="AAAA-MM"></label>
-    <button class="btn" data-x="${i}">Togli</button></div>`).join("");
-  return `<section class="list pc${S.bozza[s] ? " mod" : ""}" data-pc="${esc(s)}">
-   <h2>${esc(s)} <span class="sub">${esc(tp)}${res == null ? "" : ` · residuo ${fh(res)} alla ${esc(sc)}`}</span></h2>
-   ${verifica(s)}<div class="mg">${griglia(s)}</div>
-   <div class="fm">${lav}<div class="lr"><button class="btn" data-nl>+ Lavorazione</button><span class="sp"></span>
-    <span class="sv"><span class="sub">Modifiche non salvate</span><button class="btn" data-an>Annulla</button><button class="btn pri" data-sv>Salva ${esc(s)}</button></span></div></div></section>`;
-}
-function legaCard(sec) {
-  const s = sec.dataset.pc, bozza = () => { sec.classList.add("mod"); return S.bozza[s] = S.bozza[s] || structuredClone(modPiano(s)); };
-  const nuova = () => { const n = document.createElement("div"); n.innerHTML = cardPiano(s); const x = n.firstElementChild; sec.replaceWith(x); legaCard(x); return x; };
-  const ore = () => sec.querySelectorAll("[data-m]").forEach((e) => e.oninput = () => { // senza ridisegnare: il campo resta attivo
-    const b = bozza(); if (e.value === "") delete b.ore[e.dataset.m]; else b.ore[e.dataset.m] = Math.round(+e.value * 60);
-    sec.querySelector(".ver").outerHTML = verifica(s); });
-  ore();
-  sec.querySelectorAll("[data-l]").forEach((e) => e.oninput = () => { bozza().lav[+e.dataset.l][e.dataset.k] = e.dataset.k === "t" ? e.value.trim() : e.value;
-    sec.querySelector(".ver").outerHTML = verifica(s); sec.querySelector(".mg").innerHTML = griglia(s); ore(); });
-  sec.querySelectorAll("[data-x]").forEach((b) => b.onclick = () => { bozza().lav.splice(+b.dataset.x, 1); nuova(); });
-  sec.querySelector("[data-nl]").onclick = () => { const b = bozza(); b.lav.push({ t: "", da: "", al: "" }); nuova().querySelector(`[data-l="${b.lav.length - 1}"]`).focus(); };
-  sec.querySelector("[data-an]").onclick = () => { delete S.bozza[s]; nuova(); };
-  sec.querySelector("[data-sv]").onclick = () => salvaPiano(s);
-}
-function salvaPiano(s) { // la riga della macchina in ppl.json, anno per anno; un anno senza niente non crea righe nuove
-  const tp = aereo(s)[0], lav = S.bozza[s].lav.filter((l) => l.t || l.da);
-  if (lav.some((l) => !l.t || !l.da)) return toast("Ogni lavorazione vuole il nome e il giorno di inizio");
-  if (lav.some((l) => l.al && l.al < l.da.slice(0, 7))) return toast("«Fino al mese» viene prima dell'inizio");
-  if (new Set(lav.map((l) => l.da.slice(0, 7))).size < lav.length) return toast("Due lavorazioni iniziano nello stesso mese: nella PPL ce ne sta una per mese");
-  const anni = {};
-  for (const [m, v] of Piano.riga({ ore: S.bozza[s].ore, lav }, tuttiMesi(s))) (anni[m.slice(0, 4)] = anni[m.slice(0, 4)] || []).push([m.slice(5), v]);
-  salvaPpl(s + " piano", (p) => {
-    for (const [y, xs] of Object.entries(anni)) {
-      const k = Object.keys(p).find((x) => x.endsWith("|" + y) && p[x].righe[s]) || tp + "|" + y;
-      if (!(p[k] && p[k].righe[s]) && xs.every((x) => x[1] == null)) continue;
-      const q = p[k] = p[k] || { file: "a mano", foglio: tp, importata: new Date().toISOString(), righe: {} }, rr = q.righe[s] = q.righe[s] || {};
-      for (const [mm, v] of xs) rr[mm] = v;
+async function scriviPpt(h, detto) { // per ogni flotta il mese e l'anno della giornaliera, dai dati salvati
+  if (!h) return;
+  try {
+    for (const fl of gruppi()) for (const z of ["mese", "anno"]) {
+      const w = await (await h.getFileHandle(`Briefing ${fl} ${z}.png`, { create: true })).createWritable();
+      await w.write(await png(tavola(fl, z, S.g.data.slice(0, 7), false, false), z)); await w.close();
     }
-  }, () => delete S.bozza[s]);
+    if (detto) toast("Immagini aggiornate nella cartella «" + h.name + "»");
+  } catch (e) { toast("Immagini PowerPoint: " + e.message); }
 }
-function renderPiano() {
-  const grp = gruppi(), fl = grp.includes(S.bf) ? S.bf : grp[0];
-  const testi = [...new Set(Object.values(Piano.pplMesi(S.ppl)).flatMap((ms) => ms.filter((x) => Array.isArray(x[1])).map((x) => x[1][0])))].sort();
-  const sigle = S.g.linee.filter((l) => gruppo(l.tipo) === fl).flatMap((l) => l.aerei.filter(vive).map((a) => a.sigla));
-  $("#app").innerHTML = `<header><h1>Gestione piano</h1><button class="btn pri" id="bb">Briefing</button><button class="btn" id="fl">Flotta</button>
-    <button class="btn" id="lk">Link piloti</button><label class="btn">Importa PPL<input type="file" accept=".xlsx" id="fp" hidden></label>
-    <div class="sub" style="flex-basis:100%">Per ogni macchina: ore di volo programmate nel mese e lavorazioni (dal giorno, fino al mese). Ogni macchina si salva con il suo «Salva». Residui dalla giornaliera del <b>${fd(S.g.data)}</b>.</div></header>
-   <div class="chips" style="padding:0 0 12px">${grp.map((x) => `<button data-fl="${esc(x)}" class="${x === fl ? "on" : ""}">${esc(x)}</button>`).join("")}</div>
-   <datalist id="dl-lav">${testi.map((t) => `<option value="${esc(t)}">`).join("")}</datalist>
-   ${sigle.map(cardPiano).join("")}`;
-  document.querySelectorAll("[data-pc]").forEach(legaCard);
-  document.querySelectorAll("[data-fl]").forEach((b) => b.onclick = () => { S.bf = b.dataset.fl; ls("sf_bf", S.bf); render(); });
-  $("#bb").onclick = () => vai("brief"); $("#fl").onclick = () => vai("");
-  $("#lk").onclick = async () => linkPiloti(await Piano.codifica({ d: S.g.data, t: giornoIso(), r: righeMarcia() }));
-  $("#fp").onchange = importaPpl;
-}
-function linkPiloti(h) {
-  const url = new URL("marcia.html#" + h, location.href).href, d = $("#dlg");
-  d.innerHTML = `<div class="dh"><div class="t"><b>Link per i piloti</b><div class="sub">Sola lettura, senza frase. È un'istantanea: rimandalo a ogni cambio del piano.</div></div><button class="btn" id="cl">Chiudi</button></div>
-   <div class="db"><p><input id="ul" readonly value="${esc(url)}"></p><p><button class="btn pri" id="cp">Copia</button> <a class="btn" href="${esc(url)}" target="_blank" rel="noopener">Apri</a></p></div>`;
+async function dlgPpt() {
+  const d = $("#dlg"), si = !!window.showDirectoryPicker, h = si ? await idb((o) => o.get("ppt")).catch(() => null) : null;
+  d.innerHTML = `<div class="dh"><div class="t"><b>Briefing nella slide di PowerPoint</b></div><button class="btn" id="cl">Chiudi</button></div>
+   <div class="db"><p>Per ogni flotta due immagini, per esempio «Briefing ${esc(gruppi()[0])} mese.png» e «... anno.png», con il mese e l'anno della giornaliera.
+    Si riscrivono da sole nella cartella scelta quando, da questo PC, importi la giornaliera o salvi la PPL. Se il browser chiede il permesso sulla cartella, scegli «Consenti a ogni visita».</p>
+    <p>In PowerPoint, una volta sola: Inserisci, Immagini, Questo dispositivo, scegli l'immagine, poi sulla freccia accanto a «Inserisci» scegli <b>«Collega al file»</b>.
+    A ogni apertura della presentazione la slide mostra l'immagine aggiornata.</p>
+    ${si ? `<p class="sub">${h ? "Cartella: <b>" + esc(h.name) + "</b>" : "Nessuna cartella scelta"}</p>
+     <p><button class="btn pri" id="ag"${h ? "" : " disabled"}>Aggiorna adesso</button> <button class="btn" id="sc">${h ? "Cambia cartella" : "Scegli la cartella"}</button></p>`
+    : `<p style="color:var(--ko)">Questo browser non scrive nelle cartelle: apri la pagina con Edge o Chrome dal PC.</p>`}</div>`;
   $("#cl").onclick = () => d.close();
-  $("#cp").onclick = async () => { try { await navigator.clipboard.writeText(url); toast("Link copiato"); } catch (_) { $("#ul").select(); toast("Copia con Ctrl+C"); } };
+  if (si) {
+    $("#ag").onclick = async () => { const x = await cartella(true); d.close(); x ? scriviPpt(x, true) : toast("Permesso negato sulla cartella"); };
+    $("#sc").onclick = async () => { try { const x = await showDirectoryPicker({ id: "ppt", mode: "readwrite" }); await idb((o) => o.put(x, "ppt")); d.close(); scriviPpt(x, true); }
+      catch (e) { if (e.name !== "AbortError") toast(e.message); } };
+  }
   d.showModal();
 }
 function pagina(l) { // una pagina dello swipe per ogni flotta
@@ -624,8 +571,8 @@ async function importa(ev) {
       <p><button class="btn pri" id="sv">Salva</button> <button class="btn" id="an">Annulla</button></p></div>`;
     $("#an").onclick = () => d.close();
     $("#sv").onclick = async () => {
-      $("#sv").disabled = true;
-      try { await scrivi("giornaliere/" + g.data + ".json", g, "giornaliera " + g.data); d.close(); await carica(); render(); toast("Giornaliera del " + fd(g.data) + " salvata"); }
+      $("#sv").disabled = true; const hp = cartella(true); // permesso sulla cartella PowerPoint finché il clic è fresco
+      try { await scrivi("giornaliere/" + g.data + ".json", g, "giornaliera " + g.data); d.close(); await carica(); render(); toast("Giornaliera del " + fd(g.data) + " salvata"); scriviPpt(await hp, false); }
       catch (e) { toast(e.message); $("#sv").disabled = false; }
     };
     d.showModal();
@@ -654,7 +601,8 @@ async function importaPpl(ev) {
 }
 async function salvaPpl(msg, fn, fatto) { // rilegge, modifica, scrive (niente modifiche perse fra dispositivi), poi ricarica per il volato dei mesi nuovi
   document.querySelectorAll("#dlg button, #app button").forEach((b) => b.disabled = true);
-  try { const p = (await leggi("ppl.json")).data || {}; fn(p); await scrivi("ppl.json", p, "ppl: " + msg); $("#dlg").close(); if (fatto) fatto(); await carica(); toast("PPL salvata"); }
+  const hp = cartella(true); // chiamata dentro il clic: il permesso sulla cartella PowerPoint va chiesto subito
+  try { const p = (await leggi("ppl.json")).data || {}; fn(p); await scrivi("ppl.json", p, "ppl: " + msg); $("#dlg").close(); if (fatto) fatto(); await carica(); toast("PPL salvata"); render(); scriviPpt(await hp, false); return; }
   catch (e) { toast(e.message); }
   render();
 }
