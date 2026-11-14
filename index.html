@@ -118,21 +118,24 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .kp b{font-size:1.45em;color:var(--n);font-variant-numeric:tabular-nums}
 .bf .tw{flex:1;overflow:auto;min-height:0;padding:0 .8em}
 .bf table{border-collapse:collapse;width:100%;height:100%;table-layout:fixed;font-size:inherit;font-variant-numeric:tabular-nums}
-.bf th,.bf td{border-bottom:1px solid var(--l);padding:.3em .4em;text-align:center;vertical-align:middle;line-height:1.2;overflow-wrap:anywhere;background:#fff}
+.bf th,.bf td{border-bottom:1px solid var(--l);padding:.2em .4em;text-align:center;vertical-align:middle;line-height:1.2;overflow-wrap:anywhere;background:#fff}
 .bf thead th{color:var(--m);font-weight:600;font-size:.75em;text-transform:uppercase;letter-spacing:.03em;border-bottom:2px solid var(--n);position:sticky;top:0;z-index:2}
 .bf thead th.og{color:var(--n);background:#fff4cc}
 .bf tbody tr:nth-child(even)>*{background:var(--z)}
 .bf tr:has(+.v)>td:not([rowspan]){border-bottom-color:transparent}
-.bf .s{position:sticky;left:0;z-index:1;font-size:1.2em;font-weight:700;color:var(--n);box-shadow:inset .3em 0 0 var(--c,transparent)}
+.bf .s{position:sticky;left:0;z-index:1;font-size:1.2em;font-weight:700;color:var(--n)}
+.bf .ei{display:inline-block;min-width:3.4em;padding:.1em .4em;border-radius:.35em;line-height:1.2}
 .bf thead .s{z-index:3;font-size:.75em}
-.bf .s small{display:block;font-size:.55em;font-weight:500;color:var(--m)}
+.bf .s small{display:block;font-size:.55em;font-weight:600;color:var(--m);margin-top:.15em}
 .bf .s button{display:block;margin:.3em auto 0;font:inherit;font-size:.5em;font-weight:500;padding:.2em .5em;border-radius:6px;border:1px solid var(--l);background:#fff;color:var(--t);cursor:pointer}
 .bf [data-d]{cursor:pointer}
 .bf .p{font-weight:600}
 .bf .lav{font-weight:600;font-size:.85em;line-height:1.15}
 .bf .ed{cursor:pointer}
 .bf .ed:hover{box-shadow:inset 0 0 0 2px var(--n)}
-.bf .nx{color:var(--m);font-size:.85em}
+.bf .nx{color:#4a5466;font-size:.85em;font-weight:600}
+.bf .ch{display:inline-block;padding:.25em .6em;border-radius:.4em;font-weight:700;font-size:.85em;line-height:1.2}
+.bf .sm{font-size:.75em;font-weight:500;color:var(--m);margin-left:.4em;white-space:nowrap}
 .bf .v td{color:var(--m)}
 .bf td small{display:block;font-size:.7em;color:var(--m)}
 .bf .nt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:left;font-size:.8em;line-height:1.2;color:var(--m)}
@@ -304,7 +307,7 @@ const MESI_L = ["GENNAIO", "FEBBRAIO", "MARZO", "APRILE", "MAGGIO", "GIUGNO", "L
 const gruppo = (t) => t.replace(/^(UH-169)[BD]$/, "$1 B+D"); // B e D insieme, come nelle lastrine
 const ordine = (t) => { const i = ["UH-169", "RH-206", "UH-205"].findIndex((p) => t.startsWith(p)); return i < 0 ? 9 : i; }; // ordine chiesto dall'utente
 const gruppi = () => [...new Set(S.g.linee.map((l) => gruppo(l.tipo)))];
-const COL_EFF = { eff: "#2e9d57", ineff: "#d64545", ind: "#7c4dcc", alien: "#9aa3b2" };
+const COL_EFF = { eff: ["#2e9d57", "#fff"], ineff: ["#fde4e2", "#b42318"], ind: ["#ece5fb", "#5b3aa8"], alien: ["#eceff3", "#5d6678"] }; // efficiente pieno, il resto tenue
 const colLav = (t) => /TBD/i.test(t) ? ["#eceff3", "#4a5466"] : /ATTESA/i.test(t) ? ["#ffe9d6", "#8a4510"] : /MAGG/i.test(t) ? ["#fde4e2", "#9b1c1c"] : ["#fff1c2", "#6b5300"]; // pastello: niente muri rossi
 const nMese = (m) => MESI_L[+m.slice(5) - 1].slice(0, 3) + " " + m.slice(0, 4);
 const ZOOM = [["mese", "Mese"], ["anno", "Anno"]];
@@ -331,7 +334,7 @@ function adatta(bf, z, min) { // carattere più grande (fino a 26 px) con la tab
   const tw = bf.querySelector(".tw"); let px = Math.max(min, Math.min(26, Math.round(bf.clientWidth * (z === "anno" ? 1.15 : 1.5) / 100)));
   do bf.style.fontSize = px + "px"; while (tw.scrollHeight > tw.clientHeight && --px >= min);
 }
-addEventListener("resize", () => { const b = $(".bf"); if (b) adatta(b, zoom(), 12); });
+addEventListener("resize", () => { const b = $(".bf"); if (b) adatta(b, zoom(), KIOSK ? 10 : 12); });
 function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA-MM", ed = ore e lavorazioni modificabili → { tt, tab }
   const g = S.g, m0 = g.data.slice(0, 7), y = m.slice(0, 4), linee = g.linee.filter((l) => gruppo(l.tipo) === fl);
   const tutti = linee.flatMap((l) => l.aerei.filter(vive).map((a) => [l, a])), [E, T] = conta(tutti.map(([, a]) => a));
@@ -339,7 +342,7 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
   const inp = (s, k, v) => `<input type="number" min="0" step="any" inputmode="decimal" data-s="${esc(s)}" data-m="${k}" value="${v == null ? "" : +(v / 60).toFixed(2)}" aria-label="Ore ${esc(s)} ${nMese(k)}">`;
   const cOre = (s, c) => ed && (!c.lav || +(c.dal || "").slice(8) > 1) ? inp(s, c.m, c.ore) : hh(c.ore); // nella lavorazione da un giorno > 1: le ore prima
   const lv = (s) => ed ? ` data-lv="${esc(s)}"` : "", lc = (t) => { const [bg, fg] = colLav(t); return `background:${bg};color:${fg}`; };
-  const th = (l, a, rs) => `<th class="s" rowspan="${rs}" style="--c:${COL_EFF[eff(a).c]}"${ed ? "" : ` data-d="${esc(a.sigla)}"`}>${esc(a.sigla)}${linee.length > 1 ? `<small>${esc(l.tipo)}</small>` : ""}${ed ? `<button data-lv="${esc(a.sigla)}">Lavorazioni</button>` : ""}</th>`;
+  const th = (l, a, rs) => { const c = eff(a).c, [bg, fg] = COL_EFF[c]; return `<th class="s" rowspan="${rs}" title="${CAT[c][2]}"${ed ? "" : ` data-d="${esc(a.sigla)}"`}><span class="ei" style="background:${bg};color:${fg}">${esc(a.sigla)}</span>${linee.length > 1 ? `<small>${esc(l.tipo)}</small>` : ""}${ed ? `<button data-lv="${esc(a.sigla)}">Lavorazioni</button>` : ""}</th>`; };
   const nota = (a, rs) => { const x = eff(a), t = [x.c !== "eff" && x.m, ((S.note[a.sigla] || []).slice(-1)[0] || {}).t].filter(Boolean).join(" · ");
     return `<td rowspan="${rs}" title="${esc(t)}"><div class="nt">${esc(t)}</div></td>`; };
   let head, righe, foot = "", cols, K;
@@ -359,24 +362,25 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       <tr><th class="s">Volate</th>${tv.map((x) => `<td>${x == null ? "" : fh(x)}</td>`).join("")}<td>${hh(som(tv))}</td></tr>`;
   } else { // una riga per macchina: programmate, volate, da volare (nei mesi passati la differenza), residuo, lavorazione
     const pas = m < m0, fm = Piano.primoDopo(m), T3 = [0, 0, 0];
-    const mp = (d) => nMese(d.slice(0, 7)).toLowerCase(), per = (f) => { const a = mp(f.in), b = f.aperto ? "" : mp(Piano.addG(f.out, -1));
-      return " da " + (+f.in.slice(8) > 1 ? fd(f.in) : a) + (b && b !== a ? " a " + b : ""); }; // da 23/11/2026 a dic 2026, da gen 2027 a feb 2027
+    const mp = (d) => nMese(d.slice(0, 7)).toLowerCase(), per = (f) => { let a = mp(f.in); const b = f.aperto ? "" : mp(Piano.addG(f.out, -1));
+      if (+f.in.slice(8) > 1) a = fd(f.in).slice(0, 5); else if (b && b !== a && b.slice(4) === a.slice(4)) a = a.slice(0, 3);
+      return !b ? "da " + a : b === a ? a : a + " – " + b; }; // 23/11 – dic 2026, gen – feb 2027, da gen 2027 (senza fine)
     righe = tutti.map(([l, a]) => {
       const s = a.sigla, r = rigaS(s, ed), c = Piano.celleMesi(r, [m])[0], p = Piano.pm(Object.fromEntries(r)[m]), w = vol(s, m), [rs, rt] = residuo(a);
       const dv = pas ? (w == null ? null : w - p) : Math.max(p - (w || 0), 0), fe = Piano.fermiPpl(r);
-      const f = fe.find((x) => x.in < fm && x.out > m + "-01"), nx = !f && fe.find((x) => x.in >= fm);
+      const f = fe.find((x) => x.in < fm && x.out > m + "-01"), nx = fe.find((x) => x.in >= fm && x !== f);
       T3[0] += p; T3[1] += w || 0; T3[2] += dv || 0;
-      return `<tr>${th(l, a, 1)}<td class="p">${cOre(s, { ...c, ore: c.lav ? c.ore : p })}</td><td>${w == null || (!w && !p) ? "" : fh(w)}</td>
-        <td class="${dv < 0 ? "neg" : ""}">${dv == null ? "" : pas ? fh(dv) : hh(dv)}</td><td>${rs == null ? "" : fh(rs) + `<small>${esc(rt)}</small>`}</td>
-        ${f ? `<td class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(f.testo)}">${esc(f.testo.toUpperCase()) + per(f)}</td>` : `<td class="nx${ed ? " ed" : ""}"${lv(s)}>${nx ? "prossima: " + esc(nx.testo.toUpperCase()) + per(nx) : ""}</td>`}${nota(a, 1)}</tr>`;
+      return `<tr>${th(l, a, 1)}<td class="p">${cOre(s, { ...c, ore: c.lav ? c.ore : p })}</td><td>${w == null || (!w && !p) ? "" : fh(w) }</td>
+        <td class="${dv < 0 ? "neg" : ""}">${dv == null ? "" : pas ? fh(dv) : hh(dv)}</td><td>${rs == null ? "" : fh(rs) + `<span class="sm">${esc(rt)}</span>`}</td>
+        <td class="${ed ? "ed" : ""}"${lv(s)}>${f ? `<span class="ch" style="${lc(f.testo)}">${esc(f.testo.toUpperCase())}</span><span class="sm">${per(f)}</span>` : ""}</td><td class="nx${ed ? " ed" : ""}"${lv(s)}>${nx ? esc(nx.testo.toUpperCase()) + `<span class="sm">${per(nx)}</span>` : ""}</td>${nota(a, 1)}</tr>`;
     });
-    cols = `<col style="width:9%">${'<col style="width:10%">'.repeat(4)}<col style="width:27%"><col>`;
-    head = `<th class="s">EI</th><th>Programmate</th><th>Volate</th><th>${pas ? "Differenza" : "Da volare"}</th><th>Ore residue</th><th>Manutenzione</th><th>Note</th>`;
+    cols = `<col style="width:10%"><col style="width:9%"><col style="width:10%"><col style="width:9%"><col style="width:9%"><col style="width:17%"><col style="width:18%"><col>`;
+    head = `<th class="s">EI</th><th>Programmate</th><th>Volate</th><th>${pas ? "Differenza" : "Da volare"}</th><th>Ore residue</th><th>Manutenzione nel mese</th><th>Prossima manutenzione</th><th>Note</th>`;
     K = [["Programmate", hh(T3[0]) || "0:00"], ["Volate", m > m0 ? "" : fh(T3[1])], [pas ? "Differenza" : "Da volare", pas ? fh(T3[2]) : hh(T3[2]) || "0:00"]];
   }
   const ml = MESI_L[+m.slice(5) - 1], tt = `<div class="tt"><img src="img/${tipo(linee[0].tipo)[0]}.webp" alt=""><h1><span>PPL</span>${esc(fl)}</h1>
     <div><b>${z === "anno" ? "Anno " + y : ml[0] + ml.slice(1).toLowerCase() + " " + y}</b>giornaliera del ${fd(g.data)}${z === "anno" ? " · in grigio le ore volate" : ""}</div></div>
-    <div class="kp">${[...K, ["Efficienti oggi", E + " su " + T]].map(([a, b]) => `<div><span>${a}</span><b>${b || "&nbsp;"}</b></div>`).join("")}</div>`;
+    <div class="kp">${[...K, ["Efficienti oggi (in verde)", E + " su " + T]].map(([a, b]) => `<div><span>${a}</span><b>${b || "&nbsp;"}</b></div>`).join("")}</div>`;
   return { tt, tab: `<table class="${z}" style="min-width:${z === "anno" ? 58 : 44}em"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${righe.join("")}</tbody><tfoot>${foot}</tfoot></table>` };
 }
 function renderBrief() {
@@ -395,7 +399,7 @@ function renderBrief() {
   document.querySelectorAll("[data-lv]").forEach((e) => e.onclick = (ev) => { if (ev.target.tagName !== "INPUT") { ev.stopPropagation(); dlgLav(e.dataset.lv); } });
   document.querySelectorAll("td input[data-m]").forEach((e) => e.oninput = () => { // in bozza, senza ridisegnare: il campo resta attivo
     const b = bozza(e.dataset.s); if (e.value === "") delete b.ore[e.dataset.m]; else b.ore[e.dataset.m] = Math.round(+e.value * 60); });
-  adatta($(".bf"), z, 12);
+  adatta($(".bf"), z, KIOSK ? 10 : 12); // in proiezione tutto a schermo anche piccolo
   if (KIOSK) return;
   if (S.mod) { $("#sv").onclick = salvaTutto; $("#an").onclick = () => { S.bozza = {}; S.mod = false; render(); }; $("#fp").onchange = importaPpl; return; }
   $("#fs").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
