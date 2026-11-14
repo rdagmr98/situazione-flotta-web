@@ -1,4 +1,4 @@
-/* Piano fermi: calcoli condivisi da index.html (pagina Piano) e marcia.html (link per i piloti).
+/* Piano dalla PPL: calcoli condivisi da index.html (Briefing, Gestione piano) e marcia.html (link per i piloti).
    Date come stringhe AAAA-MM-GG, settimane ISO "AAAA-Www", ore in minuti. Gira anche in Node (test.mjs). */
 (function (g) {
   "use strict";
@@ -22,36 +22,6 @@
     x.setUTCDate(x.getUTCDate() + 4 - dow); // il giovedì decide l'anno ISO
     var y = x.getUTCFullYear(), n = Math.floor((x - Date.UTC(y, 0, 1)) / G / 7) + 1;
     return y + "-W" + String(n).padStart(2, "0");
-  }
-
-  // res ripartito sui mesi in proporzione ai giorni, senza superare il tetto di ciascuno (riempimento a livelli)
-  function ripartisci(res, giorni, tetti) {
-    var out = giorni.map(function () { return 0; }), liberi = [], resto = Math.max(res, 0);
-    giorni.forEach(function (n, i) { if (n > 0) liberi.push(i); });
-    while (liberi.length && resto > 0) {
-      var tot = liberi.reduce(function (s, i) { return s + giorni[i]; }, 0);
-      var pieni = liberi.filter(function (i) { return resto * giorni[i] / tot >= tetti[i]; });
-      if (!pieni.length) { liberi.forEach(function (i) { out[i] = resto * giorni[i] / tot; }); break; }
-      pieni.forEach(function (i) { out[i] = tetti[i]; resto -= tetti[i]; });
-      liberi = liberi.filter(function (i) { return pieni.indexOf(i) < 0; });
-    }
-    return out;
-  }
-
-  // Tabella di marcia di una macchina: ore residue alla data della giornaliera `da`, volabili fino al giorno prima
-  // dell'ingresso `a`; tetto in ore/mese (0 = nessuno), ridotto in proporzione nei mesi a metà. Ore intere per difetto.
-  function marcia(da, a, res, tettoOre) {
-    var mesi = [], giorni = [], tetti = [];
-    for (var d = addG(da, 1); d < a;) {
-      var m = d.slice(0, 7), dopo = iso(Date.UTC(+m.slice(0, 4), +m.slice(5), 1)), lim = dopo < a ? dopo : a, n = diffG(d, lim);
-      mesi.push(m); giorni.push(n); tetti.push(tettoOre ? tettoOre * 60 * n / diffG(m + "-01", dopo) : Infinity);
-      d = lim;
-    }
-    var cum = 0, prec = 0;
-    var fh = ripartisci(res, giorni, tetti).map(function (x) { // arrotonda il cumulato: la somma non supera mai il residuo
-      cum += x; var c = Math.floor(cum / 60 + 1e-9) * 60, v = c - prec; prec = c; return v;
-    });
-    return { mesi: mesi.map(function (m, i) { return [m, fh[i]]; }), resto: Math.max(res, 0) - prec };
   }
 
   // --- PPL: { "tipo|anno": { righe: { sigla: { "MM": minuti | [testo, giorno, minuti?] | null } } } } ---
@@ -85,15 +55,32 @@
   // resto = residuo meno le FH programmate fino al prossimo fermo, null se la macchina è già in un fermo
   function marciaPpl(mesi, da, oreMese, res) {
     var m0 = da.slice(0, 7), fe = fermiPpl(mesi), out = [], usate = 0;
-    var ora = fe.some(function (f) { return f.in <= da && da < f.out; }), stop = ora;
+    var ora = fe.some(function (f) { return f.in <= da && da < f.out; }), stop = ora, finite = null;
     mesi.forEach(function (x) {
       if (x[0] < m0) return;
       var v = x[1], h = x[0] === m0 ? Math.max(pm(v) - oreMese, 0) : pm(v);
       var dentro = fe.some(function (f) { return f.in < primoDopo(x[0]) && f.out > x[0] + "-01"; });
       if (Array.isArray(v)) out.push([x[0], v[0]]); else if (v != null) out.push([x[0], h]); else if (dentro) out.push([x[0], ""]);
-      if (!stop) { usate += h; stop = Array.isArray(v); }
+      if (!stop) { usate += h; if (!finite && res != null && usate > res) finite = x[0]; stop = Array.isArray(v); }
     });
-    return { mesi: out, resto: ora || res == null ? null : res - usate, prossimo: fe.find(function (f) { return f.out > da; }) || null };
+    return { mesi: out, resto: ora || res == null ? null : res - usate, finite: ora ? null : finite, prossimo: fe.find(function (f) { return f.out > da; }) || null };
+  }
+  // Gestione piano: riga PPL di una macchina <-> { ore: { "AAAA-MM": minuti }, lav: [{ t, da: "AAAA-MM-GG", al: ultimo mese "AAAA-MM" o "" se senza fine }] }
+  function modello(mesi) {
+    var ore = {};
+    mesi.forEach(function (x) { var v = x[1]; if (typeof v === "number" || (Array.isArray(v) && v[2])) ore[x[0]] = pm(v); });
+    return { ore: ore, lav: fermiPpl(mesi).map(function (f) { return { t: f.testo, da: f.in, al: f.aperto ? "" : addG(f.out, -1).slice(0, 7) }; }) };
+  }
+  // -> [["AAAA-MM", valore]] sui mesi mm: la lavorazione nel mese in cui inizia, null nei mesi dentro, e il mese dopo la fine mai vuoto (la chiude)
+  function riga(mod, mm) {
+    var lav = mod.lav.filter(function (x) { return /^\d{4}-\d\d-\d\d$/.test(x.da); }).sort(function (a, b) { return a.da < b.da ? -1 : 1; }), dopo = false;
+    return mm.map(function (m) {
+      var l = lav.find(function (x) { return x.da.slice(0, 7) === m; }), h = mod.ore[m], g = l && +l.da.slice(8);
+      var p = lav.filter(function (x) { return x.da.slice(0, 7) < m; }).pop(), dentro = !!p && (!p.al || m <= p.al); // la lavorazione dopo chiude quella prima
+      var v = l ? (g > 1 && h ? [l.t, g, h] : [l.t, g]) : dentro ? null : h != null ? h : dopo ? 0 : null;
+      dopo = !!l || dentro;
+      return [m, v];
+    });
   }
   function piuMesi(m, k) { return new Date(Date.UTC(+m.slice(0, 4), +m.slice(5, 7) - 1 + k, 1)).toISOString().slice(0, 7); }
   // riga programmata dei 12 mesi da "AAAA-MM" come nella PPL: 36 decadi (3 per mese), le lavorazioni unite su più decadi/mesi →
@@ -141,13 +128,13 @@
     return JSON.parse(await new Response(s).text());
   }
 
-  // s = { d: data giornaliera, t: data del piano, r: [{ s, tipo, isp, in, out, res, sc, mesi, resto, tetto }] }
+  // s = { d: data giornaliera, t: data del piano, r: [{ s, tipo, isp, in, out, res, sc, mesi, resto }] }
   var sh = function (m) { m = Math.round(m); return m < 0 ? "−" + hm(-m) : hm(m); };
   var corto = function (t) { // testo del fermo nella cella del mese
     return t.replace(/ISPEZIONE|ISP\.?/gi, "").replace(/INTERMEDIA|INT\./gi, "INT").replace(/MAGGIORE/gi, "MAGG").replace(/ATTESA/gi, "ATT.").replace(/\s+/g, " ").trim() || t;
   };
   // r.mesi: [mese, minuti] oppure [mese, testo del fermo] ("" = mese dentro un fermo); r.ppl = riga dalla PPL (vol/pv = scostamento)
-  function htmlMarcia(s, edit) {
+  function htmlMarcia(s) {
     if (!s.r.length) return '<p class="sub" style="padding:0 12px">Nessun fermo in programma.</p>';
     var mm = [], sc = s.r.some(function (r) { return r.vol != null; });
     s.r.forEach(function (r) { r.mesi.forEach(function (x) { if (mm.indexOf(x[0]) < 0) mm.push(x[0]); }); });
@@ -155,7 +142,7 @@
     return '<div class="gw"><table class="gantt mt"><thead><tr><th>Elicottero</th><th>Ispezione</th><th>Ingresso</th><th>Rientro</th><th>FH residue</th>' +
       (sc ? "<th>Volato</th><th>PPL<small>al periodo</small></th><th>Scost.</th>" : "") +
       mm.map(function (m) { return "<th>" + MESI[+m.slice(5) - 1] + "<small>" + m.slice(0, 4) + "</small></th>"; }).join("") +
-      "<th>Restano</th>" + (edit ? "<th>Tetto FH/mese</th>" : "") + "</tr></thead><tbody>" +
+      "<th>Restano</th></tr></thead><tbody>" +
       s.r.map(function (r) {
         var v = {}; r.mesi.forEach(function (x) { v[x[0]] = x[1]; });
         return "<tr><th>" + esc(r.s) + " <small>" + esc(r.tipo) + (r.ppl ? " · PPL" : "") + "</small></th><td>" + esc(r.isp) + "</td><td>" + fd(r.in) + "</td><td>" + fd(r.out) +
@@ -165,13 +152,12 @@
             var x = v[m];
             return typeof x === "string" ? '<td class="fe" title="' + esc(x) + '">' + esc(corto(x)) + "</td>" : "<td>" + (x == null ? "" : x % 60 ? hm(x) : x / 60) + "</td>";
           }).join("") +
-          (r.res == null || r.resto == null ? "<td>–</td>" : r.resto < 0 ? '<td class="ko">' + sh(r.resto) + "</td>" : "<td>" + hm(r.resto) + "</td>") +
-          (edit ? r.ppl ? "<td></td>" : '<td><input type="number" min="0" step="1" data-tetto="' + esc(r.s) + '" value="' + (r.tetto || "") + '" placeholder="–"></td>' : "") + "</tr>";
+          (r.res == null || r.resto == null ? "<td>–</td>" : r.resto < 0 ? '<td class="ko">' + sh(r.resto) + "</td>" : "<td>" + hm(r.resto) + "</td>") + "</tr>";
       }).join("") + "</tbody></table></div>";
   }
 
-  var api = { lunedi: lunedi, settimana: settimana, addG: addG, diffG: diffG, ripartisci: ripartisci, marcia: marcia,
-    pplMesi: pplMesi, fermiPpl: fermiPpl, marciaPpl: marciaPpl, scostamento: scostamento, celle: celle, piuMesi: piuMesi, pm: pm, primoDopo: primoDopo,
+  var api = { lunedi: lunedi, settimana: settimana, addG: addG, diffG: diffG, 
+    pplMesi: pplMesi, fermiPpl: fermiPpl, marciaPpl: marciaPpl, scostamento: scostamento, celle: celle, piuMesi: piuMesi, pm: pm, modello: modello, riga: riga, primoDopo: primoDopo,
     codifica: codifica, decodifica: decodifica, htmlMarcia: htmlMarcia, fd: fd };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else g.Piano = api;
 })(typeof window !== "undefined" ? window : globalThis);
