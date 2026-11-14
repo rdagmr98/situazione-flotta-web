@@ -94,49 +94,55 @@ select{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--li
 .lr label.lt1{flex:2 1 220px}
 .lr .btn{margin:6px 0}
 .lr input{color-scheme:dark}
-/* Briefing: tema chiaro da proiettore (blu notte, riga oro); la stessa resa va nelle immagini per PowerPoint */
+/* PPL: tema chiaro e sobrio, per il proiettore e per il Web Viewer di PowerPoint (?ppl) */
 body.chiaro{background:#fff}
 .chiaro main{max-width:none;padding:0}
-.bf{--n:#0b2a55;--o:#c9a227;--t:#13213a;--l:#b9c2d0;
-color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.3}
-.bf .ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 12px;background:#f2f4f8;border-bottom:1px solid var(--l);font-size:14px}
-.bf .ctl button,.bf .ctl label{border:1px solid var(--l);background:#fff;color:var(--t);padding:6px 12px;border-radius:8px;font:inherit;cursor:pointer}
+.bf{--n:#1b2f55;--t:#1d2433;--m:#6b7487;--l:#e1e6ee;--z:#f6f8fb;
+color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;font-family:"Segoe UI",system-ui,-apple-system,Roboto,sans-serif;line-height:1.3}
+.bf .ctl{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:6px 12px;border-bottom:1px solid var(--l);font-size:14px}
+.bf .ctl button,.bf .ctl label{border:1px solid var(--l);background:#fff;color:var(--t);padding:5px 12px;border-radius:8px;font:inherit;cursor:pointer}
 .bf .ctl button.on{background:var(--n);border-color:var(--n);color:#fff}
-.bf .ctl b{font-size:16px;min-width:5.5em;text-align:center}
-.bf .ctl i{font-style:normal;color:#5b6680}
+.bf .ctl b{font-size:15px;min-width:5.5em;text-align:center}
+.bf .ctl i{font-style:normal;color:var(--m)}
 .bf .ctl .sp{flex:1}
 .bf .ctl .nav{display:flex;align-items:center;gap:6px}
-@media (max-width:700px){.bf .tt h1{font-size:1.2em}.bf .tt div,.bf .ctl i{display:none}}
-.bf .tt{display:flex;align-items:center;gap:16px;background:var(--n);color:#fff;padding:4px 12px;border-bottom:4px solid var(--o)}
-.bf .tt img{height:2.4em;filter:drop-shadow(0 0 2px #0008)}
-.bf .tt h1{font-size:1.5em;letter-spacing:.02em;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bf .tt div{text-align:right;font-size:.9em;line-height:1.25}
-.bf .tt b{color:var(--o);font-size:1.2em}
-.bf .tw{flex:1;overflow:auto;min-height:0}
-.bf table{border-collapse:collapse;width:100%;table-layout:fixed;font-size:inherit;font-variant-numeric:tabular-nums}
-.bf th,.bf td{border:1px solid var(--l);padding:.25em .3em;text-align:center;vertical-align:middle;line-height:1.2;overflow-wrap:anywhere}
-.bf thead th{background:var(--n);color:#fff;position:sticky;top:0;z-index:2}
-.bf thead th.og{background:var(--o);color:var(--n)}
-.bf .s{position:sticky;left:0;z-index:1;color:#fff;font-size:1.25em}
+.bf .tt{display:flex;align-items:center;gap:.8em;padding:.5em .8em .4em}
+.bf .tt img{height:2.2em}
+.bf .tt h1{font-size:1.6em;margin:0;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--n)}
+.bf .tt h1 span{color:var(--m);font-weight:500;margin-right:.35em}
+.bf .tt div{text-align:right;color:var(--m);font-size:.8em;line-height:1.3}
+.bf .tt b{display:block;color:var(--n);font-size:1.6em}
+.bf .kp{display:flex;gap:.6em;padding:0 .8em .6em}
+.bf .kp div{flex:1;background:var(--z);border:1px solid var(--l);border-radius:.4em;padding:.3em .7em}
+.bf .kp span{display:block;color:var(--m);font-size:.8em}
+.bf .kp b{font-size:1.45em;color:var(--n);font-variant-numeric:tabular-nums}
+.bf .tw{flex:1;overflow:auto;min-height:0;padding:0 .8em}
+.bf table{border-collapse:collapse;width:100%;height:100%;table-layout:fixed;font-size:inherit;font-variant-numeric:tabular-nums}
+.bf th,.bf td{border-bottom:1px solid var(--l);padding:.3em .4em;text-align:center;vertical-align:middle;line-height:1.2;overflow-wrap:anywhere;background:#fff}
+.bf thead th{color:var(--m);font-weight:600;font-size:.75em;text-transform:uppercase;letter-spacing:.03em;border-bottom:2px solid var(--n);position:sticky;top:0;z-index:2}
+.bf thead th.og{color:var(--n);background:#fff4cc}
+.bf tbody tr:nth-child(even)>*{background:var(--z)}
+.bf tr:has(+.v)>td:not([rowspan]){border-bottom-color:transparent}
+.bf .s{position:sticky;left:0;z-index:1;font-size:1.2em;font-weight:700;color:var(--n);box-shadow:inset .3em 0 0 var(--c,transparent)}
+.bf thead .s{z-index:3;font-size:.75em}
+.bf .s small{display:block;font-size:.55em;font-weight:500;color:var(--m)}
+.bf .s button{display:block;margin:.3em auto 0;font:inherit;font-size:.5em;font-weight:500;padding:.2em .5em;border-radius:6px;border:1px solid var(--l);background:#fff;color:var(--t);cursor:pointer}
 .bf [data-d]{cursor:pointer}
-.bf thead .s{z-index:3;font-size:1em}
-.bf .s small{display:block;font-size:.55em;font-weight:400}
-.bf .s button{display:block;margin:.3em auto 0;font:inherit;font-size:.5em;padding:.2em .5em;border-radius:6px;border:1px solid #fff;background:#fff3;color:#fff;cursor:pointer}
-.bf tbody tr:not(.v)>*{border-top:2px solid #7d8aa0}
 .bf .p{font-weight:600}
-.bf .lav{font-weight:700;font-size:.85em;line-height:1.1}
+.bf .lav{font-weight:600;font-size:.85em;line-height:1.15}
 .bf .ed{cursor:pointer}
 .bf .ed:hover{box-shadow:inset 0 0 0 2px var(--n)}
-.bf .nx{color:#5b6680;font-size:.85em}
-.bf .v td{background:#f3f5f9;color:#3a4660}
-.bf td small{display:block;font-size:.7em;color:#5b6680}
-.bf .nt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:left;font-size:.85em;line-height:1.15}
-.bf td input{width:100%;min-width:0;padding:.2em;margin:0;text-align:center;font:inherit;font-weight:600;color:var(--t);background:#fffbe6;border:1px solid var(--o);border-radius:4px;color-scheme:light}
-.bf tfoot{position:sticky;bottom:0;z-index:2}
-.bf tfoot td,.bf tfoot th{background:#e7ebf2;font-weight:700}
-.bf tfoot .s{background:var(--n);font-size:.9em}
-.bf tfoot tr:first-child>*{border-top:3px solid var(--n)}
-.bf .neg{color:#c62828}
+.bf .nx{color:var(--m);font-size:.85em}
+.bf .v td{color:var(--m)}
+.bf td small{display:block;font-size:.7em;color:var(--m)}
+.bf .nt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:left;font-size:.8em;line-height:1.2;color:var(--m)}
+.bf td input{width:100%;min-width:0;padding:.2em;margin:0;text-align:center;font:inherit;font-weight:600;color:var(--t);background:#fffbe6;border:1px solid #c9a227;border-radius:4px;color-scheme:light}
+.bf tfoot td,.bf tfoot th{background:#eef1f6;font-weight:700;color:var(--n)}
+.bf tfoot tr:first-child>*{border-top:2px solid var(--n)}
+.bf .neg{color:#b42318}
+.bf .anno td,.bf .anno th{padding:.1em .3em}
+.bf tfoot .s{font-size:.75em;overflow-wrap:normal}
+@media (max-width:700px){.bf .tt div,.bf .ctl i{display:none}.bf .kp{flex-wrap:wrap}.bf .kp div{flex-basis:40%}}
 @media print{
 .bf{height:auto;font-size:11px}
 :root{--bg:#fff;--card:#fff;--card2:#f3f4f6;--line:#ccc;--tx:#000;--mu:#555}
@@ -172,6 +178,8 @@ const ls = (k, v) => { try { return v === undefined ? localStorage.getItem(k) ||
 // stati.json = { sigla: { e: efficiente?, m: motivo, d: giorno } }: correzione a mano, vale finché non arriva una giornaliera più recente
 const S = { g: null, note: {}, stati: {}, vista: "macchine", flotta: ls("sf_flotta"), filtro: ls("sf_filtro") || "tutti", info: false };
 S.pag = ls("sf_pag");
+const KIOSK = new URLSearchParams(location.search).has("ppl"); // ?ppl: solo la PPL in sola lettura, per il Web Viewer di PowerPoint
+if (KIOSK) { S.pag = "brief"; setInterval(() => carica().then(render).catch(() => {}), 6e5); } // si aggiorna da sola ogni 10 minuti
 
 // --- formati ---
 const fh = (m) => m == null ? "–" : (m < 0 ? "-" : "") + Math.floor(Math.abs(m) / 60) + ":" + String(Math.abs(m) % 60).padStart(2, "0");
@@ -225,7 +233,8 @@ async function carica() {
   const [g, n, s, q] = await Promise.all([ult ? leggi("giornaliere/" + ult) : { data: null }, leggi("note.json"), leggi("stati.json"), leggi("ppl.json")]);
   S.g = g.data; S.note = n.data || {}; S.stati = s.data || {}; S.ppl = q.data || {}; S.vol = {};
   if (!S.g) return;
-  // volato per il Briefing: ore mese dell'ultima giornaliera di ogni mese, dal primo anno di PPL
+  S.g.linee.sort((a, b) => ordine(a.tipo) - ordine(b.tipo));
+  // volato per la PPL: ore mese dell'ultima giornaliera di ogni mese, dal primo anno di PPL
   const a0 = Object.keys(S.ppl).map((k) => k.split("|")[1]).sort()[0], m1 = S.g.data.slice(0, 7), um = {};
   for (const x of nomi) um[x.slice(0, 7)] = x;
   const mesi = Object.keys(um).filter((m) => a0 && m >= a0 && m < m1);
@@ -266,7 +275,7 @@ function render() {
   const pag = ["note", ...g.linee.map((l) => l.tipo)], k0 = pag.indexOf(S.flotta), i = k0 < 0 ? 1 : k0;
   const N = nascoste(), tutte = g.linee.flatMap((l) => l.aerei.filter((a) => S.note[a.sigla] || eff(a).man).map((a) => [l, a]));
   const ann = tutte.filter(([, a]) => N[a.sigla] !== firma(a.sigla)), nn = tutte.length - ann.length;
-  $("#app").innerHTML = `<header><h1>Situazione flotta</h1><button class="btn pri" id="bb">Briefing</button>${imp}
+  $("#app").innerHTML = `<header><h1>Situazione flotta</h1><button class="btn pri" id="bb">PPL</button>${imp}
     <div class="sub" style="flex-basis:100%">Giornaliera del <b>${fd(g.data)}</b> · efficienti ${E} su ${T} (${P}%)</div></header>
    <nav class="tabs"><button data-p="0" style="--c:#7aa2ff"><b>Note</b>${ann.length}</button>${g.linee.map((x, k) => { const [a, b] = conta(x.aerei);
      return `<button data-p="${k + 1}" style="--c:${tipo(x.tipo)[1]}"><b>${esc(x.tipo)}</b>${a}/${b}</button>`; }).join("")}</nav>
@@ -289,13 +298,14 @@ function render() {
 }
 const vai = (p) => { S.pag = p; ls("sf_pag", p); scrollTo(0, 0); render(); };
 
-// --- Briefing: per flotta le ore programmate (PPL) e le volate. Mese = una riga per macchina, Anno = la PPL dell'anno solare.
+// --- PPL: per flotta le ore programmate (PPL) e le volate. Mese = una riga per macchina, Anno = la PPL dell'anno solare.
 // In sola lettura si proietta; «Modifica» apre ore e lavorazioni in bozza e «Salva» le scrive tutte insieme in ppl.json ---
 const MESI_L = ["GENNAIO", "FEBBRAIO", "MARZO", "APRILE", "MAGGIO", "GIUGNO", "LUGLIO", "AGOSTO", "SETTEMBRE", "OTTOBRE", "NOVEMBRE", "DICEMBRE"];
 const gruppo = (t) => t.replace(/^(UH-169)[BD]$/, "$1 B+D"); // B e D insieme, come nelle lastrine
+const ordine = (t) => { const i = ["UH-169", "RH-206", "UH-205"].findIndex((p) => t.startsWith(p)); return i < 0 ? 9 : i; }; // ordine chiesto dall'utente
 const gruppi = () => [...new Set(S.g.linee.map((l) => gruppo(l.tipo)))];
-const COL_EFF = { eff: "#1e9e4a", ineff: "#e0262b", ind: "#7c4dcc", alien: "#8793a8" };
-const colLav = (t) => /TBD/i.test(t) ? ["#a6a6a6", "#13213a"] : /ATTESA/i.test(t) ? ["#e46c0a", "#fff"] : /MAGG/i.test(t) ? ["#e8262a", "#fff"] : ["#f5b800", "#13213a"];
+const COL_EFF = { eff: "#2e9d57", ineff: "#d64545", ind: "#7c4dcc", alien: "#9aa3b2" };
+const colLav = (t) => /TBD/i.test(t) ? ["#eceff3", "#4a5466"] : /ATTESA/i.test(t) ? ["#ffe9d6", "#8a4510"] : /MAGG/i.test(t) ? ["#fde4e2", "#9b1c1c"] : ["#fff1c2", "#6b5300"]; // pastello: niente muri rossi
 const nMese = (m) => MESI_L[+m.slice(5) - 1].slice(0, 3) + " " + m.slice(0, 4);
 const ZOOM = [["mese", "Mese"], ["anno", "Anno"]];
 // S.mm: mese a schermo (null = quello della giornaliera); S.bozza: sigla -> { ore, lav } modificati e non ancora salvati
@@ -317,22 +327,22 @@ function tuttiMesi(s) { // mesi consecutivi che la riga della bozza può toccare
   return mm;
 }
 const rigaS = (s, ed) => ed && S.bozza[s] ? Piano.riga(S.bozza[s], tuttiMesi(s)) : Piano.pplMesi(S.ppl)[s] || [];
-function adatta(bf, z, min) { // carattere più grande (fino a 30 px) con la tabella intera a schermo o nell'immagine, ma non sotto min
-  const tw = bf.querySelector(".tw"); let px = Math.max(min, Math.min(30, Math.round(bf.clientWidth * (z === "anno" ? 1.15 : 1.6) / 100)));
+function adatta(bf, z, min) { // carattere più grande (fino a 26 px) con la tabella intera a schermo, ma non sotto min
+  const tw = bf.querySelector(".tw"); let px = Math.max(min, Math.min(26, Math.round(bf.clientWidth * (z === "anno" ? 1.15 : 1.5) / 100)));
   do bf.style.fontSize = px + "px"; while (tw.scrollHeight > tw.clientHeight && --px >= min);
 }
 addEventListener("resize", () => { const b = $(".bf"); if (b) adatta(b, zoom(), 12); });
-function tavola(fl, z, m, ed, img) { // Briefing di una flotta: z "mese" | "anno", m "AAAA-MM", ed = ore e lavorazioni modificabili → { tt, tab }
+function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA-MM", ed = ore e lavorazioni modificabili → { tt, tab }
   const g = S.g, m0 = g.data.slice(0, 7), y = m.slice(0, 4), linee = g.linee.filter((l) => gruppo(l.tipo) === fl);
   const tutti = linee.flatMap((l) => l.aerei.filter(vive).map((a) => [l, a])), [E, T] = conta(tutti.map(([, a]) => a));
   const vol = (s, k) => S.vol[k] ? S.vol[k].o[s] ?? null : null, hh = (v) => v ? fh(v) : "", som = (xs) => xs.reduce((t, x) => t + (x || 0), 0);
   const inp = (s, k, v) => `<input type="number" min="0" step="any" inputmode="decimal" data-s="${esc(s)}" data-m="${k}" value="${v == null ? "" : +(v / 60).toFixed(2)}" aria-label="Ore ${esc(s)} ${nMese(k)}">`;
   const cOre = (s, c) => ed && (!c.lav || +(c.dal || "").slice(8) > 1) ? inp(s, c.m, c.ore) : hh(c.ore); // nella lavorazione da un giorno > 1: le ore prima
   const lv = (s) => ed ? ` data-lv="${esc(s)}"` : "", lc = (t) => { const [bg, fg] = colLav(t); return `background:${bg};color:${fg}`; };
-  const th = (l, a, rs) => `<th class="s" rowspan="${rs}" style="background:${COL_EFF[eff(a).c]}"${ed ? "" : ` data-d="${esc(a.sigla)}"`}>${esc(a.sigla)}${linee.length > 1 ? `<small>${esc(l.tipo)}</small>` : ""}${ed ? `<button data-lv="${esc(a.sigla)}">Lavorazioni</button>` : ""}</th>`;
+  const th = (l, a, rs) => `<th class="s" rowspan="${rs}" style="--c:${COL_EFF[eff(a).c]}"${ed ? "" : ` data-d="${esc(a.sigla)}"`}>${esc(a.sigla)}${linee.length > 1 ? `<small>${esc(l.tipo)}</small>` : ""}${ed ? `<button data-lv="${esc(a.sigla)}">Lavorazioni</button>` : ""}</th>`;
   const nota = (a, rs) => { const x = eff(a), t = [x.c !== "eff" && x.m, ((S.note[a.sigla] || []).slice(-1)[0] || {}).t].filter(Boolean).join(" · ");
     return `<td rowspan="${rs}" title="${esc(t)}"><div class="nt">${esc(t)}</div></td>`; };
-  let head, righe, foot, cols;
+  let head, righe, foot = "", cols, K;
   if (z === "anno") { // per macchina due righe: sopra programmate e lavorazioni (celle unite sui mesi in cui continuano), sotto volate
     const mY = MESI_L.map((_, i) => y + "-" + String(i + 1).padStart(2, "0")), tp = mY.map(() => 0), tv = mY.map(() => null);
     righe = tutti.map(([l, a]) => {
@@ -341,9 +351,9 @@ function tavola(fl, z, m, ed, img) { // Briefing di una flotta: z "mese" | "anno
       const cel = (c) => { const ore = cOre(s, c), gd = +(c.dal || "").slice(8);
         return !c.lav ? `<td class="p">${ore}</td>` : `<td colspan="${c.n}" class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(c.lav)}" title="${esc(c.lav)}">${ore}${ore ? "<br>" : ""}${esc(c.lav.toUpperCase())}${gd > 1 ? " dal " + gd : ""}</td>`; };
       return `<tr>${th(l, a, 2)}${Piano.celleMesi(r, mY).map(cel).join("")}<td class="p">${hh(som(pr))}</td>${nota(a, 2)}</tr>
-       <tr class="v">${vo.map((x) => `<td>${x == null ? "" : fh(x)}</td>`).join("")}<td>${hh(som(vo))}</td></tr>`;
+       <tr class="v">${vo.map((x, i) => `<td>${x == null || (!x && !pr[i]) ? "" : fh(x)}</td>`).join("")}<td>${hh(som(vo))}</td></tr>`;
     });
-    cols = `<col style="width:6.5em">${"<col>".repeat(12)}<col style="width:5.5em"><col style="width:12em">`;
+    cols = `<col style="width:7%">${"<col>".repeat(12)}<col style="width:6%"><col style="width:13%">`; K = [["Programmate nell'anno", hh(som(tp)) || "0:00"], ["Volate nell'anno", hh(som(tv)) || "0:00"]];
     head = `<th class="s">EI</th>${mY.map((k) => `<th class="${k === m0 ? "og" : ""}">${MESI_L[+k.slice(5) - 1].slice(0, 3)}</th>`).join("")}<th>Totale</th><th>Note</th>`;
     foot = `<tr><th class="s">Programmate</th>${tp.map((x) => `<td>${hh(x)}</td>`).join("")}<td>${hh(som(tp))}</td><td rowspan="2"></td></tr>
       <tr><th class="s">Volate</th>${tv.map((x) => `<td>${x == null ? "" : fh(x)}</td>`).join("")}<td>${hh(som(tv))}</td></tr>`;
@@ -356,26 +366,27 @@ function tavola(fl, z, m, ed, img) { // Briefing di una flotta: z "mese" | "anno
       const dv = pas ? (w == null ? null : w - p) : Math.max(p - (w || 0), 0), fe = Piano.fermiPpl(r);
       const f = fe.find((x) => x.in < fm && x.out > m + "-01"), nx = !f && fe.find((x) => x.in >= fm);
       T3[0] += p; T3[1] += w || 0; T3[2] += dv || 0;
-      return `<tr>${th(l, a, 1)}<td class="p">${cOre(s, { ...c, ore: c.lav ? c.ore : p })}</td><td>${w == null ? "" : fh(w)}</td>
+      return `<tr>${th(l, a, 1)}<td class="p">${cOre(s, { ...c, ore: c.lav ? c.ore : p })}</td><td>${w == null || (!w && !p) ? "" : fh(w)}</td>
         <td class="${dv < 0 ? "neg" : ""}">${dv == null ? "" : pas ? fh(dv) : hh(dv)}</td><td>${rs == null ? "" : fh(rs) + `<small>${esc(rt)}</small>`}</td>
         ${f ? `<td class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(f.testo)}">${esc(f.testo.toUpperCase()) + per(f)}</td>` : `<td class="nx${ed ? " ed" : ""}"${lv(s)}>${nx ? "prossima: " + esc(nx.testo.toUpperCase()) + per(nx) : ""}</td>`}${nota(a, 1)}</tr>`;
     });
-    cols = `<col style="width:6.5em">${'<col style="width:8em">'.repeat(4)}<col style="width:22em"><col>`;
-    head = `<th class="s">EI</th><th>Programmate</th><th>Volate</th><th>${pas ? "Differenza" : "Da volare"}</th><th>Residuo ore oggi</th><th>Lavorazione</th><th>Note</th>`;
-    foot = `<tr><th class="s">Totale</th><td>${hh(T3[0])}</td><td>${m > m0 ? "" : fh(T3[1])}</td><td class="${T3[2] < 0 ? "neg" : ""}">${pas ? fh(T3[2]) : hh(T3[2])}</td><td></td><td></td><td></td></tr>`;
+    cols = `<col style="width:9%">${'<col style="width:10%">'.repeat(4)}<col style="width:27%"><col>`;
+    head = `<th class="s">EI</th><th>Programmate</th><th>Volate</th><th>${pas ? "Differenza" : "Da volare"}</th><th>Ore residue</th><th>Manutenzione</th><th>Note</th>`;
+    K = [["Programmate", hh(T3[0]) || "0:00"], ["Volate", m > m0 ? "" : fh(T3[1])], [pas ? "Differenza" : "Da volare", pas ? fh(T3[2]) : hh(T3[2]) || "0:00"]];
   }
-  const tt = `<div class="tt">${img ? [...new Set(linee.map((l) => tipo(l.tipo)[0]))].map((f) => `<img src="img/${f}.webp" alt="">`).join("") : ""}<h1>PROGRAMMAZIONE ORE DI VOLO · ${esc(fl)}</h1>
-    <div><b>${z === "anno" ? "ANNO " + y : MESI_L[+m.slice(5) - 1] + " " + y}</b><br>efficienti ${E} su ${T} · giornaliera del ${fd(g.data)}${z === "anno" ? "<br>riga sopra: programmate · riga sotto: volate" : ""}</div></div>`;
-  return { tt, tab: `<table style="min-width:${z === "anno" ? 58 : 50}em"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${righe.join("")}</tbody><tfoot>${foot}</tfoot></table>` };
+  const ml = MESI_L[+m.slice(5) - 1], tt = `<div class="tt"><img src="img/${tipo(linee[0].tipo)[0]}.webp" alt=""><h1><span>PPL</span>${esc(fl)}</h1>
+    <div><b>${z === "anno" ? "Anno " + y : ml[0] + ml.slice(1).toLowerCase() + " " + y}</b>giornaliera del ${fd(g.data)}${z === "anno" ? " · in grigio le ore volate" : ""}</div></div>
+    <div class="kp">${[...K, ["Efficienti oggi", E + " su " + T]].map(([a, b]) => `<div><span>${a}</span><b>${b || "&nbsp;"}</b></div>`).join("")}</div>`;
+  return { tt, tab: `<table class="${z}" style="min-width:${z === "anno" ? 58 : 44}em"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${righe.join("")}</tbody><tfoot>${foot}</tfoot></table>` };
 }
 function renderBrief() {
-  const grp = gruppi(), fl = grp.includes(S.bf) ? S.bf : grp[0], z = zoom(), m = mese(), t = tavola(fl, z, m, S.mod, true);
+  const grp = gruppi(), fl = grp.includes(S.bf) ? S.bf : grp[0], z = zoom(), m = mese(), t = tavola(fl, z, m, S.mod);
   $("#app").innerHTML = `<div class="bf">
    <div class="ctl noprint">${grp.map((x) => `<button data-fl="${esc(x)}" class="${x === fl ? "on" : ""}">${esc(x)}</button>`).join("")}<span class="sp"></span>
     <span class="nav">${ZOOM.map(([k, n]) => `<button data-z="${k}" class="${k === z ? "on" : ""}">${n}</button>`).join("")}
      <button data-y="-1" title="Prima (freccia sinistra)">‹</button><b>${z === "anno" ? m.slice(0, 4) : nMese(m)}</b><button data-y="1" title="Dopo (freccia destra)">›</button></span><span class="sp"></span>
     ${S.mod ? `<i>Scrivi le ore nelle celle gialle, le lavorazioni da «Lavorazioni»</i><label>Importa PPL<input type="file" accept=".xlsx" id="fp" hidden></label><button id="an">Annulla</button><button id="sv" class="on">Salva</button>`
-      : `<button id="fs">Schermo intero</button><button id="ppt">PowerPoint</button><button id="ed">Modifica</button><button id="fv">Flotta</button>`}</div>
+      : KIOSK ? "" : `<button id="fs">Schermo intero</button><button id="ed">Modifica</button><button id="fv">Flotta</button>`}</div>
    ${t.tt}<div class="tw">${t.tab}</div></div>`;
   document.querySelectorAll("[data-fl]").forEach((b) => b.onclick = () => { S.bf = b.dataset.fl; ls("sf_bf", S.bf); render(); });
   document.querySelectorAll("[data-z]").forEach((b) => b.onclick = () => { S.zoom = b.dataset.z; ls("sf_zoom", S.zoom); render(); });
@@ -385,15 +396,16 @@ function renderBrief() {
   document.querySelectorAll("td input[data-m]").forEach((e) => e.oninput = () => { // in bozza, senza ridisegnare: il campo resta attivo
     const b = bozza(e.dataset.s); if (e.value === "") delete b.ore[e.dataset.m]; else b.ore[e.dataset.m] = Math.round(+e.value * 60); });
   adatta($(".bf"), z, 12);
+  if (KIOSK) return;
   if (S.mod) { $("#sv").onclick = salvaTutto; $("#an").onclick = () => { S.bozza = {}; S.mod = false; render(); }; $("#fp").onchange = importaPpl; return; }
   $("#fs").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
-  $("#ppt").onclick = dlgPpt; $("#ed").onclick = () => { S.mod = true; render(); }; $("#fv").onclick = () => vai("");
+  $("#ed").onclick = () => { S.mod = true; render(); }; $("#fv").onclick = () => vai("");
 }
-function dlgLav(s) { // lavorazioni di una macchina, in bozza: si scrivono con «Salva» del Briefing
+function dlgLav(s) { // lavorazioni di una macchina, in bozza: si scrivono con «Salva» della PPL
   const b = bozza(s), d = $("#dlg"), m0 = S.g.data.slice(0, 7);
   const testi = [...new Set(Object.values(Piano.pplMesi(S.ppl)).flatMap((ms) => ms.filter((x) => Array.isArray(x[1])).map((x) => x[1][0])))].sort();
   const disegna = () => {
-    d.innerHTML = `<div class="dh"><div class="t"><b>${esc(s)} · lavorazioni</b><div class="sub">Restano in bozza fino a «Salva» del Briefing</div></div><button class="btn pri" id="cl">Fatto</button></div>
+    d.innerHTML = `<div class="dh"><div class="t"><b>${esc(s)} · lavorazioni</b><div class="sub">Restano in bozza fino a «Salva» della PPL</div></div><button class="btn pri" id="cl">Fatto</button></div>
      <div class="db fm">${b.lav.map((l, i) => [l, i]).filter(([l]) => !l.da || (l.al || "9999") >= m0).map(([l, i]) => `<div class="lr">
       <label class="lt1">Lavorazione<input data-l="${i}" data-k="t" list="dl-lav" value="${esc(l.t)}" placeholder="es. ISP 200H URBE"></label>
       <label>Dal giorno<input type="date" data-l="${i}" data-k="da" value="${esc(l.da)}"></label>
@@ -434,56 +446,6 @@ addEventListener("keydown", (e) => { // frecce: ← → periodo, ↑ ↓ flotta 
   if (f) { e.preventDefault(); const gr = gruppi(), i = Math.max(gr.indexOf(S.bf), 0); S.bf = gr[(i + f + gr.length) % gr.length]; ls("sf_bf", S.bf); render(); }
 });
 
-// --- immagini per PowerPoint: nella slide si inseriscono con «Collega al file» e PowerPoint le ricarica a ogni apertura.
-// La cartella si sceglie una volta (handle in IndexedDB, Edge/Chrome da PC); si riscrivono dopo l'import della giornaliera e il salvataggio della PPL ---
-function idb(fn) { return new Promise((ok, ko) => { const r = indexedDB.open("sf", 1);
-  r.onupgradeneeded = () => r.result.createObjectStore("k"); r.onerror = () => ko(r.error);
-  r.onsuccess = () => { const q = fn(r.result.transaction("k", "readwrite").objectStore("k")); q.onsuccess = () => ok(q.result); q.onerror = () => ko(q.error); }; }); }
-async function cartella(chiedi) { // cartella scelta con il permesso di scrittura, se no null; chiedi solo dentro un clic (apre la richiesta del browser)
-  try { const h = await idb((o) => o.get("ppt")), o = { mode: "readwrite" };
-    return h && ((await h.queryPermission(o)) === "granted" || chiedi && (await h.requestPermission(o)) === "granted") ? h : null; }
-  catch (_) { return null; }
-}
-async function png(t, z) { // Briefing → PNG 1920×1080 via SVG foreignObject, senza immagini esterne (non si caricherebbero)
-  const W = 1920, H = 1080, el = document.createElement("div");
-  el.className = "bf"; el.style.cssText = `width:${W}px;height:${H}px;position:fixed;left:-${2 * W}px;top:0`;
-  el.innerHTML = `<style>${document.querySelector("style").textContent}</style>${t.tt}<div class="tw" style="overflow:hidden">${t.tab}</div>`;
-  document.body.append(el); adatta(el, z, 8); el.remove(); el.style.position = el.style.left = el.style.top = ""; // misurata fuori schermo
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><foreignObject width="100%" height="100%">${new XMLSerializer().serializeToString(el)}</foreignObject></svg>`;
-  const img = new Image();
-  await new Promise((ok, ko) => { img.onload = ok; img.onerror = () => ko(new Error("immagine non generata")); img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg); });
-  const c = Object.assign(document.createElement("canvas"), { width: W, height: H });
-  c.getContext("2d").drawImage(img, 0, 0);
-  return new Promise((ok) => c.toBlob(ok, "image/png"));
-}
-async function scriviPpt(h, detto) { // per ogni flotta il mese e l'anno della giornaliera, dai dati salvati
-  if (!h) return;
-  try {
-    for (const fl of gruppi()) for (const z of ["mese", "anno"]) {
-      const w = await (await h.getFileHandle(`Briefing ${fl} ${z}.png`, { create: true })).createWritable();
-      await w.write(await png(tavola(fl, z, S.g.data.slice(0, 7), false, false), z)); await w.close();
-    }
-    if (detto) toast("Immagini aggiornate nella cartella «" + h.name + "»");
-  } catch (e) { toast("Immagini PowerPoint: " + e.message); }
-}
-async function dlgPpt() {
-  const d = $("#dlg"), si = !!window.showDirectoryPicker, h = si ? await idb((o) => o.get("ppt")).catch(() => null) : null;
-  d.innerHTML = `<div class="dh"><div class="t"><b>Briefing nella slide di PowerPoint</b></div><button class="btn" id="cl">Chiudi</button></div>
-   <div class="db"><p>Per ogni flotta due immagini, per esempio «Briefing ${esc(gruppi()[0])} mese.png» e «... anno.png», con il mese e l'anno della giornaliera.
-    Si riscrivono da sole nella cartella scelta quando, da questo PC, importi la giornaliera o salvi la PPL. Se il browser chiede il permesso sulla cartella, scegli «Consenti a ogni visita».</p>
-    <p>In PowerPoint, una volta sola: Inserisci, Immagini, Questo dispositivo, scegli l'immagine, poi sulla freccia accanto a «Inserisci» scegli <b>«Collega al file»</b>.
-    A ogni apertura della presentazione la slide mostra l'immagine aggiornata.</p>
-    ${si ? `<p class="sub">${h ? "Cartella: <b>" + esc(h.name) + "</b>" : "Nessuna cartella scelta"}</p>
-     <p><button class="btn pri" id="ag"${h ? "" : " disabled"}>Aggiorna adesso</button> <button class="btn" id="sc">${h ? "Cambia cartella" : "Scegli la cartella"}</button></p>`
-    : `<p style="color:var(--ko)">Questo browser non scrive nelle cartelle: apri la pagina con Edge o Chrome dal PC.</p>`}</div>`;
-  $("#cl").onclick = () => d.close();
-  if (si) {
-    $("#ag").onclick = async () => { const x = await cartella(true); d.close(); x ? scriviPpt(x, true) : toast("Permesso negato sulla cartella"); };
-    $("#sc").onclick = async () => { try { const x = await showDirectoryPicker({ id: "ppt", mode: "readwrite" }); await idb((o) => o.put(x, "ppt")); d.close(); scriviPpt(x, true); }
-      catch (e) { if (e.name !== "AbortError") toast(e.message); } };
-  }
-  d.showModal();
-}
 function pagina(l) { // una pagina dello swipe per ogni flotta
   const [img, col] = tipo(l.tipo), [e, t, pc] = conta(l.aerei), cats = l.aerei.map((a) => eff(a).c);
   const urg = l.aerei.filter(vive).flatMap((a) => a.scadenze).filter((s) => livello(s) >= 1).length;
@@ -571,8 +533,8 @@ async function importa(ev) {
       <p><button class="btn pri" id="sv">Salva</button> <button class="btn" id="an">Annulla</button></p></div>`;
     $("#an").onclick = () => d.close();
     $("#sv").onclick = async () => {
-      $("#sv").disabled = true; const hp = cartella(true); // permesso sulla cartella PowerPoint finché il clic è fresco
-      try { await scrivi("giornaliere/" + g.data + ".json", g, "giornaliera " + g.data); d.close(); await carica(); render(); toast("Giornaliera del " + fd(g.data) + " salvata"); scriviPpt(await hp, false); }
+      $("#sv").disabled = true;
+      try { await scrivi("giornaliere/" + g.data + ".json", g, "giornaliera " + g.data); d.close(); await carica(); render(); toast("Giornaliera del " + fd(g.data) + " salvata"); }
       catch (e) { toast(e.message); $("#sv").disabled = false; }
     };
     d.showModal();
@@ -601,8 +563,7 @@ async function importaPpl(ev) {
 }
 async function salvaPpl(msg, fn, fatto) { // rilegge, modifica, scrive (niente modifiche perse fra dispositivi), poi ricarica per il volato dei mesi nuovi
   document.querySelectorAll("#dlg button, #app button").forEach((b) => b.disabled = true);
-  const hp = cartella(true); // chiamata dentro il clic: il permesso sulla cartella PowerPoint va chiesto subito
-  try { const p = (await leggi("ppl.json")).data || {}; fn(p); await scrivi("ppl.json", p, "ppl: " + msg); $("#dlg").close(); if (fatto) fatto(); await carica(); toast("PPL salvata"); render(); scriviPpt(await hp, false); return; }
+  try { const p = (await leggi("ppl.json")).data || {}; fn(p); await scrivi("ppl.json", p, "ppl: " + msg); $("#dlg").close(); if (fatto) fatto(); await carica(); toast("PPL salvata"); render(); return; }
   catch (e) { toast(e.message); }
   render();
 }
