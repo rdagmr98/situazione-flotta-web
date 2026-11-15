@@ -329,7 +329,10 @@ function tuttiMesi(s) { // mesi consecutivi che la riga della bozza può toccare
   for (let m = xs[0]; m <= xs[xs.length - 1]; m = Piano.piuMesi(m, 1)) mm.push(m);
   return mm;
 }
-const rigaS = (s, ed) => ed && S.bozza[s] ? Piano.riga(S.bozza[s], tuttiMesi(s)) : Piano.pplMesi(S.ppl)[s] || [];
+const rigaS = (s, ed) => { const r = Piano.pplMesi(S.ppl)[s] || [];
+  if (ed) return S.bozza[s] ? Piano.riga(S.bozza[s], tuttiMesi(s)) : r;
+  const a = S.g.linee.flatMap((l) => l.aerei).find((x) => x.sigla === s); // in sola lettura conta anche cosa è fermo oggi per la giornaliera
+  return a && a.stato !== "IN LINEA" && a.attivita && ["ineff", "ind"].includes(eff(a).c) ? Piano.conGiornaliera(r, S.g.data.slice(0, 7), a.attivita) : r; };
 function adatta(bf, z, min) { // carattere più grande (fino a 26 px) con la tabella intera a schermo, ma non sotto min
   const tw = bf.querySelector(".tw"); let px = Math.max(min, Math.min(26, Math.round(bf.clientWidth * (z === "anno" ? 1.15 : 1.5) / 100)));
   do bf.style.fontSize = px + "px"; while (tw.scrollHeight > tw.clientHeight && --px >= min);
@@ -579,7 +582,7 @@ async function sblocca(frase) { // stesso schema di cifra.mjs: PBKDF2-SHA256 →
   return new TextDecoder().decode(await crypto.subtle.decrypt({ name: "AES-GCM", iv: b(SF_PAT.iv) }, k, b(SF_PAT.c)));
 }
 async function avvia() {
-  const frase = ls("sf_frase");
+  const frase = new URLSearchParams(location.hash.slice(1)).get("k") || ls("sf_frase"); // #k=frase nel link del Web Viewer: niente frase da digitare (il frammento non va al server)
   if (!frase) return vistaFrase();
   if (!window.SF_PAT) { $("#app").innerHTML = `<p class="empty">Configurazione da completare: manca la chiave di accesso ai dati.</p>`; return; }
   if (!PAT) try { PAT = await sblocca(frase); } catch (_) { ls("sf_frase", ""); return vistaFrase("Frase errata"); }

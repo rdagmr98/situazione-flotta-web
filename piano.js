@@ -62,11 +62,20 @@
       var f = fs.find(function (f) { return f.in.slice(0, 7) === m; }) || fs[0], v = val[m];
       if (f && u && u.f === f && u.ore == null) { u.n++; return; }
       out.push(!f ? { m: m, n: 1, ore: typeof v === "number" ? v : null }
-        : f.in.slice(0, 7) === m ? { m: m, n: 1, lav: f.testo, dal: f.in, ore: +f.in.slice(8) > 1 ? pm(v) || null : null, f: f } : { m: m, n: 1, lav: f.testo, ore: null, f: f });
+        : f.in.slice(0, 7) === m ? { m: m, n: 1, lav: f.testo, dal: f.in, ore: pm(v) || null, f: f } : { m: m, n: 1, lav: f.testo, ore: null, f: f });
     });
     return out;
   }
+  // la giornaliera dice che oggi la macchina è ferma per una lavorazione che la PPL nel mese m non segna (640/641 in intermedia):
+  // il testo va nella cella di m, ore della PPL comprese, e come nella PPL dura fino alla prossima cella piena.
+  // ponytail: solo il mese della giornaliera; i mesi passati tornano alla PPL (servirebbero le giornaliere vecchie intere)
+  function conGiornaliera(mesi, m, testo) {
+    if (fermiPpl(mesi).some(function (f) { return f.in < primoDopo(m) && f.out > m + "-01"; })) return mesi;
+    var v = (mesi.find(function (x) { return x[0] === m; }) || [])[1];
+    return mesi.filter(function (x) { return x[0] !== m; }).concat([[m, typeof v === "number" && v ? [testo, 1, v] : [testo, 1]]])
+      .sort(function (a, b) { return a[0] < b[0] ? -1 : 1; });
+  }
 
-  var api = { addG: addG, pplMesi: pplMesi, fermiPpl: fermiPpl, celleMesi: celleMesi, piuMesi: piuMesi, pm: pm, modello: modello, riga: riga, primoDopo: primoDopo };
+  var api = { addG: addG, pplMesi: pplMesi, fermiPpl: fermiPpl, celleMesi: celleMesi, piuMesi: piuMesi, pm: pm, modello: modello, riga: riga, primoDopo: primoDopo, conGiornaliera: conGiornaliera };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else g.Piano = api;
 })(typeof window !== "undefined" ? window : globalThis);
