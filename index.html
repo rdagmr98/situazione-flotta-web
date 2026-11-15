@@ -198,7 +198,21 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .ph .bg{display:inline-flex;align-items:center;gap:.38em;font-weight:700;color:var(--n);font-size:1.04em}
 .bf .ph .dt{width:.65em;height:.65em;border-radius:50%;display:inline-block}
 .bf .ph .gs{overflow:hidden;text-overflow:ellipsis}
-.bf .anno td,.bf .anno th{padding:.1em .3em}
+.bf .anno td,.bf .anno th{padding:.08em .26em}
+.bf .anno tbody tr:nth-child(even)>*{background:#fff}
+.bf .anno tbody tr.alt>*{background:var(--z)}
+.bf .anno tbody tr.sep>*{border-top:2px solid #cbd5e1}
+.bf .anno tbody tr>td.og,.bf .anno td.og{background:#fffbeb}
+.bf .anno tbody tr.alt>td.og{background:#fcf5d8}
+.bf .anno tfoot td.og{background:#f7ebc2}
+.bf .anno tfoot td{white-space:nowrap}
+.bf .anno td small.neg{color:#b42318}
+.bf .anno .s button{white-space:nowrap}
+.bf.mod .anno td,.bf.mod .anno th{padding:.06em .22em}
+.bf.mod .anno td input{padding:.08em .12em;line-height:1.15}
+.bf.mod .anno .s button{margin:.15em auto 0;padding:.12em .4em}
+.bf.mod .anno .lav br{display:none}
+.bf.mod .anno .lav .lt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:.12em}
 .bf tfoot .s{font-size:.75em;overflow-wrap:normal;white-space:nowrap}
 @media (max-width:900px){.bf .mp{grid-template-columns:1fr}}
 @media (max-width:700px){.bf .tt div,.bf .ctl i{display:none}.bf .kp{flex-wrap:wrap}.bf .kp div{flex-basis:40%}}
@@ -394,11 +408,12 @@ const rigaS = (s, ed) => { const r = Piano.pplMesi(S.ppl)[s] || [];
   if (ed) return S.bozza[s] ? Piano.riga(S.bozza[s], tuttiMesi(s)) : r;
   const a = S.g.linee.flatMap((l) => l.aerei).find((x) => x.sigla === s); // in sola lettura conta anche cosa è fermo oggi per la giornaliera
   return a && a.stato !== "IN LINEA" && a.attivita && ["ineff", "ind"].includes(eff(a).c) ? Piano.conGiornaliera(r, S.g.data.slice(0, 7), a.attivita) : r; };
+const minPx = () => KIOSK ? 10 : zoom() === "anno" ? (S.mod ? 9 : 10) : 12;
 function adatta(bf, z, min) { // carattere più grande (fino a 26 px) con la tabella intera a schermo, ma non sotto min
   const tw = bf.querySelector(".tw"); let px = Math.max(min, Math.min(26, Math.round(bf.clientWidth * (z === "anno" ? 1.15 : 1.5) / 100)));
   do bf.style.fontSize = px + "px"; while (tw.scrollHeight > tw.clientHeight && --px >= min);
 }
-addEventListener("resize", () => { const b = $(".bf"); if (b) adatta(b, zoom(), KIOSK ? 10 : 12); });
+addEventListener("resize", () => { const b = $(".bf"); if (b) adatta(b, zoom(), minPx()); });
 function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA-MM", ed = ore e lavorazioni modificabili → { tt, tab }
   const g = S.g, m0 = g.data.slice(0, 7), y = m.slice(0, 4), linee = g.linee.filter((l) => gruppo(l.tipo) === fl);
   const tutti = linee.flatMap((l) => l.aerei.filter(vive).map((a) => [l, a])), [E, T] = conta(tutti.map(([, a]) => a));
@@ -411,20 +426,33 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
   const nota = (a, rs, gia = []) => { const t = txtNota(a, gia); return `<td rowspan="${rs}" title="${esc(t)}"><div class="nt">${esc(t)}</div></td>`; };
   let tab, K;
   if (z === "anno") { // per macchina due righe: sopra programmate e lavorazioni (celle unite sui mesi in cui continuano), sotto volate
-    const mY = MESI_L.map((_, i) => y + "-" + String(i + 1).padStart(2, "0")), tp = mY.map(() => 0), tv = mY.map(() => null);
-    const righe = tutti.map(([l, a]) => {
+    const mY = MESI_L.map((_, i) => y + "-" + String(i + 1).padStart(2, "0")), tp = mY.map(() => 0), tv = mY.map(() => null), y0 = m0.slice(0, 4);
+    const fmtTot = (v, p) => v == null || (!v && !p) ? "" : fh(v) + (p > 0 ? (y < y0 ? `<small class="${v < p ? "neg" : ""}">${(v > p ? "+" : "") + fh(v - p)}</small>` : `<small>${Math.round(100 * v / p)}%</small>`) : "");
+    const righe = tutti.map(([l, a], ri) => {
       const s = a.sigla, r = rigaS(s, ed), v = Object.fromEntries(r), pr = mY.map((k) => Piano.pm(v[k])), vo = mY.map((k) => vol(s, k));
       mY.forEach((_, i) => { tp[i] += pr[i]; if (vo[i] != null) tv[i] = (tv[i] || 0) + vo[i]; });
-      const cel = (c) => { const ore = cOre(s, c), gd = +(c.dal || "").slice(8);
-        return !c.lav ? `<td class="p">${ore}</td>` : `<td colspan="${c.n}" class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(c.lav)}" title="${esc(c.lav)}">${ore}${ore ? "<br>" : ""}${esc(breve(c.lav))}${gd > 1 ? " dal " + gd : ""}</td>`; };
-      return `<tr>${th(l, a, 2)}${Piano.celleMesi(r, mY).map(cel).join("")}<td class="p">${hh(som(pr))}</td>${nota(a, 2, Piano.fermiPpl(r).map((f) => f.testo))}</tr>
-       <tr class="v">${vo.map((x, i) => `<td>${x == null || (!x && !pr[i]) ? "" : fh(x)}</td>`).join("")}<td>${hh(som(vo))}</td></tr>`;
+      const skipV = Array(12).fill(false); let idx = 0;
+      const cel = (c) => {
+        const ore = cOre(s, c), gd = +(c.dal || "").slice(8), span2 = !!c.lav && !ore && mY.slice(idx, idx + c.n).every((_, k) => { const j = idx + k; return vo[j] == null || (!vo[j] && !pr[j]); });
+        if (span2) for (let k = 0; k < c.n; k++) skipV[idx + k] = true;
+        idx += c.n;
+        const og = !c.lav && c.m === m0 ? " og" : "";
+        return !c.lav ? `<td class="p${og}">${ore}</td>`
+          : `<td colspan="${c.n}"${span2 ? ' rowspan="2"' : ""} class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(c.lav)}" title="${esc(c.lav)}">${ore}${ore ? "<br>" : ""}<span class="lt">${esc(breve(c.lav))}${gd > 1 ? " dal " + gd : ""}</span></td>`;
+      };
+      const cls1 = [ri > 0 && "sep", ri % 2 && "alt"].filter(Boolean).join(" "), cls2 = ["v", ri % 2 && "alt"].filter(Boolean).join(" ");
+      const totPr = som(pr), totVo = vo.some((x) => x != null) ? som(vo) : null;
+      return `<tr${cls1 ? ` class="${cls1}"` : ""}>${th(l, a, 2)}${Piano.celleMesi(r, mY).map(cel).join("")}<td class="p">${hh(totPr)}</td>${nota(a, 2, Piano.fermiPpl(r).map((f) => f.testo))}</tr>
+       <tr class="${cls2}">${vo.map((x, i) => skipV[i] ? "" : `<td${mY[i] === m0 ? ' class="og"' : ""}>${x == null || (!x && !pr[i]) ? "" : fh(x)}</td>`).join("")}<td>${fmtTot(totVo, totPr)}</td></tr>`;
     });
-    const cols = `<col style="width:7%">${"<col>".repeat(12)}<col style="width:6%"><col style="width:13%">`; K = [["Programmate nell'anno", hh(som(tp)) || "0:00"], ["Volate nell'anno", hh(som(tv)) || "0:00"]];
+    const totP = som(tp), totV = tv.every((x) => x == null) ? null : som(tv);
+    const k3 = y < y0 || (totV || 0) > totP ? ["Differenza", totV == null ? "–" : fh(totV - totP)] : ["Da volare nell'anno", hh(totP - (totV || 0)) || "0:00"];
+    const cols = `<col style="width:${ed ? "6.2em" : "7%"}">${"<col>".repeat(12)}<col style="width:6.5%"><col style="width:13%">`;
+    K = [["Programmate nell'anno", hh(totP) || "0:00"], ["Volate nell'anno", totV == null ? "–" : hh(totV)], k3];
     const head = `<th class="s">EI</th>${mY.map((k) => `<th class="${k === m0 ? "og" : ""}">${MESI_L[+k.slice(5) - 1].slice(0, 3)}</th>`).join("")}<th>Totale</th><th>Note</th>`;
-    const foot = `<tr><th class="s">Programmate</th>${tp.map((x) => `<td>${hh(x)}</td>`).join("")}<td>${hh(som(tp))}</td><td rowspan="2"></td></tr>
-      <tr><th class="s">Volate</th>${tv.map((x) => `<td>${x == null ? "" : fh(x)}</td>`).join("")}<td>${hh(som(tv))}</td></tr>`;
-    tab = `<table class="anno" style="min-width:58em"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${righe.join("")}</tbody><tfoot>${foot}</tfoot></table>`;
+    const foot = `<tr><th class="s">Programmate</th>${tp.map((x, i) => `<td${mY[i] === m0 ? ' class="og"' : ""}>${hh(x)}</td>`).join("")}<td>${hh(totP)}</td><td rowspan="2"></td></tr>
+      <tr><th class="s">Volate</th>${tv.map((x, i) => `<td${mY[i] === m0 ? ' class="og"' : ""}>${x == null ? "" : fh(x)}</td>`).join("")}<td>${fmtTot(totV, totP)}</td></tr>`;
+    tab = `<table class="anno" style="min-width:max(58em,780px)"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${righe.join("")}</tbody><tfoot>${foot}</tfoot></table>`;
   } else { // due pannelli affiancati: a sinistra chi è efficiente oggi (ore e scadenze), a destra chi è fermo raggruppato per lavorazione
     const pas = m < m0, fm = Piano.primoDopo(m), T3 = [0, 0, 0], Te = [0, 0, 0];
     const mp = (d) => nMese(d.slice(0, 7)).toLowerCase(), per = (f) => { let a = mp(f.in); const b = f.aperto ? "" : mp(Piano.addG(f.out, -1));
@@ -479,12 +507,12 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
   return { tt, tab };
 }
 function renderBrief() {
-  const grp = gruppi(), fl = grp.includes(S.bf) ? S.bf : grp[0], z = zoom(), m = mese(), t = tavola(fl, z, m, S.mod);
-  $("#app").innerHTML = `<div class="bf">
+  const grp = gruppi(), fl = grp.includes(S.bf) ? S.bf : grp[0], z = zoom(), m = mese(), t = tavola(fl, z, m, S.mod), nb = Object.keys(S.bozza).length;
+  $("#app").innerHTML = `<div class="bf${S.mod ? " mod" : ""}">
    <div class="ctl noprint">${grp.map((x) => `<button data-fl="${esc(x)}" class="${x === fl ? "on" : ""}">${esc(x)}</button>`).join("")}<span class="sp"></span>
     <span class="nav">${ZOOM.map(([k, n]) => `<button data-z="${k}" class="${k === z ? "on" : ""}">${n}</button>`).join("")}
      <button data-y="-1" title="Prima (freccia sinistra)">‹</button><b>${z === "anno" ? m.slice(0, 4) : nMese(m)}</b><button data-y="1" title="Dopo (freccia destra)">›</button></span><span class="sp"></span>
-    ${S.mod ? `<i>Scrivi le ore nelle celle gialle, le lavorazioni da «Lavorazioni»</i><label>Importa PPL<input type="file" accept=".xlsx" id="fp" hidden></label><button id="an">Annulla</button><button id="sv" class="on">Salva</button>`
+    ${S.mod ? `<i>Scrivi le ore nelle celle gialle, le lavorazioni da «Lavorazioni»</i><label>Importa PPL<input type="file" accept=".xlsx" id="fp" hidden></label><button id="an">Annulla</button><button id="sv" class="on">Salva${nb ? ` (${nb})` : ""}</button>`
       : KIOSK ? "" : `<button id="fs">Schermo intero</button><button id="ed">Modifica</button><button id="fv">Flotta</button>`}</div>
    ${t.tt}<div class="tw">${t.tab}</div></div>`;
   document.querySelectorAll("[data-fl]").forEach((b) => b.onclick = () => { S.bf = b.dataset.fl; ls("sf_bf", S.bf); render(); });
@@ -493,8 +521,9 @@ function renderBrief() {
   document.querySelectorAll("[data-d]").forEach((e) => e.onclick = () => dettaglio(e.dataset.d));
   document.querySelectorAll("[data-lv]").forEach((e) => e.onclick = (ev) => { if (ev.target.tagName !== "INPUT") { ev.stopPropagation(); dlgLav(e.dataset.lv); } });
   document.querySelectorAll("td input[data-m]").forEach((e) => e.oninput = () => { // in bozza, senza ridisegnare: il campo resta attivo
-    const b = bozza(e.dataset.s); if (e.value === "") delete b.ore[e.dataset.m]; else b.ore[e.dataset.m] = Math.round(+e.value * 60); });
-  adatta($(".bf"), z, KIOSK ? 10 : 12); // in proiezione tutto a schermo anche piccolo
+    const b = bozza(e.dataset.s); if (e.value === "") delete b.ore[e.dataset.m]; else b.ore[e.dataset.m] = Math.round(+e.value * 60);
+    const n = Object.keys(S.bozza).length; if ($("#sv")) $("#sv").textContent = "Salva" + (n ? ` (${n})` : ""); });
+  adatta($(".bf"), z, minPx()); // in proiezione tutto a schermo anche piccolo
   if (KIOSK) return;
   if (S.mod) { $("#sv").onclick = salvaTutto; $("#an").onclick = () => { S.bozza = {}; S.mod = false; render(); }; $("#fp").onchange = importaPpl; return; }
   $("#fs").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
