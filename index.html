@@ -51,12 +51,34 @@ details summary{cursor:pointer;color:#7aa2ff;font-weight:600;margin:16px 0 4px}
 .lh .t b{font-size:17px}
 .bar{height:6px;background:var(--line);border-radius:3px;margin-top:6px;overflow:hidden}
 .bar i{display:block;height:100%}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:8px;padding:8px}
 .tile{position:relative;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;background:var(--card2);border:1px solid var(--line);border-left:4px solid var(--st);border-radius:10px;padding:8px 10px;cursor:pointer;min-width:0;text-align:left;color:var(--tx);font:inherit}
 .tile b{display:block;font-size:21px}
 .tile .h{display:block;font-size:14px;font-weight:600;margin-top:2px;font-variant-numeric:tabular-nums}
+.tile .dt{display:block;font-size:11px;font-weight:600;margin-top:1px;font-variant-numeric:tabular-nums}
 .tile .st{font-size:12px;font-weight:600;color:var(--st);white-space:nowrap}
 .tile .pill{position:absolute;top:4px;right:4px}
+.fp{display:grid;grid-template-columns:1fr;gap:10px;padding:10px;align-items:start}
+@media (min-width:720px){.fp{grid-template-columns:1fr 1fr}.fp.uno{grid-template-columns:1fr}}
+.fp-box{background:var(--bg);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.fp-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--card2);border-bottom:1px solid var(--line);font-size:13px;font-weight:700}
+.fp-h span{display:inline-flex;align-items:center;gap:6px}
+.fg{border-bottom:1px solid var(--line)}
+.fg:last-child{border-bottom:0}
+.fg-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--mu)}
+.fg-h b{color:var(--tx);font-variant-numeric:tabular-nums}
+.frow{display:flex;align-items:center;gap:10px;width:100%;background:none;border:0;border-top:1px solid var(--line);border-left:4px solid var(--st);padding:8px 10px;color:var(--tx);font:inherit;text-align:left;cursor:pointer}
+.frow:hover{background:var(--card2)}
+.frow .fa{width:54px;flex:none}
+.frow .fa b{display:block;font-size:17px;line-height:1.15}
+.frow .fa .st{font-size:11px;font-weight:600;color:var(--st);white-space:nowrap}
+.frow .fm{flex:1;min-width:0;font-size:13px;color:var(--mu)}
+.frow .fm .fn{color:var(--tx);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.frow .fv{text-align:right;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.frow .fv small{display:block;font-size:11px;font-weight:600}
+.al-box{margin:0 10px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:0 8px}
+.al-box summary{margin:0;padding:8px 2px;font-size:13px;color:var(--mu)}
+.al-box[open] summary{border-bottom:1px solid var(--line)}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
 .pill{font-size:10px;border:1px solid var(--line);border-radius:6px;padding:0 4px;color:var(--mu)}
 .list{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px}
@@ -190,7 +212,6 @@ const TIPI = { // silhouette e colori di AVES Tecnici (helicopter_catalog.dart)
 const STATI = { "IN LINEA": ["ok", "IN LINEA"], "DISPONIBILE": ["warn", "DISP."], "INDISPONIBILE": ["ko", "INDISP."],
   "INDUSTRIA": ["ind", "INDUSTRIA"], "ALIENAZIONE": ["off", "ALIEN."] };
 const CAT = { eff: ["ok", "EFF", "Efficiente"], ineff: ["ko", "INEFF", "Inefficiente"], ind: ["ind", "IND.", "In industria"], alien: ["off", "ALIEN.", "In alienazione"] };
-const ORD = Object.keys(CAT); // ordine dei riquadri: prima gli efficienti
 const FILTRI = [["tutti", "Tutti", () => true], ["eff", "Efficienti", (c) => c === "eff"], ["ineff", "Inefficienti", (c) => c === "ineff" || c === "ind"],
   ["ind", "Industria", (c) => c === "ind"], ["alien", "Alienazione", (c) => c === "alien"]];
 const $ = (s) => document.querySelector(s);
@@ -219,6 +240,8 @@ const LV = ["var(--ok)", "var(--warn)", "var(--ko)"];
 const valore = (sc) => sc.ore != null ? fh(sc.ore) + " h" : sc.data ? fd(sc.data) + " (" + giorni(sc.data) + " gg)" : esc(sc.raw || "–");
 const vive = (a) => a.stato !== "ALIENAZIONE";
 const disp = (a) => { const o = a.scadenze.filter((s) => s.ore != null).map((s) => s.ore); return o.length ? Math.min(...o) : null; }; // ore alla prossima scadenza a ore
+const scadDataUrg = (a) => a.scadenze.filter((s) => s.data && livello(s) >= 1).sort((x, y) => x.data.localeCompare(y.data))[0] || null; // scadenza a data imminente o scaduta
+const motivoFermo = (a, x) => x.m ? breve(x.m) : x.man ? "Cambiata a mano" : x.c === "ind" ? "In industria" : stato(a.stato)[1];
 // righe nascoste della pagina Note (solo su questo dispositivo): ricompaiono se cambiano note o efficienza
 const firma = (s) => JSON.stringify([S.note[s] || null, S.stati[s] || null]);
 const nascoste = () => { try { return JSON.parse(ls("sf_nascoste") || "{}"); } catch (_) { return {}; } };
@@ -507,17 +530,47 @@ addEventListener("keydown", (e) => { // frecce: ← → periodo, ↑ ↓ flotta 
   if (f) { e.preventDefault(); const gr = gruppi(), i = Math.max(gr.indexOf(S.bf), 0); S.bf = gr[(i + f + gr.length) % gr.length]; ls("sf_bf", S.bf); render(); }
 });
 
-function pagina(l) { // una pagina dello swipe per ogni flotta
+function fermoRow(a) {
+  const x = eff(a), [c, s] = CAT[x.c], h = disp(a), du = scadDataUrg(a), note = S.note[a.sigla] || [];
+  const meta = [a.perc, a.fine && "fine " + a.fine, !a.perc && !a.fine && (x.man ? "dal " + fd(x.man.d).slice(0, 5) : a.inizio && "dal " + fd(a.inizio).slice(0, 5))].filter(Boolean).join(" · ");
+  const last = note.length ? note[note.length - 1] : null;
+  return `<button class="frow" data-s="${esc(a.sigla)}" style="--st:var(--${c})">
+    <div class="fa"><b>${esc(a.sigla)}</b><span class="st">${s}${x.man ? "*" : ""}</span></div>
+    <div class="fm">${meta ? `<div>${esc(meta)}</div>` : ""}${last ? `<div class="fn">✎ ${esc(last.t)}${note.length > 1 ? ` (+${note.length - 1})` : ""}</div>` : ""}</div>
+    <div class="fv">${h != null ? `<span style="color:${LV[livello({ ore: h })]}">${fh(h)} h</span>` : ""}${du ? `<small style="color:${LV[livello(du)]}">${esc(du.tipo)} ${giorni(du.data)} gg</small>` : ""}</div>
+  </button>`;
+}
+function pagina(l) { // una pagina dello swipe per ogni flotta: efficienti a sinistra, fermi raggruppati per motivo a destra
   const [img, col] = tipo(l.tipo), [e, t, pc] = conta(l.aerei), cats = l.aerei.map((a) => eff(a).c);
   const urg = l.aerei.filter(vive).flatMap((a) => a.scadenze).filter((s) => livello(s) >= 1).length;
   const filtro = FILTRI.find((f) => f[0] === S.filtro) || FILTRI[0], mac = S.vista === "macchine";
+  let corpo = "";
+  if (mac) {
+    const vis = l.aerei.filter((a) => filtro[2](eff(a).c));
+    const effList = vis.filter((a) => eff(a).c === "eff");
+    const fermiList = vis.filter((a) => { const c = eff(a).c; return c === "ineff" || c === "ind"; });
+    const alienList = vis.filter((a) => eff(a).c === "alien");
+    const gruppiF = new Map();
+    fermiList.forEach((a) => {
+      const x = eff(a), mot = motivoFermo(a, x);
+      if (!gruppiF.has(mot)) gruppiF.set(mot, { mot, raw: x.m || mot, items: [] });
+      gruppiF.get(mot).items.push(a);
+    });
+    const fOrd = [...gruppiF.values()].sort((a, b) => (b.items.length - a.items.length) || a.mot.localeCompare(b.mot));
+    const pEff = effList.length ? `<div class="fp-box"><div class="fp-h"><span><i class="dot" style="background:var(--ok)"></i>Efficienti</span><span>${effList.length}</span></div><div class="grid">${effList.map(tile).join("")}</div></div>` : "";
+    const pFer = fOrd.length ? `<div class="fp-box"><div class="fp-h"><span><i class="dot" style="background:var(--ko)"></i>Fermi</span><span>${fermiList.length}</span></div>${fOrd.map((g) => `<div class="fg"><div class="fg-h" title="${esc(g.raw)}"><span>${esc(g.mot)}</span><b>${g.items.length}</b></div>${g.items.map(fermoRow).join("")}</div>`).join("")}</div>` : "";
+    const pan = pEff || pFer ? `<div class="fp${!pEff || !pFer ? " uno" : ""}">${pEff}${pFer}</div>` : "";
+    const al = alienList.length ? (filtro[0] === "alien" ? `<div class="grid">${alienList.map(tile).join("")}</div>` : `<details class="al-box"><summary>In alienazione · ${alienList.length}</summary><div class="grid">${alienList.map(tile).join("")}</div></details>`) : "";
+    corpo = `<div class="chips">${FILTRI.map(([k, n, f]) => { const c = cats.filter(f).length;
+      return c || k === "tutti" || k === "eff" || k === "ineff" || k === filtro[0] ? `<button data-k="${k}" class="${k === filtro[0] ? "on" : ""}">${n} ${c}</button>` : ""; }).join("")}</div>
+      ${pan || al ? pan + al : '<p class="empty">Nessun aeromobile</p>'}`;
+  } else {
+    corpo = scadenze(l);
+  }
   return `<section class="linea"><div class="lh"><img src="img/${img}.webp" alt="">
      <div class="t"><b style="color:${col}">${esc(l.tipo)}</b><div class="sub">Efficienti ${e} su ${t} · ${pc}% · ore mese ${fh(l.totMese)}</div>
      <div class="bar"><i style="width:${pc}%;background:${col}"></i></div></div>
-     <button class="btn" data-vi>${mac ? `Scadenze${urg ? ` <b style="color:var(--warn)">${urg}</b>` : ""}` : "Macchine"}</button></div>
-    ${mac ? `<div class="chips">${FILTRI.map(([k, n, f]) => { const c = cats.filter(f).length;
-      return c || k === "tutti" || k === "eff" || k === "ineff" || k === filtro[0] ? `<button data-k="${k}" class="${k === filtro[0] ? "on" : ""}">${n} ${c}</button>` : ""; }).join("")}</div>
-     <div class="grid">${l.aerei.filter((a) => filtro[2](eff(a).c)).sort((x, y) => ORD.indexOf(eff(x).c) - ORD.indexOf(eff(y).c)).map(tile).join("") || '<p class="sub">Nessuno</p>'}</div>` : scadenze(l)}</section>`;
+     <button class="btn" data-vi>${mac ? `Scadenze${urg ? ` <b style="color:var(--warn)">${urg}</b>` : ""}` : "Macchine"}</button></div>${corpo}</section>`;
 }
 function annotata([l, a]) { // riga della pagina Note: sigla, motivo, note, efficienza
   const x = eff(a), [c, s] = CAT[x.c], mot = x.man ? (x.m || "cambiata a mano") + " · " + fd(x.man.d).slice(0, 5) : x.m;
@@ -526,10 +579,10 @@ function annotata([l, a]) { // riga della pagina Note: sigla, motivo, note, effi
     <div class="v"><b style="color:var(--${c})">${s}${x.man ? "*" : ""}</b></div><button class="x" data-h="${esc(a.sigla)}" aria-label="Nascondi">×</button></div>`;
 }
 function tile(a) {
-  const x = eff(a), [c, s] = CAT[x.c], n = (S.note[a.sigla] || []).length, h = vive(a) ? disp(a) : null;
+  const x = eff(a), [c, s] = CAT[x.c], n = (S.note[a.sigla] || []).length, h = vive(a) ? disp(a) : null, du = vive(a) ? scadDataUrg(a) : null;
   return `<button class="tile" data-s="${esc(a.sigla)}" style="--st:var(--${c})"><b>${esc(a.sigla)}</b>
     <span class="st">${s}${x.man ? "*" : ""}</span>${n ? `<span class="pill">✎${n}</span>` : ""}
-    ${h != null ? `<span class="h" style="color:${LV[livello({ ore: h })]}">${fh(h)} h</span>` : ""}</button>`;
+    ${h != null ? `<span class="h" style="color:${LV[livello({ ore: h })]}">${fh(h)} h</span>` : ""}${du ? `<span class="dt" style="color:${LV[livello(du)]}">${esc(du.tipo)} ${giorni(du.data)} gg</span>` : ""}</button>`;
 }
 function scadenze(l) {
   const voci = l.aerei.filter(vive).flatMap((a) => a.scadenze.map((s) => ({ a, s })));
