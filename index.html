@@ -119,7 +119,7 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .tw{flex:1;overflow:auto;min-height:0;padding:0 .8em}
 .bf table{border-collapse:collapse;width:100%;height:100%;table-layout:fixed;font-size:inherit;font-variant-numeric:tabular-nums}
 .bf th,.bf td{border-bottom:1px solid var(--l);padding:.2em .4em;text-align:center;vertical-align:middle;line-height:1.2;overflow-wrap:anywhere;background:#fff}
-.bf thead th{color:var(--m);font-weight:600;font-size:.75em;text-transform:uppercase;letter-spacing:.03em;border-bottom:2px solid var(--n);position:sticky;top:0;z-index:2}
+.bf thead th{overflow-wrap:normal;color:var(--m);font-weight:600;font-size:.75em;text-transform:uppercase;letter-spacing:.03em;border-bottom:2px solid var(--n);position:sticky;top:0;z-index:2}
 .bf thead th.og{color:var(--n);background:#fff4cc}
 .bf tbody tr:nth-child(even)>*{background:var(--z)}
 .bf tr:has(+.v)>td:not([rowspan]){border-bottom-color:transparent}
@@ -134,7 +134,7 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .ed{cursor:pointer}
 .bf .ed:hover{box-shadow:inset 0 0 0 2px var(--n)}
 .bf .nx{color:#4a5466;font-size:.85em;font-weight:600}
-.bf .ch{display:inline-block;padding:.25em .6em;border-radius:.4em;font-weight:700;font-size:.85em;line-height:1.2}
+.bf .ch{display:inline-block;white-space:nowrap;padding:.25em .6em;border-radius:.4em;font-weight:700;font-size:.85em;line-height:1.2}
 .bf .sm{font-size:.75em;font-weight:500;color:var(--m);margin-left:.4em;white-space:nowrap}
 .bf .v td{color:var(--m)}
 .bf td small{display:block;font-size:.7em;color:var(--m)}
@@ -309,6 +309,10 @@ const ordine = (t) => { const i = ["UH-169", "RH-206", "UH-205"].findIndex((p) =
 const gruppi = () => [...new Set(S.g.linee.map((l) => gruppo(l.tipo)))];
 const COL_EFF = { eff: ["#2e9d57", "#fff"], ineff: ["#fde4e2", "#b42318"], ind: ["#ece5fb", "#5b3aa8"], alien: ["#eceff3", "#5d6678"] }; // efficiente pieno, il resto tenue
 const colLav = (t) => /TBD/i.test(t) ? ["#eceff3", "#4a5466"] : /ATTESA/i.test(t) ? ["#ffe9d6", "#8a4510"] : /MAGG/i.test(t) ? ["#fde4e2", "#9b1c1c"] : ["#fff1c2", "#6b5300"]; // pastello: niente muri rossi
+// etichette lavorazione a schermo, su una riga (il testo intero resta nel title): «CESSIONE TEMPORANEA AL 1°IDRA PER ISP. MAGG.» -> «ISP. MAGG. · 1°IDRA»
+const BREVE = [[/^CESSIONE TEMPORANEA AL\s*(.+?) PER (.+)$/, "$2 · $1"], [/CESSIONE TEMPORANEA/, "CESSIONE"], [/\bIN ATTESA\b/, "ATTESA"], [/RICOVERO AL P\.?T\.?L\.? PER (.+)/, "$1 PTL"],
+  [/ISPEZIONE|ISPEZ\./g, "ISP."], [/INTERMEDIA|INTERM\./g, "INT."], [/MAGGIORE/g, "MAGG."], [/P\.T\.L\./g, "PTL"], [/CONDIZIONALE/g, "COND."], [/ATTERRAGGIO PESANTE/g, "ATT. PESANTE"], [/SOSTI?ZIONE/g, "SOST."]];
+const breve = (t) => BREVE.reduce((x, [a, b]) => x.replace(a, b), String(t).toUpperCase().replace(/\s+/g, " ").trim());
 const nMese = (m) => MESI_L[+m.slice(5) - 1].slice(0, 3) + " " + m.slice(0, 4);
 const ZOOM = [["mese", "Mese"], ["anno", "Anno"]];
 // S.mm: mese a schermo (null = quello della giornaliera); S.bozza: sigla -> { ore, lav } modificati e non ancora salvati
@@ -319,7 +323,7 @@ const sposta = (k) => { S.mm = Piano.piuMesi(mese(), zoom() === "anno" ? 12 * k 
 function aereo(s) { for (const l of S.g.linee) { const a = l.aerei.find((x) => x.sigla === s); if (a) return [l.tipo, a]; } return [null, null]; }
 function residuo(a) { // ore alla prossima scadenza a ore e quale
   const s = a.scadenze.filter((x) => x.ore != null).sort((x, y) => x.ore - y.ore)[0];
-  return s ? [Math.max(s.ore, 0), s.tipo] : [null, ""];
+  return s ? [Math.max(s.ore, 0), breve(s.tipo)] : [null, ""];
 }
 const bozza = (s) => S.bozza[s] = S.bozza[s] || structuredClone(Piano.modello(Piano.pplMesi(S.ppl)[s] || []));
 function tuttiMesi(s) { // mesi consecutivi che la riga della bozza può toccare: PPL, anno a schermo, ore e lavorazioni
@@ -346,7 +350,7 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
   const cOre = (s, c) => ed && (!c.lav || +(c.dal || "").slice(8) > 1) ? inp(s, c.m, c.ore) : hh(c.ore); // nella lavorazione da un giorno > 1: le ore prima
   const lv = (s) => ed ? ` data-lv="${esc(s)}"` : "", lc = (t) => { const [bg, fg] = colLav(t); return `background:${bg};color:${fg}`; };
   const th = (l, a, rs) => { const c = eff(a).c, [bg, fg] = COL_EFF[c]; return `<th class="s" rowspan="${rs}" title="${CAT[c][2]}"${ed ? "" : ` data-d="${esc(a.sigla)}"`}><span class="ei" style="background:${bg};color:${fg}">${esc(a.sigla)}</span>${linee.length > 1 ? `<small>${esc(l.tipo)}</small>` : ""}${ed ? `<button data-lv="${esc(a.sigla)}">Lavorazioni</button>` : ""}</th>`; };
-  const nota = (a, rs) => { const x = eff(a), t = [x.c !== "eff" && x.m, ((S.note[a.sigla] || []).slice(-1)[0] || {}).t].filter(Boolean).join(" · ");
+  const nota = (a, rs, gia = []) => { const x = eff(a), t = [x.c !== "eff" && !gia.includes(x.m) && x.m, ((S.note[a.sigla] || []).slice(-1)[0] || {}).t].filter(Boolean).join(" · "); // il motivo già nella colonna lavorazioni non si ripete
     return `<td rowspan="${rs}" title="${esc(t)}"><div class="nt">${esc(t)}</div></td>`; };
   let head, righe, foot = "", cols, K;
   if (z === "anno") { // per macchina due righe: sopra programmate e lavorazioni (celle unite sui mesi in cui continuano), sotto volate
@@ -355,8 +359,8 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       const s = a.sigla, r = rigaS(s, ed), v = Object.fromEntries(r), pr = mY.map((k) => Piano.pm(v[k])), vo = mY.map((k) => vol(s, k));
       mY.forEach((_, i) => { tp[i] += pr[i]; if (vo[i] != null) tv[i] = (tv[i] || 0) + vo[i]; });
       const cel = (c) => { const ore = cOre(s, c), gd = +(c.dal || "").slice(8);
-        return !c.lav ? `<td class="p">${ore}</td>` : `<td colspan="${c.n}" class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(c.lav)}" title="${esc(c.lav)}">${ore}${ore ? "<br>" : ""}${esc(c.lav.toUpperCase())}${gd > 1 ? " dal " + gd : ""}</td>`; };
-      return `<tr>${th(l, a, 2)}${Piano.celleMesi(r, mY).map(cel).join("")}<td class="p">${hh(som(pr))}</td>${nota(a, 2)}</tr>
+        return !c.lav ? `<td class="p">${ore}</td>` : `<td colspan="${c.n}" class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(c.lav)}" title="${esc(c.lav)}">${ore}${ore ? "<br>" : ""}${esc(breve(c.lav))}${gd > 1 ? " dal " + gd : ""}</td>`; };
+      return `<tr>${th(l, a, 2)}${Piano.celleMesi(r, mY).map(cel).join("")}<td class="p">${hh(som(pr))}</td>${nota(a, 2, Piano.fermiPpl(r).map((f) => f.testo))}</tr>
        <tr class="v">${vo.map((x, i) => `<td>${x == null || (!x && !pr[i]) ? "" : fh(x)}</td>`).join("")}<td>${hh(som(vo))}</td></tr>`;
     });
     cols = `<col style="width:7%">${"<col>".repeat(12)}<col style="width:6%"><col style="width:13%">`; K = [["Programmate nell'anno", hh(som(tp)) || "0:00"], ["Volate nell'anno", hh(som(tv)) || "0:00"]];
@@ -375,9 +379,9 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       T3[0] += p; T3[1] += w || 0; T3[2] += dv || 0;
       return `<tr>${th(l, a, 1)}<td class="p">${cOre(s, { ...c, ore: c.lav ? c.ore : p })}</td><td>${w == null || (!w && !p) ? "" : fh(w) }</td>
         <td class="${dv < 0 ? "neg" : ""}">${dv == null ? "" : pas ? fh(dv) : hh(dv)}</td><td>${rs == null ? "" : fh(rs) + `<span class="sm">${esc(rt)}</span>`}</td>
-        <td class="${ed ? "ed" : ""}"${lv(s)}>${f ? `<span class="ch" style="${lc(f.testo)}">${esc(f.testo.toUpperCase())}</span><span class="sm">${per(f)}</span>` : ""}</td><td class="nx${ed ? " ed" : ""}"${lv(s)}>${nx ? esc(nx.testo.toUpperCase()) + `<span class="sm">${per(nx)}</span>` : ""}</td>${nota(a, 1)}</tr>`;
+        <td class="${ed ? "ed" : ""}"${lv(s)}>${f ? `<span class="ch" style="${lc(f.testo)}" title="${esc(f.testo)}">${esc(breve(f.testo))}</span><span class="sm">${per(f)}</span>` : ""}</td><td class="nx${ed ? " ed" : ""}"${lv(s)}${nx ? ` title="${esc(nx.testo)}">${esc(breve(nx.testo))}<span class="sm">${per(nx)}</span>` : ">"}</td>${nota(a, 1, f ? [f.testo] : [])}</tr>`;
     });
-    cols = `<col style="width:10%"><col style="width:9%"><col style="width:10%"><col style="width:9%"><col style="width:9%"><col style="width:17%"><col style="width:18%"><col>`;
+    cols = `<col style="width:7%"><col style="width:9%"><col style="width:7%"><col style="width:8%"><col style="width:9%"><col style="width:22%"><col style="width:20%"><col>`;
     head = `<th class="s">EI</th><th>Programmate</th><th>Volate</th><th>${pas ? "Differenza" : "Da volare"}</th><th>Ore residue</th><th>Manutenzione nel mese</th><th>Prossima manutenzione</th><th>Note</th>`;
     K = [["Programmate", hh(T3[0]) || "0:00"], ["Volate", m > m0 ? "" : fh(T3[1])], [pas ? "Differenza" : "Da volare", pas ? fh(T3[2]) : hh(T3[2]) || "0:00"]];
   }
