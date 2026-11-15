@@ -142,9 +142,28 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf td input{width:100%;min-width:0;padding:.2em;margin:0;text-align:center;font:inherit;font-weight:600;color:var(--t);background:#fffbe6;border:1px solid #c9a227;border-radius:4px;color-scheme:light}
 .bf tfoot td,.bf tfoot th{background:#eef1f6;font-weight:700;color:var(--n)}
 .bf tfoot tr:first-child>*{border-top:2px solid var(--n)}
-.bf .neg{color:#b42318}
+.bf .neg{color:#b42318;font-weight:700}
+.bf .wrn{color:#b45309;font-weight:700}
+.bf .dv{font-weight:700;color:var(--n)}
+.bf .nw{white-space:nowrap}
+.bf .hm{display:inline-block;font-size:.74em;font-weight:600;color:var(--n);background:#eef2f9;border:1px solid #cbd5e1;border-radius:.3em;padding:.08em .42em;margin-left:.38em;white-space:nowrap}
+.bf .mp{display:grid;grid-template-columns:46fr 54fr;gap:.75em;align-items:start;padding-bottom:.35em}
+.bf .mp.uno{grid-template-columns:1fr}
+.bf .pn{border:1px solid var(--l);border-radius:.45em;overflow:hidden;background:#fff}
+.bf .pn table{height:auto}
+.bf .pn th,.bf .pn td{padding:.21em .4em}
+.bf .pn.pv tbody td,.bf .pn.pv tbody th{padding:.32em .42em}
+.bf .pn.pv .p,.bf .pn.pv .dv{font-size:1.06em}
+.bf .pn td.tl,.bf .pn th.tl{text-align:left}
+.bf .pn tr.grp>*{border-top:2px solid #cbd5e1}
+.bf .ph{display:flex;align-items:center;justify-content:space-between;gap:.6em;padding:.3em .65em;background:var(--z);border-bottom:2px solid var(--n);font-size:.82em;color:var(--m);white-space:nowrap;overflow:hidden}
+.bf .ph b{color:var(--n);font-size:1.04em}
+.bf .ph .bg{display:inline-flex;align-items:center;gap:.38em;font-weight:700;color:var(--n);font-size:1.04em}
+.bf .ph .dt{width:.65em;height:.65em;border-radius:50%;display:inline-block}
+.bf .ph .gs{overflow:hidden;text-overflow:ellipsis}
 .bf .anno td,.bf .anno th{padding:.1em .3em}
-.bf tfoot .s{font-size:.75em;overflow-wrap:normal}
+.bf tfoot .s{font-size:.75em;overflow-wrap:normal;white-space:nowrap}
+@media (max-width:900px){.bf .mp{grid-template-columns:1fr}}
 @media (max-width:700px){.bf .tt div,.bf .ctl i{display:none}.bf .kp{flex-wrap:wrap}.bf .kp div{flex-basis:40%}}
 @media print{
 .bf{height:auto;font-size:11px}
@@ -350,12 +369,12 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
   const cOre = (s, c) => ed && (!c.lav || +(c.dal || "").slice(8) > 1) ? inp(s, c.m, c.ore) : hh(c.ore); // nella lavorazione da un giorno > 1: le ore prima
   const lv = (s) => ed ? ` data-lv="${esc(s)}"` : "", lc = (t) => { const [bg, fg] = colLav(t); return `background:${bg};color:${fg}`; };
   const th = (l, a, rs) => { const c = eff(a).c, [bg, fg] = COL_EFF[c]; return `<th class="s" rowspan="${rs}" title="${CAT[c][2]}"${ed ? "" : ` data-d="${esc(a.sigla)}"`}><span class="ei" style="background:${bg};color:${fg}">${esc(a.sigla)}</span>${linee.length > 1 ? `<small>${esc(l.tipo)}</small>` : ""}${ed ? `<button data-lv="${esc(a.sigla)}">Lavorazioni</button>` : ""}</th>`; };
-  const nota = (a, rs, gia = []) => { const x = eff(a), t = [x.c !== "eff" && !gia.includes(x.m) && x.m, ((S.note[a.sigla] || []).slice(-1)[0] || {}).t].filter(Boolean).join(" · "); // il motivo già nella colonna lavorazioni non si ripete
-    return `<td rowspan="${rs}" title="${esc(t)}"><div class="nt">${esc(t)}</div></td>`; };
-  let head, righe, foot = "", cols, K;
+  const txtNota = (a, gia = []) => { const x = eff(a); return [x.c !== "eff" && !gia.includes(x.m) && x.m, ((S.note[a.sigla] || []).slice(-1)[0] || {}).t].filter(Boolean).join(" · "); }; // il motivo già nella colonna lavorazioni non si ripete
+  const nota = (a, rs, gia = []) => { const t = txtNota(a, gia); return `<td rowspan="${rs}" title="${esc(t)}"><div class="nt">${esc(t)}</div></td>`; };
+  let tab, K;
   if (z === "anno") { // per macchina due righe: sopra programmate e lavorazioni (celle unite sui mesi in cui continuano), sotto volate
     const mY = MESI_L.map((_, i) => y + "-" + String(i + 1).padStart(2, "0")), tp = mY.map(() => 0), tv = mY.map(() => null);
-    righe = tutti.map(([l, a]) => {
+    const righe = tutti.map(([l, a]) => {
       const s = a.sigla, r = rigaS(s, ed), v = Object.fromEntries(r), pr = mY.map((k) => Piano.pm(v[k])), vo = mY.map((k) => vol(s, k));
       mY.forEach((_, i) => { tp[i] += pr[i]; if (vo[i] != null) tv[i] = (tv[i] || 0) + vo[i]; });
       const cel = (c) => { const ore = cOre(s, c), gd = +(c.dal || "").slice(8);
@@ -363,32 +382,63 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       return `<tr>${th(l, a, 2)}${Piano.celleMesi(r, mY).map(cel).join("")}<td class="p">${hh(som(pr))}</td>${nota(a, 2, Piano.fermiPpl(r).map((f) => f.testo))}</tr>
        <tr class="v">${vo.map((x, i) => `<td>${x == null || (!x && !pr[i]) ? "" : fh(x)}</td>`).join("")}<td>${hh(som(vo))}</td></tr>`;
     });
-    cols = `<col style="width:7%">${"<col>".repeat(12)}<col style="width:6%"><col style="width:13%">`; K = [["Programmate nell'anno", hh(som(tp)) || "0:00"], ["Volate nell'anno", hh(som(tv)) || "0:00"]];
-    head = `<th class="s">EI</th>${mY.map((k) => `<th class="${k === m0 ? "og" : ""}">${MESI_L[+k.slice(5) - 1].slice(0, 3)}</th>`).join("")}<th>Totale</th><th>Note</th>`;
-    foot = `<tr><th class="s">Programmate</th>${tp.map((x) => `<td>${hh(x)}</td>`).join("")}<td>${hh(som(tp))}</td><td rowspan="2"></td></tr>
+    const cols = `<col style="width:7%">${"<col>".repeat(12)}<col style="width:6%"><col style="width:13%">`; K = [["Programmate nell'anno", hh(som(tp)) || "0:00"], ["Volate nell'anno", hh(som(tv)) || "0:00"]];
+    const head = `<th class="s">EI</th>${mY.map((k) => `<th class="${k === m0 ? "og" : ""}">${MESI_L[+k.slice(5) - 1].slice(0, 3)}</th>`).join("")}<th>Totale</th><th>Note</th>`;
+    const foot = `<tr><th class="s">Programmate</th>${tp.map((x) => `<td>${hh(x)}</td>`).join("")}<td>${hh(som(tp))}</td><td rowspan="2"></td></tr>
       <tr><th class="s">Volate</th>${tv.map((x) => `<td>${x == null ? "" : fh(x)}</td>`).join("")}<td>${hh(som(tv))}</td></tr>`;
-  } else { // una riga per macchina: programmate, volate, da volare (nei mesi passati la differenza), residuo, lavorazione
-    const pas = m < m0, fm = Piano.primoDopo(m), T3 = [0, 0, 0];
+    tab = `<table class="anno" style="min-width:58em"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${righe.join("")}</tbody><tfoot>${foot}</tfoot></table>`;
+  } else { // due pannelli affiancati: a sinistra chi è efficiente oggi (ore e scadenze), a destra chi è fermo raggruppato per lavorazione
+    const pas = m < m0, fm = Piano.primoDopo(m), T3 = [0, 0, 0], Te = [0, 0, 0];
     const mp = (d) => nMese(d.slice(0, 7)).toLowerCase(), per = (f) => { let a = mp(f.in); const b = f.aperto ? "" : mp(Piano.addG(f.out, -1));
       if (+f.in.slice(8) > 1) a = fd(f.in).slice(0, 5); else if (b && b !== a && b.slice(4) === a.slice(4)) a = a.slice(0, 3);
       return !b ? "da " + a : b === a ? a : a + " – " + b; }; // 23/11 – dic 2026, gen – feb 2027, da gen 2027 (senza fine)
-    righe = tutti.map(([l, a]) => {
-      const s = a.sigla, r = rigaS(s, ed), c = Piano.celleMesi(r, [m])[0], p = Piano.pm(Object.fromEntries(r)[m]), w = vol(s, m), [rs, rt] = residuo(a);
+    const dati = tutti.map(([l, a]) => {
+      const s = a.sigla, x = eff(a), r = rigaS(s, ed), c = Piano.celleMesi(r, [m])[0], p = Piano.pm(Object.fromEntries(r)[m]), w = vol(s, m), [rs, rt] = residuo(a);
       const dv = pas ? (w == null ? null : w - p) : Math.max(p - (w || 0), 0), fe = Piano.fermiPpl(r);
       const f = fe.find((x) => x.in < fm && x.out > m + "-01"), nx = fe.find((x) => x.in >= fm && x !== f);
+      const mot = f ? breve(f.testo) : x.m ? breve(x.m) : "", nt = txtNota(a, f ? [f.testo] : []);
       T3[0] += p; T3[1] += w || 0; T3[2] += dv || 0;
-      return `<tr>${th(l, a, 1)}<td class="p">${cOre(s, { ...c, ore: c.lav ? c.ore : p })}</td><td>${w == null || (!w && !p) ? "" : fh(w) }</td>
-        <td class="${dv < 0 ? "neg" : ""}">${dv == null ? "" : pas ? fh(dv) : hh(dv)}</td><td>${rs == null ? "" : fh(rs) + `<span class="sm">${esc(rt)}</span>`}</td>
-        <td class="${ed ? "ed" : ""}"${lv(s)}>${f ? `<span class="ch" style="${lc(f.testo)}" title="${esc(f.testo)}">${esc(breve(f.testo))}</span><span class="sm">${per(f)}</span>` : ""}</td><td class="nx${ed ? " ed" : ""}"${lv(s)}${nx ? ` title="${esc(nx.testo)}">${esc(breve(nx.testo))}<span class="sm">${per(nx)}</span>` : ">"}</td>${nota(a, 1, f ? [f.testo] : [])}</tr>`;
+      if (x.c === "eff") { Te[0] += p; Te[1] += w || 0; Te[2] += dv || 0; }
+      return { l, a, s, x, c, p, w, rs, rt, dv, f, nx, mot, nt };
     });
-    cols = `<col style="width:7%"><col style="width:9%"><col style="width:7%"><col style="width:8%"><col style="width:9%"><col style="width:22%"><col style="width:20%"><col>`;
-    head = `<th class="s">EI</th><th>Programmate</th><th>Volate</th><th>${pas ? "Differenza" : "Da volare"}</th><th>Ore residue</th><th>Manutenzione nel mese</th><th>Prossima manutenzione</th><th>Note</th>`;
+    const cRes = (rs, rt) => rs == null ? "" : `<b class="${rs <= 0 ? "neg" : rs < ORE_WARN ? "wrn" : ""}">${fh(rs)}</b><span class="sm">${esc(rt)}</span>`;
+    const cChip = (f) => f ? `<span class="ch" style="${lc(f.testo)}" title="${esc(f.testo)}">${esc(breve(f.testo))}</span><span class="sm">${per(f)}</span>` : "";
+    const cNx = (nx) => nx ? `<span class="nx" title="${esc(nx.testo)}">${esc(breve(nx.testo))}<span class="sm">${per(nx)}</span></span>` : "";
+    const volano = dati.filter((d) => d.x.c === "eff"), fermi = dati.filter((d) => d.x.c !== "eff"), cnt = {};
+    fermi.forEach((d) => cnt[d.mot] = (cnt[d.mot] || 0) + 1);
+    fermi.sort((a, b) => (cnt[b.mot] - cnt[a.mot]) || a.mot.localeCompare(b.mot) || a.s.localeCompare(b.s));
+    const rVol = volano.map((d) => {
+      const info = [cChip(d.f) && `<div>${cChip(d.f)}</div>`, cNx(d.nx), d.nt && `<div class="nt">${esc(d.nt)}</div>`].filter(Boolean).join("");
+      return `<tr>${th(d.l, d.a, 1)}<td class="p">${cOre(d.s, { ...d.c, ore: d.c.lav ? d.c.ore : d.p })}</td><td>${d.w == null || (!d.w && !d.p) ? "" : fh(d.w)}</td>
+        <td class="dv${d.dv < 0 ? " neg" : ""}">${d.dv == null ? "" : pas ? fh(d.dv) : hh(d.dv)}</td><td class="nw">${cRes(d.rs, d.rt)}</td>
+        <td class="tl${ed ? " ed" : ""}"${lv(d.s)}>${info}</td></tr>`;
+    });
+    const rFer = fermi.map((d, i) => {
+      const grp = i > 0 && d.mot !== fermi[i - 1].mot ? ' class="grp"' : "";
+      const oreTag = !ed && (d.p || d.w) ? `<span class="hm">${[d.p && "Prog. " + fh(d.p), d.w && "Vol. " + fh(d.w)].filter(Boolean).join(" · ")}</span>` : "";
+      const lav = (d.f ? cChip(d.f) : d.x.m ? `<span class="ch" style="${lc(d.x.m)}">${esc(breve(d.x.m))}</span>` : "") + oreTag;
+      const info = [cNx(d.nx), d.nt && `<div class="nt">${esc(d.nt)}</div>`].filter(Boolean).join("");
+      return `<tr${grp}>${th(d.l, d.a, 1)}${ed ? `<td class="p">${cOre(d.s, { ...d.c, ore: d.c.lav ? d.c.ore : d.p })}</td>` : ""}<td class="tl${ed ? " ed" : ""}"${lv(d.s)}>${lav}</td>
+        <td class="nw">${cRes(d.rs, d.rt)}</td><td class="tl${ed ? " ed" : ""}"${lv(d.s)}>${info}</td></tr>`;
+    });
+    const gc = Object.entries(cnt).filter(([k]) => k).sort((a, b) => b[1] - a[1]);
+    const riepFermi = gc.filter(([, n]) => n > 1).map(([k, n]) => `<b>${n}</b> ${esc(k)}`).join(" · "); // solo i gruppi, i singoli si leggono nelle righe
+    const pVol = volano.length ? `<section class="pn pv"><div class="ph"><span class="bg"><i class="dt" style="background:#2e9d57"></i>EFFICIENTI · ${volano.length}</span>
+      <span>Prog. <b>${hh(Te[0]) || "0:00"}</b> · Volate <b>${m > m0 ? "–" : fh(Te[1])}</b> · ${pas ? "Diff." : "Da volare"} <b>${pas ? fh(Te[2]) : hh(Te[2]) || "0:00"}</b></span></div>
+      <table><colgroup><col style="width:5.6em"><col style="width:12%"><col style="width:11%"><col style="width:13%"><col style="width:21%"><col></colgroup>
+      <thead><tr><th class="s">EI</th><th>Prog.</th><th>Volate</th><th>${pas ? "Diff." : "Da volare"}</th><th>Ore residue</th><th class="tl">Prossima manut. / Note</th></tr></thead>
+      <tbody>${rVol.join("")}</tbody></table></section>` : "";
+    const pFer = fermi.length ? `<section class="pn"><div class="ph"><span class="bg"><i class="dt" style="background:#b42318"></i>FERMI · ${fermi.length}</span><span class="gs">${riepFermi}</span></div>
+      <table><colgroup><col style="width:5.6em">${ed ? '<col style="width:11%">' : ""}<col style="width:${ed ? 35 : 41}%"><col style="width:18%"><col></colgroup>
+      <thead><tr><th class="s">EI</th>${ed ? "<th>Prog.</th>" : ""}<th class="tl">Manutenzione nel mese</th><th>Ore residue</th><th class="tl">Prossima manut. / Note</th></tr></thead>
+      <tbody>${rFer.join("")}</tbody></table></section>` : "";
+    tab = `<div class="mp${!volano.length || !fermi.length ? " uno" : ""}">${pVol}${pFer}</div>`;
     K = [["Programmate", hh(T3[0]) || "0:00"], ["Volate", m > m0 ? "" : fh(T3[1])], [pas ? "Differenza" : "Da volare", pas ? fh(T3[2]) : hh(T3[2]) || "0:00"]];
   }
   const ml = MESI_L[+m.slice(5) - 1], tt = `<div class="tt"><img src="img/${tipo(linee[0].tipo)[0]}.webp" alt=""><h1><span>PPL</span>${esc(fl)}</h1>
     <div><b>${z === "anno" ? "Anno " + y : ml[0] + ml.slice(1).toLowerCase() + " " + y}</b>giornaliera del ${fd(g.data)}${z === "anno" ? " · in grigio le ore volate" : ""}</div></div>
     <div class="kp">${[...K, ["Efficienti oggi (in verde)", E + " su " + T]].map(([a, b]) => `<div><span>${a}</span><b>${b || "&nbsp;"}</b></div>`).join("")}</div>`;
-  return { tt, tab: `<table class="${z}" style="min-width:${z === "anno" ? 58 : 44}em"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${righe.join("")}</tbody><tfoot>${foot}</tfoot></table>` };
+  return { tt, tab };
 }
 function renderBrief() {
   const grp = gruppi(), fl = grp.includes(S.bf) ? S.bf : grp[0], z = zoom(), m = mese(), t = tavola(fl, z, m, S.mod);
