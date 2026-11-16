@@ -161,9 +161,7 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf tbody tr:nth-child(even)>*{background:var(--z)}
 .bf tr:has(+.v)>td:not([rowspan]){border-bottom-color:transparent}
 .bf .s{position:sticky;left:0;z-index:1;font-size:1.2em;font-weight:700;color:var(--n)}
-.bf .ei{display:inline-block;min-width:3.4em;padding:.1em .4em;border-radius:.35em;line-height:1.2}
 .bf thead .s{z-index:3;font-size:.75em}
-.bf .s small{display:block;font-size:.55em;font-weight:600;color:var(--m);margin-top:.15em}
 .bf .s button{display:block;margin:.3em auto 0;font:inherit;font-size:.5em;font-weight:500;padding:.2em .5em;border-radius:6px;border:1px solid var(--l);background:#fff;color:var(--t);cursor:pointer}
 .bf [data-d]{cursor:pointer}
 .bf .p{font-weight:600}
@@ -193,12 +191,13 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .mese .lav{font-size:1em;line-height:1.2}
 .bf .mese td b{font-weight:600}
 .bf .mese .nw b{font-weight:700}
-.bf .mese tbody tr.grp th{text-align:left;background:#eef2f7;color:var(--n);font-size:.8em;font-weight:700;letter-spacing:.03em;padding:.18em .5em;border-top:1px solid #cbd5e1;border-bottom:1px solid #cbd5e1}
+.bf .mese tbody tr.grp th,.bf .anno tbody tr.grp th{text-align:left;background:#eef2f7;color:var(--n);font-size:.8em;font-weight:700;letter-spacing:.03em;padding:.18em .5em;border-top:1px solid #cbd5e1;border-bottom:1px solid #cbd5e1}
 .bf .mese tbody tr.fsep th{text-align:left;background:#fbf0f0;color:#9b1c1c;font-size:.8em;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:.22em .5em;border-top:2px solid var(--n);border-bottom:1px solid #e5b4b0}
 .bf.mod .mese tbody .s{padding:.18em .3em}
 .bf.mod .mese .s button{margin:.18em auto 0;font-size:.66em;padding:.14em .42em;border-radius:4px;white-space:nowrap}
 .bf.mod .mese td input{padding:.14em .2em;line-height:1.15;box-sizing:border-box}
-.bf .anno td,.bf .anno th{padding:.08em .26em}
+.bf .anno td,.bf .anno th{padding:.08em .26em;border-left:1px solid #d5dde8;border-right:1px solid #d5dde8}
+.bf .anno thead th:not(.og){background:var(--z)}
 .bf .anno tbody tr:nth-child(even)>*{background:#fff}
 .bf .anno tbody tr.alt>*{background:var(--z)}
 .bf .anno tbody tr.sep>*{border-top:2px solid #cbd5e1}
@@ -420,19 +419,41 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
   const inp = (s, k, v) => `<input type="number" min="0" step="any" inputmode="decimal" data-s="${esc(s)}" data-m="${k}" value="${v == null ? "" : +(v / 60).toFixed(2)}" aria-label="Ore ${esc(s)} ${nMese(k)}">`;
   const cOre = (s, c) => ed && (!c.lav || +(c.dal || "").slice(8) > 1) ? inp(s, c.m, c.ore) : hh(c.ore); // nella lavorazione da un giorno > 1: le ore prima
   const lv = (s) => ed ? ` data-lv="${esc(s)}"` : "", lc = (t) => { const [bg, fg] = colLav(t); return `background:${bg};color:${fg}`; };
-  const th = (l, a, rs) => { const c = eff(a).c, [bg, fg] = COL_EFF[c]; return `<th class="s" rowspan="${rs}" title="${CAT[c][2]}"${ed ? "" : ` data-d="${esc(a.sigla)}"`}><span class="ei" style="background:${bg};color:${fg}">${esc(a.sigla)}</span>${linee.length > 1 ? `<small>${esc(l.tipo)}</small>` : ""}${ed ? `<button data-lv="${esc(a.sigla)}">Lavorazioni</button>` : ""}</th>`; };
-  const txtNota = (a, gia = []) => { const x = eff(a); return [x.c !== "eff" && !gia.includes(x.m) && x.m, ((S.note[a.sigla] || []).slice(-1)[0] || {}).t].filter(Boolean).join(" · "); }; // il motivo già nella colonna lavorazioni non si ripete
-  const nota = (a, rs, gia = []) => { const t = txtNota(a, gia); return `<td rowspan="${rs}" title="${esc(t)}"><div class="nt">${esc(t)}</div></td>`; };
+  const th = (l, a, rs) => { const c = eff(a).c, [bg, fg] = COL_EFF[c]; return `<th class="s" rowspan="${rs}" style="background:${bg};color:${fg}" title="${esc(CAT[c][2] + (linee.length > 1 ? " · " + l.tipo : ""))}"${ed ? "" : ` data-d="${esc(a.sigla)}"`}>${esc(a.sigla)}${ed ? `<button data-lv="${esc(a.sigla)}">Lavorazioni</button>` : ""}</th>`; };
+  const STOP = new Set("il lo la i gli le un uno una di a da in con su per tra fra del dello della dei degli delle al allo alla ai agli alle dal dallo dalla dai dagli dalle nel nello nella nei negli nelle sul sullo sulla sui sugli sulle e ed o ad".split(" "));
+  const MESI_N = { gen: 1, gennaio: 1, feb: 2, febbraio: 2, mar: 3, marzo: 3, apr: 4, aprile: 4, mag: 5, maggio: 5, giu: 6, giugno: 6, lug: 7, luglio: 7, ago: 8, agosto: 8, set: 9, settembre: 9, ott: 10, ottobre: 10, nov: 11, novembre: 11, dic: 12, dicembre: 12 };
+  const toks = (s) => String(s || "").toLowerCase().match(/[a-zàèéìòù0-9]+/g) || [];
+  const sigWords = (s) => toks(breve(s)).filter((w) => !STOP.has(w) && !(w in MESI_N) && !/^(?:\d+(?:f?h)?|f?h)$/.test(w));
+  const notaGiorno = (s) => {
+    const rx = /\b(\d{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre|gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic)\b/i.exec(s)
+      || /\b(\d{1,2})\/(\d{1,2})(?!\/\d|\d)/.exec(s);
+    if (!rx) return null;
+    const gg = +rx[1], mm = isNaN(rx[2]) ? MESI_N[rx[2].toLowerCase()] : +rx[2];
+    return gg >= 1 && gg <= 31 && mm >= 1 && mm <= 12 ? [gg, mm] : null;
+  };
+  // ultima nota senza ciò che dicono già le lavorazioni mostrate (lavs, testi = i loro testi + il motivo); il giorno della nota passa nella data della lavorazione → { rid, nt, gi: {inizio: nuovo inizio} }
+  const pulisci = (s, lavs, testi) => {
+    const tk = new Set(testi.flatMap((t) => [...toks(t), ...toks(breve(t))])), gi = {};
+    const rid = (t) => { if (!testi.length) return false; const sw = sigWords(t); if (sw.length) return sw.every((w) => tk.has(w)); const gm = notaGiorno(t); return !!gm && lavs.some((v) => +v.in.slice(5, 7) === gm[1]); };
+    let nt = ((S.note[s] || []).slice(-1)[0] || {}).t || "";
+    if (nt && rid(nt)) { const gm = notaGiorno(nt), v = gm && lavs.find((v) => +v.in.slice(5, 7) === gm[1]);
+      if (v && +v.in.slice(8) === 1) gi[v.in] = v.in.slice(0, 8) + String(gm[0]).padStart(2, "0");
+      if (!gm || v) nt = ""; } // nessuna lavorazione nel mese della nota: la nota resta
+    return { rid, nt, gi };
+  };
+  const nota = (rs, t) => `<td rowspan="${rs}" title="${esc(t)}"><div class="nt">${esc(t)}</div></td>`;
   let tab, K;
   if (z === "anno") { // per macchina due righe: sopra programmate e lavorazioni (celle unite sui mesi in cui continuano), sotto volate
     const mY = MESI_L.map((_, i) => y + "-" + String(i + 1).padStart(2, "0")), tp = mY.map(() => 0), tv = mY.map(() => null), y0 = m0.slice(0, 4);
     const fmtTot = (v, p) => v == null || (!v && !p) ? "" : fh(v) + (p > 0 ? (y < y0 ? `<small class="${v < p ? "neg" : ""}">${(v > p ? "+" : "") + fh(v - p)}</small>` : `<small>${Math.round(100 * v / p)}%</small>`) : "");
     const righe = tutti.map(([l, a], ri) => {
       const s = a.sigla, r = rigaS(s, ed), v = Object.fromEntries(r), pr = mY.map((k) => Piano.pm(v[k])), vo = mY.map((k) => vol(s, k));
+      const x = eff(a), fe = Piano.fermiPpl(r), lavs = fe.filter((f) => f.in < (+y + 1) + "-01-01" && f.out > y + "-01-01");
+      const mot = x.c !== "eff" && x.m && !fe.some((f) => f.testo === x.m) ? x.m : "", P = pulisci(s, lavs, [...lavs.map((f) => f.testo), mot].filter(Boolean));
       mY.forEach((_, i) => { tp[i] += pr[i]; if (vo[i] != null) tv[i] = (tv[i] || 0) + vo[i]; });
       const skipV = Array(12).fill(false); let idx = 0;
       const cel = (c) => {
-        const ore = cOre(s, c), gd = +(c.dal || "").slice(8), span2 = !!c.lav && !ore && mY.slice(idx, idx + c.n).every((_, k) => { const j = idx + k; return vo[j] == null || (!vo[j] && !pr[j]); });
+        const ore = cOre(s, c), gd = +(c.dal ? P.gi[c.dal] || c.dal : "").slice(8), span2 = !!c.lav && !ore && mY.slice(idx, idx + c.n).every((_, k) => { const j = idx + k; return vo[j] == null || (!vo[j] && !pr[j]); });
         if (span2) for (let k = 0; k < c.n; k++) skipV[idx + k] = true;
         idx += c.n;
         const og = !c.lav && c.m === m0 ? " og" : "";
@@ -441,7 +462,8 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       };
       const cls1 = [ri > 0 && "sep", ri % 2 && "alt"].filter(Boolean).join(" "), cls2 = ["v", ri % 2 && "alt"].filter(Boolean).join(" ");
       const totPr = som(pr), totVo = vo.some((x) => x != null) ? som(vo) : null;
-      return `<tr${cls1 ? ` class="${cls1}"` : ""}>${th(l, a, 2)}${Piano.celleMesi(r, mY).map(cel).join("")}<td class="p">${hh(totPr)}</td>${nota(a, 2, Piano.fermiPpl(r).map((f) => f.testo))}</tr>
+      const grp = linee.length > 1 && (ri === 0 || tutti[ri - 1][0] !== l) ? `<tr class="grp"><th colspan="15">${esc(l.tipo)}</th></tr>` : ""; // tipo in una riga di gruppo, non sotto ogni sigla
+      return `${grp}<tr${cls1 ? ` class="${cls1}"` : ""}>${th(l, a, 2)}${Piano.celleMesi(r, mY).map(cel).join("")}<td class="p">${hh(totPr)}</td>${nota(2, [mot, P.nt].filter(Boolean).join(" · "))}</tr>
        <tr class="${cls2}">${vo.map((x, i) => skipV[i] ? "" : `<td${mY[i] === m0 ? ' class="og"' : ""}>${x == null || (!x && !pr[i]) ? "" : fh(x)}</td>`).join("")}<td>${fmtTot(totVo, totPr)}</td></tr>`;
     });
     const totP = som(tp), totV = tv.every((x) => x == null) ? null : som(tv);
@@ -459,46 +481,15 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       if (+d0.slice(8) > 1) a = fd(d0).slice(0, 5); else if (b && b !== a && b.slice(4) === a.slice(4)) a = a.slice(0, 3);
       return !b ? "da " + a : b === a ? a : a + " – " + b; }; // 23/11 – dic 2026, gen – feb 2027, da gen 2027 (senza fine)
     const normRt = (t) => String(t || "").toUpperCase().replace(/\bISP\.?\s*/g, "ISP. ").replace(/(\d)\s*H\.?\b/g, "$1 H").replace(/\s+/g, " ").replace(/\.+$/, "").trim();
-    const STOP = new Set("il lo la i gli le un uno una di a da in con su per tra fra del dello della dei degli delle al allo alla ai agli alle dal dallo dalla dai dagli dalle nel nello nella nei negli nelle sul sullo sulla sui sugli sulle e ed o ad".split(" "));
-    const MESI_N = { gen: 1, gennaio: 1, feb: 2, febbraio: 2, mar: 3, marzo: 3, apr: 4, aprile: 4, mag: 5, maggio: 5, giu: 6, giugno: 6, lug: 7, luglio: 7, ago: 8, agosto: 8, set: 9, settembre: 9, ott: 10, ottobre: 10, nov: 11, novembre: 11, dic: 12, dicembre: 12 };
-    const toks = (s) => String(s || "").toLowerCase().match(/[a-zàèéìòù0-9]+/g) || [];
-    const sigWords = (s) => toks(breve(s)).filter((w) => !STOP.has(w) && !(w in MESI_N) && !/^(?:\d+(?:f?h)?|f?h)$/.test(w));
-    const notaGiorno = (s) => {
-      const rx = /\b(\d{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre|gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic)\b/i.exec(s)
-        || /\b(\d{1,2})\/(\d{1,2})(?!\/\d|\d)/.exec(s);
-      if (!rx) return null;
-      const gg = +rx[1], mm = isNaN(rx[2]) ? MESI_N[rx[2].toLowerCase()] : +rx[2];
-      return gg >= 1 && gg <= 31 && mm >= 1 && mm <= 12 ? [gg, mm] : null;
-    };
     const dati = tutti.map(([l, a]) => {
       const s = a.sigla, x = eff(a), r = rigaS(s, ed), c = Piano.celleMesi(r, [m])[0], p = Piano.pm(Object.fromEntries(r)[m]), w = vol(s, m), [rs, rt0] = residuo(a);
       const rt = normRt(rt0), dv = pas ? (w == null ? null : w - p) : Math.max(p - (w || 0), 0), fe = Piano.fermiPpl(r);
       const f = fe.find((x) => x.in < fm && x.out > m + "-01"), nx = fe.find((x) => x.in >= fm && x !== f);
       const mot = f ? breve(f.testo) : x.m ? breve(x.m) : "";
-      const lavTexts = [f && f.testo, nx && nx.testo, !f && m === m0 && x.c !== "eff" && x.m].filter(Boolean);
-      const lavToks = new Set(lavTexts.flatMap((t) => [...toks(t), ...toks(breve(t))]));
-      const ridond = (t) => {
-        const sw = sigWords(t);
-        if (!lavTexts.length) return false;
-        if (sw.length) return sw.every((w) => lavToks.has(w));
-        const gm = notaGiorno(t);
-        return !!gm && [f, nx].some((lv) => lv && +lv.in.slice(5, 7) === gm[1]);
-      };
-      let fIn = f ? f.in : null, nxIn = nx ? nx.in : null, ntNota = "";
-      for (const { t: rn } of (S.note[s] || []).slice(-1)) { // solo l'ultima nota, come prima
-        if (!rn) continue;
-        if (ridond(rn)) {
-          const gm = notaGiorno(rn);
-          if (gm) { // il giorno della nota va nella data della lavorazione; se il mese non coincide la nota resta
-            const [gg, mm] = gm, dIso = (lav) => lav.in.slice(0, 8) + String(gg).padStart(2, "0");
-            if (f && +f.in.slice(5, 7) === mm && +f.in.slice(8, 10) === 1) fIn = dIso(f);
-            else if (nx && +nx.in.slice(5, 7) === mm && +nx.in.slice(8, 10) === 1) nxIn = dIso(nx);
-            else if (![f, nx].some((lv) => lv && +lv.in.slice(5, 7) === mm)) ntNota = rn;
-          }
-        } else ntNota = rn;
-      }
-      const xmExtra = m === m0 && f && x.c !== "eff" && x.m && !ridond(x.m) ? x.m : "";
-      const nt = [xmExtra, ntNota].filter(Boolean).join(" · ");
+      const lavs = [f, nx].filter(Boolean), P = pulisci(s, lavs, [...lavs.map((v) => v.testo), !f && m === m0 && x.c !== "eff" && x.m].filter(Boolean));
+      const fIn = f && (P.gi[f.in] || f.in), nxIn = nx && (P.gi[nx.in] || nx.in);
+      const xmExtra = m === m0 && f && x.c !== "eff" && x.m && !P.rid(x.m) ? x.m : "";
+      const nt = [xmExtra, P.nt].filter(Boolean).join(" · ");
       T3[0] += p; T3[1] += w || 0; T3[2] += dv || 0;
       return { l, a, s, x, c, p, w, rs, rt, dv, f, fIn, nx, nxIn, mot, nt };
     });
