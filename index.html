@@ -170,9 +170,6 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .lav{font-weight:600;font-size:.85em;line-height:1.15}
 .bf .ed{cursor:pointer}
 .bf .ed:hover{box-shadow:inset 0 0 0 2px var(--n)}
-.bf .nx{color:#4a5466;font-size:.85em;font-weight:600}
-.bf .ch{display:inline-block;white-space:nowrap;padding:.25em .6em;border-radius:.4em;font-weight:700;font-size:.85em;line-height:1.2}
-.bf .sm{font-size:.75em;font-weight:500;color:var(--m);margin-left:.4em;white-space:nowrap}
 .bf .v td{color:var(--m)}
 .bf td small{display:block;font-size:.7em;color:var(--m)}
 .bf .nt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:left;font-size:.8em;line-height:1.2;color:var(--m)}
@@ -183,21 +180,24 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .wrn{color:#b45309;font-weight:700}
 .bf .dv{font-weight:700;color:var(--n)}
 .bf .nw{white-space:nowrap}
-.bf .hm{display:inline-block;font-size:.74em;font-weight:600;color:var(--n);background:#eef2f9;border:1px solid #cbd5e1;border-radius:.3em;padding:.08em .42em;margin-left:.38em;white-space:nowrap}
-.bf .mp{display:grid;grid-template-columns:46fr 54fr;gap:.75em;align-items:start;padding-bottom:.35em}
-.bf .mp.uno{grid-template-columns:1fr}
-.bf .pn{border:1px solid var(--l);border-radius:.45em;overflow:hidden;background:#fff}
-.bf .pn table{height:auto}
-.bf .pn th,.bf .pn td{padding:.21em .4em}
-.bf .pn.pv tbody td,.bf .pn.pv tbody th{padding:.32em .42em}
-.bf .pn.pv .p,.bf .pn.pv .dv{font-size:1.06em}
-.bf .pn td.tl,.bf .pn th.tl{text-align:left}
-.bf .pn tr.grp>*{border-top:2px solid #cbd5e1}
-.bf .ph{display:flex;align-items:center;justify-content:space-between;gap:.6em;padding:.3em .65em;background:var(--z);border-bottom:2px solid var(--n);font-size:.82em;color:var(--m);white-space:nowrap;overflow:hidden}
-.bf .ph b{color:var(--n);font-size:1.04em}
-.bf .ph .bg{display:inline-flex;align-items:center;gap:.38em;font-weight:700;color:var(--n);font-size:1.04em}
-.bf .ph .dt{width:.65em;height:.65em;border-radius:50%;display:inline-block}
-.bf .ph .gs{overflow:hidden;text-overflow:ellipsis}
+.bf .mese{height:auto;min-width:680px}
+.bf .mese th,.bf .mese td{border:1px solid #d5dde8;padding:.34em .5em;overflow-wrap:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bf .mese thead th{white-space:normal;border-bottom:2px solid var(--n);background:var(--z);line-height:1.15;padding:.34em .45em}
+.bf .mese thead th span{display:block;color:var(--n);font-weight:700;margin-top:.1em}
+.bf .mese thead .s{background:var(--z)}
+.bf .mese tbody tr:nth-child(even)>*{background:#fff}
+.bf .mese tbody tr.alt>*{background:var(--z)}
+.bf .mese tbody .s{font-size:1em;padding:.34em .3em}
+.bf .mese .tl{text-align:left;white-space:normal}
+.bf .mese .per{font-weight:400;opacity:.82}
+.bf .mese .lav{font-size:1em;line-height:1.2}
+.bf .mese td b{font-weight:600}
+.bf .mese .nw b{font-weight:700}
+.bf .mese tbody tr.grp th{text-align:left;background:#eef2f7;color:var(--n);font-size:.8em;font-weight:700;letter-spacing:.03em;padding:.18em .5em;border-top:1px solid #cbd5e1;border-bottom:1px solid #cbd5e1}
+.bf .mese tbody tr.fsep th{text-align:left;background:#fbf0f0;color:#9b1c1c;font-size:.8em;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:.22em .5em;border-top:2px solid var(--n);border-bottom:1px solid #e5b4b0}
+.bf.mod .mese tbody .s{padding:.18em .3em}
+.bf.mod .mese .s button{margin:.18em auto 0;font-size:.66em;padding:.14em .42em;border-radius:4px;white-space:nowrap}
+.bf.mod .mese td input{padding:.14em .2em;line-height:1.15;box-sizing:border-box}
 .bf .anno td,.bf .anno th{padding:.08em .26em}
 .bf .anno tbody tr:nth-child(even)>*{background:#fff}
 .bf .anno tbody tr.alt>*{background:var(--z)}
@@ -214,7 +214,6 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf.mod .anno .lav br{display:none}
 .bf.mod .anno .lav .lt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:.12em}
 .bf tfoot .s{font-size:.75em;overflow-wrap:normal;white-space:nowrap}
-@media (max-width:900px){.bf .mp{grid-template-columns:1fr}}
 @media (max-width:700px){.bf .tt div,.bf .ctl i{display:none}.bf .kp{flex-wrap:wrap}.bf .kp div{flex-basis:40%}}
 @media print{
 .bf{height:auto;font-size:11px}
@@ -453,53 +452,102 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
     const foot = `<tr><th class="s">Programmate</th>${tp.map((x, i) => `<td${mY[i] === m0 ? ' class="og"' : ""}>${hh(x)}</td>`).join("")}<td>${hh(totP)}</td><td rowspan="2"></td></tr>
       <tr><th class="s">Volate</th>${tv.map((x, i) => `<td${mY[i] === m0 ? ' class="og"' : ""}>${x == null ? "" : fh(x)}</td>`).join("")}<td>${fmtTot(totV, totP)}</td></tr>`;
     tab = `<table class="anno" style="min-width:max(58em,780px)"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${righe.join("")}</tbody><tfoot>${foot}</tfoot></table>`;
-  } else { // due pannelli affiancati: a sinistra chi è efficiente oggi (ore e scadenze), a destra chi è fermo raggruppato per lavorazione
-    const pas = m < m0, fm = Piano.primoDopo(m), T3 = [0, 0, 0], Te = [0, 0, 0];
-    const mp = (d) => nMese(d.slice(0, 7)).toLowerCase(), per = (f) => { let a = mp(f.in); const b = f.aperto ? "" : mp(Piano.addG(f.out, -1));
-      if (+f.in.slice(8) > 1) a = fd(f.in).slice(0, 5); else if (b && b !== a && b.slice(4) === a.slice(4)) a = a.slice(0, 3);
+  } else { // tabella unica: efficienti prima, poi fermi dopo la riga separatrice «Fermi», raggruppati per tipo se la flotta ne ha più d'uno
+    const pas = m < m0, fut = m > m0, fm = Piano.primoDopo(m), T3 = [0, 0, 0];
+    const mp = (d) => nMese(d.slice(0, 7)).toLowerCase();
+    const per = (f, ini) => { const d0 = ini || f.in; let a = mp(d0); const b = f.aperto ? "" : mp(Piano.addG(f.out, -1));
+      if (+d0.slice(8) > 1) a = fd(d0).slice(0, 5); else if (b && b !== a && b.slice(4) === a.slice(4)) a = a.slice(0, 3);
       return !b ? "da " + a : b === a ? a : a + " – " + b; }; // 23/11 – dic 2026, gen – feb 2027, da gen 2027 (senza fine)
+    const normRt = (t) => String(t || "").toUpperCase().replace(/\bISP\.?\s*/g, "ISP. ").replace(/(\d)\s*H\.?\b/g, "$1 H").replace(/\s+/g, " ").replace(/\.+$/, "").trim();
+    const STOP = new Set("il lo la i gli le un uno una di a da in con su per tra fra del dello della dei degli delle al allo alla ai agli alle dal dallo dalla dai dagli dalle nel nello nella nei negli nelle sul sullo sulla sui sugli sulle e ed o ad".split(" "));
+    const MESI_N = { gen: 1, gennaio: 1, feb: 2, febbraio: 2, mar: 3, marzo: 3, apr: 4, aprile: 4, mag: 5, maggio: 5, giu: 6, giugno: 6, lug: 7, luglio: 7, ago: 8, agosto: 8, set: 9, settembre: 9, ott: 10, ottobre: 10, nov: 11, novembre: 11, dic: 12, dicembre: 12 };
+    const toks = (s) => String(s || "").toLowerCase().match(/[a-zàèéìòù0-9]+/g) || [];
+    const sigWords = (s) => toks(breve(s)).filter((w) => !STOP.has(w) && !(w in MESI_N) && !/^(?:\d+(?:f?h)?|f?h)$/.test(w));
+    const notaGiorno = (s) => {
+      const rx = /\b(\d{1,2})\s+(gennaio|febbraio|marzo|aprile|maggio|giugno|luglio|agosto|settembre|ottobre|novembre|dicembre|gen|feb|mar|apr|mag|giu|lug|ago|set|ott|nov|dic)\b/i.exec(s)
+        || /\b(\d{1,2})\/(\d{1,2})(?!\/\d|\d)/.exec(s);
+      if (!rx) return null;
+      const gg = +rx[1], mm = isNaN(rx[2]) ? MESI_N[rx[2].toLowerCase()] : +rx[2];
+      return gg >= 1 && gg <= 31 && mm >= 1 && mm <= 12 ? [gg, mm] : null;
+    };
     const dati = tutti.map(([l, a]) => {
-      const s = a.sigla, x = eff(a), r = rigaS(s, ed), c = Piano.celleMesi(r, [m])[0], p = Piano.pm(Object.fromEntries(r)[m]), w = vol(s, m), [rs, rt] = residuo(a);
-      const dv = pas ? (w == null ? null : w - p) : Math.max(p - (w || 0), 0), fe = Piano.fermiPpl(r);
+      const s = a.sigla, x = eff(a), r = rigaS(s, ed), c = Piano.celleMesi(r, [m])[0], p = Piano.pm(Object.fromEntries(r)[m]), w = vol(s, m), [rs, rt0] = residuo(a);
+      const rt = normRt(rt0), dv = pas ? (w == null ? null : w - p) : Math.max(p - (w || 0), 0), fe = Piano.fermiPpl(r);
       const f = fe.find((x) => x.in < fm && x.out > m + "-01"), nx = fe.find((x) => x.in >= fm && x !== f);
-      const mot = f ? breve(f.testo) : x.m ? breve(x.m) : "", nt = txtNota(a, f ? [f.testo] : []);
+      const mot = f ? breve(f.testo) : x.m ? breve(x.m) : "";
+      const lavTexts = [f && f.testo, nx && nx.testo, !f && m === m0 && x.c !== "eff" && x.m].filter(Boolean);
+      const lavToks = new Set(lavTexts.flatMap((t) => [...toks(t), ...toks(breve(t))]));
+      const ridond = (t) => {
+        const sw = sigWords(t);
+        if (!lavTexts.length) return false;
+        if (sw.length) return sw.every((w) => lavToks.has(w));
+        const gm = notaGiorno(t);
+        return !!gm && [f, nx].some((lv) => lv && +lv.in.slice(5, 7) === gm[1]);
+      };
+      let fIn = f ? f.in : null, nxIn = nx ? nx.in : null, ntNota = "";
+      for (const { t: rn } of (S.note[s] || []).slice(-1)) { // solo l'ultima nota, come prima
+        if (!rn) continue;
+        if (ridond(rn)) {
+          const gm = notaGiorno(rn);
+          if (gm) { // il giorno della nota va nella data della lavorazione; se il mese non coincide la nota resta
+            const [gg, mm] = gm, dIso = (lav) => lav.in.slice(0, 8) + String(gg).padStart(2, "0");
+            if (f && +f.in.slice(5, 7) === mm && +f.in.slice(8, 10) === 1) fIn = dIso(f);
+            else if (nx && +nx.in.slice(5, 7) === mm && +nx.in.slice(8, 10) === 1) nxIn = dIso(nx);
+            else if (![f, nx].some((lv) => lv && +lv.in.slice(5, 7) === mm)) ntNota = rn;
+          }
+        } else ntNota = rn;
+      }
+      const xmExtra = m === m0 && f && x.c !== "eff" && x.m && !ridond(x.m) ? x.m : "";
+      const nt = [xmExtra, ntNota].filter(Boolean).join(" · ");
       T3[0] += p; T3[1] += w || 0; T3[2] += dv || 0;
-      if (x.c === "eff") { Te[0] += p; Te[1] += w || 0; Te[2] += dv || 0; }
-      return { l, a, s, x, c, p, w, rs, rt, dv, f, nx, mot, nt };
+      return { l, a, s, x, c, p, w, rs, rt, dv, f, fIn, nx, nxIn, mot, nt };
     });
-    const cRes = (rs, rt) => rs == null ? "" : `<b class="${rs <= 0 ? "neg" : rs < ORE_WARN ? "wrn" : ""}">${fh(rs)}</b><span class="sm">${esc(rt)}</span>`;
-    const cChip = (f) => f ? `<span class="ch" style="${lc(f.testo)}" title="${esc(f.testo)}">${esc(breve(f.testo))}</span><span class="sm">${per(f)}</span>` : "";
-    const cNx = (nx) => nx ? `<span class="nx" title="${esc(nx.testo)}">${esc(breve(nx.testo))}<span class="sm">${per(nx)}</span></span>` : "";
+    const rtCnt = {};
+    dati.forEach((d) => { if (d.rs != null && d.rt) rtCnt[d.rt] = (rtCnt[d.rt] || 0) + 1; });
+    const rtOrd = Object.entries(rtCnt).sort((a, b) => b[1] - a[1]), rtTot = rtOrd.reduce((s, [, n]) => s + n, 0);
+    const rtHead = rtOrd.length === 1 || (rtOrd.length > 1 && rtOrd[0][1] / rtTot >= 0.6) ? rtOrd[0][0] : "";
+    const cRes = (rs, rt) => {
+      if (rs == null) return "";
+      const cls = rs <= 0 ? "neg" : rs < ORE_WARN ? "wrn" : "";
+      const num = `<b${cls ? ` class="${cls}"` : ""}>${fh(rs)}</b>`;
+      return rt && rt !== rtHead ? `${num} ${esc(rt)}` : num;
+    };
     const volano = dati.filter((d) => d.x.c === "eff"), fermi = dati.filter((d) => d.x.c !== "eff"), cnt = {};
     fermi.forEach((d) => cnt[d.mot] = (cnt[d.mot] || 0) + 1);
-    fermi.sort((a, b) => (cnt[b.mot] - cnt[a.mot]) || a.mot.localeCompare(b.mot) || a.s.localeCompare(b.s));
-    const rVol = volano.map((d) => {
-      const info = [cChip(d.f) && `<div>${cChip(d.f)}</div>`, cNx(d.nx), d.nt && `<div class="nt">${esc(d.nt)}</div>`].filter(Boolean).join("");
-      return `<tr>${th(d.l, d.a, 1)}<td class="p">${cOre(d.s, { ...d.c, ore: d.c.lav ? d.c.ore : d.p })}</td><td>${d.w == null || (!d.w && !d.p) ? "" : fh(d.w)}</td>
-        <td class="dv${d.dv < 0 ? " neg" : ""}">${d.dv == null ? "" : pas ? fh(d.dv) : hh(d.dv)}</td><td class="nw">${cRes(d.rs, d.rt)}</td>
-        <td class="tl${ed ? " ed" : ""}"${lv(d.s)}>${info}</td></tr>`;
-    });
-    const rFer = fermi.map((d, i) => {
-      const grp = i > 0 && d.mot !== fermi[i - 1].mot ? ' class="grp"' : "";
-      const oreTag = !ed && (d.p || d.w) ? `<span class="hm">${[d.p && "Prog. " + fh(d.p), d.w && "Vol. " + fh(d.w)].filter(Boolean).join(" · ")}</span>` : "";
-      const lav = (d.f ? cChip(d.f) : d.x.m ? `<span class="ch" style="${lc(d.x.m)}">${esc(breve(d.x.m))}</span>` : "") + oreTag;
-      const info = [cNx(d.nx), d.nt && `<div class="nt">${esc(d.nt)}</div>`].filter(Boolean).join("");
-      return `<tr${grp}>${th(d.l, d.a, 1)}${ed ? `<td class="p">${cOre(d.s, { ...d.c, ore: d.c.lav ? d.c.ore : d.p })}</td>` : ""}<td class="tl${ed ? " ed" : ""}"${lv(d.s)}>${lav}</td>
-        <td class="nw">${cRes(d.rs, d.rt)}</td><td class="tl${ed ? " ed" : ""}"${lv(d.s)}>${info}</td></tr>`;
-    });
-    const gc = Object.entries(cnt).filter(([k]) => k).sort((a, b) => b[1] - a[1]);
-    const riepFermi = gc.filter(([, n]) => n > 1).map(([k, n]) => `<b>${n}</b> ${esc(k)}`).join(" · "); // solo i gruppi, i singoli si leggono nelle righe
-    const pVol = volano.length ? `<section class="pn pv"><div class="ph"><span class="bg"><i class="dt" style="background:#2e9d57"></i>EFFICIENTI · ${volano.length}</span>
-      <span>Prog. <b>${hh(Te[0]) || "0:00"}</b> · Volate <b>${m > m0 ? "–" : fh(Te[1])}</b> · ${pas ? "Diff." : "Da volare"} <b>${pas ? fh(Te[2]) : hh(Te[2]) || "0:00"}</b></span></div>
-      <table><colgroup><col style="width:5.6em"><col style="width:12%"><col style="width:11%"><col style="width:13%"><col style="width:21%"><col></colgroup>
-      <thead><tr><th class="s">EI</th><th>Prog.</th><th>Volate</th><th>${pas ? "Diff." : "Da volare"}</th><th>Ore residue</th><th class="tl">Prossima manut. / Note</th></tr></thead>
-      <tbody>${rVol.join("")}</tbody></table></section>` : "";
-    const pFer = fermi.length ? `<section class="pn"><div class="ph"><span class="bg"><i class="dt" style="background:#b42318"></i>FERMI · ${fermi.length}</span><span class="gs">${riepFermi}</span></div>
-      <table><colgroup><col style="width:5.6em">${ed ? '<col style="width:11%">' : ""}<col style="width:${ed ? 35 : 41}%"><col style="width:18%"><col></colgroup>
-      <thead><tr><th class="s">EI</th>${ed ? "<th>Prog.</th>" : ""}<th class="tl">Manutenzione nel mese</th><th>Ore residue</th><th class="tl">Prossima manut. / Note</th></tr></thead>
-      <tbody>${rFer.join("")}</tbody></table></section>` : "";
-    tab = `<div class="mp${!volano.length || !fermi.length ? " uno" : ""}">${pVol}${pFer}</div>`;
-    K = [["Programmate", hh(T3[0]) || "0:00"], ["Volate", m > m0 ? "" : fh(T3[1])], [pas ? "Differenza" : "Da volare", pas ? fh(T3[2]) : hh(T3[2]) || "0:00"]];
+    const ordT = Object.fromEntries(linee.map((l, i) => [l.tipo, i]));
+    fermi.sort((a, b) => (ordT[a.l.tipo] - ordT[b.l.tipo]) || (cnt[b.mot] - cnt[a.mot]) || a.mot.localeCompare(b.mot) || a.s.localeCompare(b.s));
+    const renderRiga = (d, alt) => {
+      const [bg, fg] = COL_EFF[d.x.c], thTitle = CAT[d.x.c][2] + (linee.length > 1 ? " · " + d.l.tipo : "");
+      const thEl = `<th class="s${ed ? " ed" : ""}" style="background:${bg};color:${fg}" title="${esc(thTitle)}"${ed ? ` data-lv="${esc(d.s)}"` : ` data-d="${esc(d.s)}"`}>${esc(d.s)}${ed ? `<button data-lv="${esc(d.s)}">Lavorazioni</button>` : ""}</th>`;
+      const progEl = `<td class="p">${cOre(d.s, { ...d.c, ore: d.c.lav ? d.c.ore : d.p })}</td>`;
+      const volEl = `<td>${fut || d.w == null || (!d.w && !d.p) ? "" : fh(d.w)}</td>`;
+      const dvEl = `<td class="dv${d.dv < 0 ? " neg" : ""}">${d.dv == null ? "" : pas ? fh(d.dv) : hh(d.dv)}</td>`;
+      const resEl = `<td class="nw">${cRes(d.rs, d.rt)}</td>`;
+      const lavObj = d.f ? { t: d.f.testo, p: per(d.f, d.fIn) } : m === m0 && d.x.c !== "eff" && d.x.m ? { t: d.x.m, p: "" } : null;
+      const lavTxt = lavObj ? `<b>${esc(breve(lavObj.t))}</b>${lavObj.p ? ` <span class="per">${esc(lavObj.p)}</span>` : ""}` : "";
+      const lavFull = lavObj ? lavObj.t + (lavObj.p ? " · " + lavObj.p : "") : "";
+      const lavEl = `<td class="tl${lavObj ? " lav" : ""}${ed ? " ed" : ""}"${lv(d.s)}${lavObj ? ` style="${lc(lavObj.t)}"` : ""} title="${esc(lavFull)}">${lavTxt}</td>`;
+      const nxP = d.nx ? per(d.nx, d.nxIn) : "", nxFull = d.nx ? d.nx.testo + " · " + nxP : "";
+      const nxEl = `<td class="tl${ed ? " ed" : ""}"${lv(d.s)} title="${esc(nxFull)}">${d.nx ? `<b>${esc(breve(d.nx.testo))}</b> <span class="per">${esc(nxP)}</span>` : ""}</td>`;
+      const ntEl = `<td class="tl" title="${esc(d.nt)}">${esc(d.nt)}</td>`;
+      return `<tr${alt}>${thEl}${progEl}${volEl}${dvEl}${resEl}${lavEl}${nxEl}${ntEl}</tr>`;
+    };
+    let rowIdx = 0;
+    const renderGruppi = (lista) => {
+      let lastTipo = "";
+      return lista.map((d) => {
+        const gRow = linee.length > 1 && d.l.tipo !== lastTipo ? `<tr class="grp"><th colspan="8">${esc(d.l.tipo)}</th></tr>` : "";
+        lastTipo = d.l.tipo;
+        return gRow + renderRiga(d, rowIdx++ % 2 ? ' class="alt"' : "");
+      }).join("");
+    };
+    const body = renderGruppi(volano) + (fermi.length ? `<tr class="fsep"><th colspan="8">Fermi</th></tr>` + renderGruppi(fermi) : "");
+    const wRes = rtOrd.length > 1 ? 14.5 : 9.5, wNum = ed ? [7, 6.5, 5.5, 7] : [4.5, 5.5, 5.5, 7];
+    const wTxt = rtOrd.length > 1 ? (ed ? [20, 20, 19.5] : [21, 21.5, 20.5]) : (ed ? [21.5, 22, 21] : [22.5, 23.5, 22]);
+    const cols = [...wNum, wRes, ...wTxt].map((w) => `<col style="width:${w}%">`).join("");
+    const head = `<th class="s">EI</th><th>Prog.</th><th>Volate</th><th>${pas ? "Diff." : "Da volare"}</th><th>Ore residue${rtHead ? `<span>${esc(rtHead)}</span>` : ""}</th><th class="tl">Manutenzione nel mese</th><th class="tl">Prossima manutenzione</th><th class="tl">Note</th>`;
+    tab = `<table class="mese"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+    K = [["Programmate", hh(T3[0]) || "0:00"], ["Volate", fut ? "" : fh(T3[1])], [pas ? "Differenza" : "Da volare", pas ? fh(T3[2]) : hh(T3[2]) || "0:00"]];
   }
   const ml = MESI_L[+m.slice(5) - 1], tt = `<div class="tt"><img src="img/${tipo(linee[0].tipo)[0]}.webp" alt=""><h1><span>PPL</span>${esc(fl)}</h1>
     <div><b>${z === "anno" ? "Anno " + y : ml[0] + ml.slice(1).toLowerCase() + " " + y}</b>giornaliera del ${fd(g.data)}${z === "anno" ? " · in grigio le ore volate" : ""}</div></div>
