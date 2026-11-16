@@ -166,7 +166,6 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf [data-d]{cursor:pointer}
 .bf .p{font-weight:600}
 .bf .ei{display:inline-block;min-width:3.4em;padding:.1em .4em;border-radius:.35em;line-height:1.2}
-.bf .mese .lb{display:block;border-radius:.35em;padding:.12em .5em;overflow:hidden;text-overflow:ellipsis}
 .bf .lav{font-weight:600;font-size:.85em;line-height:1.15}
 .bf .ed{cursor:pointer}
 .bf .ed:hover{box-shadow:inset 0 0 0 2px var(--n)}
@@ -180,24 +179,25 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .wrn{color:#b45309;font-weight:700}
 .bf .dv{font-weight:700;color:var(--n)}
 .bf .nw{white-space:nowrap}
-.bf .mese{height:auto;min-width:680px}
-.bf .mese th,.bf .mese td{border:0;border-bottom:1px solid var(--l);padding:.34em .5em;overflow-wrap:normal;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bf .mese thead th{white-space:normal;border-bottom:2px solid var(--n);line-height:1.15;padding:.34em .45em}
-.bf .mese thead th span{display:block;color:var(--n);font-weight:700;margin-top:.1em}
-.bf .mese tbody tr:nth-child(even)>*{background:#fff}
-.bf .mese tbody tr.alt>*{background:var(--z)}
-.bf .mese tbody .s{font-size:1em;padding:.34em .15em}
-.bf .mese .ei{min-width:2.7em;padding:.1em .25em}
-.bf .mese .tl{text-align:left;white-space:normal}
-.bf .mese .per{font-weight:400;opacity:.82}
-.bf .mese .lav{font-size:1em;line-height:1.2}
-.bf .mese td b{font-weight:600}
-.bf .mese .nw b{font-weight:700}
-.bf .mese tbody tr.grp th,.bf .anno tbody tr.grp th{text-align:left;background:#fff;color:var(--n);font-size:.8em;font-weight:700;letter-spacing:.03em;padding:.55em .5em .12em;border-bottom:1px solid #cbd5e1}
-.bf .mese tbody tr.fsep th{text-align:left;background:#fbf0f0;color:#9b1c1c;font-size:.8em;font-weight:700;text-transform:uppercase;letter-spacing:.04em;padding:.22em .5em;border-top:2px solid var(--n);border-bottom:1px solid #e5b4b0}
-.bf.mod .mese tbody .s{padding:.18em .3em}
-.bf.mod .mese .s button{margin:.18em auto 0;font-size:.66em;padding:.14em .42em;border-radius:4px;white-space:nowrap}
-.bf.mod .mese td input{padding:.14em .2em;line-height:1.15;box-sizing:border-box}
+.bf .nx{color:#4a5466;font-size:.85em;font-weight:600}
+.bf .ch{display:inline-block;white-space:nowrap;padding:.25em .6em;border-radius:.4em;font-weight:700;font-size:.85em;line-height:1.2}
+.bf .sm{font-size:.75em;font-weight:500;color:var(--m);margin-left:.4em;white-space:nowrap}
+.bf .hm{display:inline-block;font-size:.74em;font-weight:600;color:var(--n);background:#eef2f9;border:1px solid #cbd5e1;border-radius:.3em;padding:.08em .42em;margin-left:.38em;white-space:nowrap}
+.bf .mp{display:grid;grid-template-columns:46fr 54fr;gap:.75em;align-items:start;padding-bottom:.35em}
+.bf .mp.uno{grid-template-columns:1fr}
+.bf .pn{border:1px solid var(--l);border-radius:.45em;overflow:hidden;background:#fff}
+.bf .pn table{height:auto}
+.bf .pn th,.bf .pn td{padding:.21em .4em}
+.bf .pn.pv tbody td,.bf .pn.pv tbody th{padding:.32em .42em}
+.bf .pn.pv .p,.bf .pn.pv .dv{font-size:1.06em}
+.bf .pn td.tl,.bf .pn th.tl{text-align:left}
+.bf .pn tr.grp>*{border-top:2px solid #cbd5e1}
+.bf .pn thead th span{display:block;font-size:.85em;color:var(--n);font-weight:700}
+.bf .ph{display:flex;align-items:center;justify-content:space-between;gap:.6em;padding:.3em .65em;background:var(--z);border-bottom:2px solid var(--n);font-size:.82em;color:var(--m);white-space:nowrap;overflow:hidden}
+.bf .ph .bg{display:inline-flex;align-items:center;gap:.38em;font-weight:700;color:var(--n);font-size:1.04em}
+.bf .ph .dt{width:.65em;height:.65em;border-radius:50%;display:inline-block}
+.bf .ph .gs{overflow:hidden;text-overflow:ellipsis}
+.bf .pn tbody tr.tg th,.bf .anno tbody tr.grp th{text-align:left;background:#fff;color:var(--n);font-size:.8em;font-weight:700;letter-spacing:.03em;padding:.55em .5em .12em;border-bottom:1px solid #cbd5e1}
 .bf .anno td,.bf .anno th{padding:.08em .26em}
 .bf .anno tbody tr:nth-child(even)>*{background:#fff}
 .bf .anno tbody tr.alt>*{background:var(--z)}
@@ -475,7 +475,7 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
     const foot = `<tr><th class="s">Programmate</th>${tp.map((x, i) => `<td${mY[i] === m0 ? ' class="og"' : ""}>${hh(x)}</td>`).join("")}<td>${hh(totP)}</td><td rowspan="2"></td></tr>
       <tr><th class="s">Volate</th>${tv.map((x, i) => `<td${mY[i] === m0 ? ' class="og"' : ""}>${x == null ? "" : fh(x)}</td>`).join("")}<td>${fmtTot(totV, totP)}</td></tr>`;
     tab = `<table class="anno" style="min-width:max(58em,780px)"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${righe.join("")}</tbody><tfoot>${foot}</tfoot></table>`;
-  } else { // tabella unica: efficienti prima, poi fermi dopo la riga separatrice «Fermi», raggruppati per tipo se la flotta ne ha più d'uno
+  } else { // Mese: due pannelli, efficienti a sinistra e fermi a destra
     const pas = m < m0, fut = m > m0, fm = Piano.primoDopo(m), T3 = [0, 0, 0];
     const mp = (d) => nMese(d.slice(0, 7)).toLowerCase();
     const per = (f, ini) => { const d0 = ini || f.in; let a = mp(d0); const b = f.aperto ? "" : mp(Piano.addG(f.out, -1));
@@ -508,37 +508,35 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
     fermi.forEach((d) => cnt[d.mot] = (cnt[d.mot] || 0) + 1);
     const ordT = Object.fromEntries(linee.map((l, i) => [l.tipo, i]));
     fermi.sort((a, b) => (ordT[a.l.tipo] - ordT[b.l.tipo]) || (cnt[b.mot] - cnt[a.mot]) || a.mot.localeCompare(b.mot) || a.s.localeCompare(b.s));
-    const renderRiga = (d, alt) => {
-      const [bg, fg] = COL_EFF[d.x.c], thTitle = CAT[d.x.c][2] + (linee.length > 1 ? " · " + d.l.tipo : "");
-      const thEl = `<th class="s${ed ? " ed" : ""}" title="${esc(thTitle)}"${ed ? ` data-lv="${esc(d.s)}"` : ` data-d="${esc(d.s)}"`}><span class="ei" style="background:${bg};color:${fg}">${esc(d.s)}</span>${ed ? `<button data-lv="${esc(d.s)}">Lavorazioni</button>` : ""}</th>`;
-      const progEl = `<td class="p">${cOre(d.s, { ...d.c, ore: d.c.lav ? d.c.ore : d.p })}</td>`;
-      const volEl = `<td>${fut || d.w == null || (!d.w && !d.p) ? "" : fh(d.w)}</td>`;
-      const dvEl = `<td class="dv${d.dv < 0 ? " neg" : ""}">${d.dv == null ? "" : pas ? fh(d.dv) : hh(d.dv)}</td>`;
-      const resEl = `<td class="nw">${cRes(d.rs, d.rt)}</td>`;
-      const lavObj = d.f ? { t: d.f.testo, p: per(d.f, d.fIn) } : m === m0 && d.x.c !== "eff" && d.x.m ? { t: d.x.m, p: "" } : null;
-      const lavTxt = lavObj ? `<b>${esc(breve(lavObj.t))}</b>${lavObj.p ? ` <span class="per">${esc(lavObj.p)}</span>` : ""}` : "";
-      const lavFull = lavObj ? lavObj.t + (lavObj.p ? " · " + lavObj.p : "") : "";
-      const lavEl = `<td class="tl${lavObj ? " lav" : ""}${ed ? " ed" : ""}"${lv(d.s)} title="${esc(lavFull)}">${lavObj ? `<span class="lb" style="${lc(lavObj.t)}">${lavTxt}</span>` : ""}</td>`;
-      const nxP = d.nx ? per(d.nx, d.nxIn) : "", nxFull = d.nx ? d.nx.testo + " · " + nxP : "";
-      const nxEl = `<td class="tl${ed ? " ed" : ""}"${lv(d.s)} title="${esc(nxFull)}">${d.nx ? `<b>${esc(breve(d.nx.testo))}</b> <span class="per">${esc(nxP)}</span>` : ""}</td>`;
-      const ntEl = `<td class="tl" title="${esc(d.nt)}">${esc(d.nt)}</td>`;
-      return `<tr${alt}>${thEl}${progEl}${volEl}${dvEl}${resEl}${lavEl}${nxEl}${ntEl}</tr>`;
+    // due pannelli affiancati come prima: a sinistra chi è efficiente, a destra chi è fermo; ripetizioni tolte (tipo in riga di gruppo, scadenza prevalente in intestazione, note filtrate)
+    const cChip = (t, p) => `<span class="ch" style="${lc(t)}" title="${esc(t)}">${esc(breve(t))}</span>${p ? `<span class="sm">${esc(p)}</span>` : ""}`;
+    const cNx = (d) => `<span class="nx" title="${esc(d.nx.testo)}">${esc(breve(d.nx.testo))}<span class="sm">${esc(per(d.nx, d.nxIn))}</span></span>`;
+    const info = (d, lav) => [lav && `<div>${lav}</div>`, d.nx && `<div>${cNx(d)}</div>`, d.nt && `<div class="nt">${esc(d.nt)}</div>`].filter(Boolean).join("");
+    const thEl = (d) => { const [bg, fg] = COL_EFF[d.x.c]; return `<th class="s" title="${esc(CAT[d.x.c][2])}"${ed ? "" : ` data-d="${esc(d.s)}"`}><span class="ei" style="background:${bg};color:${fg}">${esc(d.s)}</span>${ed ? `<button data-lv="${esc(d.s)}">Lavorazioni</button>` : ""}</th>`; };
+    const prog = (d) => `<td class="p">${cOre(d.s, { ...d.c, ore: d.c.lav ? d.c.ore : d.p })}</td>`;
+    const rVol = (d) => `${thEl(d)}${prog(d)}<td>${fut || d.w == null || (!d.w && !d.p) ? "" : fh(d.w)}</td><td class="dv${d.dv < 0 ? " neg" : ""}">${d.dv == null ? "" : pas ? fh(d.dv) : hh(d.dv)}</td>
+      <td class="nw">${cRes(d.rs, d.rt)}</td><td class="tl${ed ? " ed" : ""}"${lv(d.s)}>${info(d, d.f && cChip(d.f.testo, per(d.f, d.fIn)))}</td>`;
+    const rFer = (d) => {
+      const lav = d.f ? cChip(d.f.testo, per(d.f, d.fIn)) : m === m0 && d.x.m ? cChip(d.x.m, "") : "";
+      const oreTag = !ed && (d.p || d.w) ? `<span class="hm">${[d.p && "Prog. " + fh(d.p), d.w && "Vol. " + fh(d.w)].filter(Boolean).join(" · ")}</span>` : "";
+      return `${thEl(d)}${ed ? prog(d) : ""}<td class="tl${ed ? " ed" : ""}"${lv(d.s)}>${lav}${oreTag}</td><td class="nw">${cRes(d.rs, d.rt)}</td><td class="tl${ed ? " ed" : ""}"${lv(d.s)}>${info(d, "")}</td>`;
     };
-    let rowIdx = 0;
-    const renderGruppi = (lista) => {
-      let lastTipo = "";
-      return lista.map((d) => {
-        const gRow = linee.length > 1 && d.l.tipo !== lastTipo ? `<tr class="grp"><th colspan="8">${esc(d.l.tipo)}</th></tr>` : "";
-        lastTipo = d.l.tipo;
-        return gRow + renderRiga(d, rowIdx++ % 2 ? ' class="alt"' : "");
-      }).join("");
-    };
-    const body = renderGruppi(volano) + (fermi.length ? `<tr class="fsep"><th colspan="8">Fermi</th></tr>` + renderGruppi(fermi) : "");
-    const wRes = rtOrd.length > 1 ? 14.5 : 9.5, wNum = ed ? [7, 6.5, 5.5, 7] : [4.5, 5.5, 5.5, 7];
-    const wTxt = rtOrd.length > 1 ? (ed ? [20, 20, 19.5] : [21, 21.5, 20.5]) : (ed ? [21.5, 22, 21] : [22.5, 23.5, 22]);
-    const cols = [...wNum, wRes, ...wTxt].map((w) => `<col style="width:${w}%">`).join("");
-    const head = `<th class="s">EI</th><th>Prog.</th><th>Volate</th><th>${pas ? "Diff." : "Da volare"}</th><th>Ore residue${rtHead ? `<span>${esc(rtHead)}</span>` : ""}</th><th class="tl">Manutenzione nel mese</th><th class="tl">Prossima manutenzione</th><th class="tl">Note</th>`;
-    tab = `<table class="mese"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table>`;
+    const righe = (lista, riga, nc, perMot) => lista.map((d, i) => {
+      const p = lista[i - 1], tg = linee.length > 1 && (!p || p.l.tipo !== d.l.tipo) ? `<tr class="tg"><th colspan="${nc}">${esc(d.l.tipo)}</th></tr>` : "";
+      return `${tg}<tr${perMot && p && !tg && p.mot !== d.mot ? ' class="grp"' : ""}>${riga(d)}</tr>`;
+    }).join("");
+    const resH = `<th>Ore residue${rtHead ? `<span>${esc(rtHead)}</span>` : ""}</th>`;
+    const gc = Object.entries(cnt).filter(([k, n]) => k && n > 1).sort((a, b) => b[1] - a[1]);
+    const riepFermi = gc.map(([k, n]) => `<b>${n}</b> ${esc(k)}`).join(" · "); // solo i gruppi, i singoli si leggono nelle righe
+    const pVol = volano.length ? `<section class="pn pv"><div class="ph"><span class="bg"><i class="dt" style="background:#2e9d57"></i>EFFICIENTI · ${volano.length}</span></div>
+      <table><colgroup><col style="width:5.6em"><col style="width:12%"><col style="width:11%"><col style="width:13%"><col style="width:${rtOrd.length > 1 ? 21 : 14}%"><col></colgroup>
+      <thead><tr><th class="s">EI</th><th>Prog.</th><th>Volate</th><th>${pas ? "Diff." : "Da volare"}</th>${resH}<th class="tl">Prossima manut. / Note</th></tr></thead>
+      <tbody>${righe(volano, rVol, 6, false)}</tbody></table></section>` : "";
+    const pFer = fermi.length ? `<section class="pn"><div class="ph"><span class="bg"><i class="dt" style="background:#b42318"></i>FERMI · ${fermi.length}</span><span class="gs">${riepFermi}</span></div>
+      <table><colgroup><col style="width:5.6em">${ed ? '<col style="width:11%">' : ""}<col style="width:${ed ? 35 : 41}%"><col style="width:${rtOrd.length > 1 ? 18 : 13}%"><col></colgroup>
+      <thead><tr><th class="s">EI</th>${ed ? "<th>Prog.</th>" : ""}<th class="tl">Manutenzione nel mese</th>${resH}<th class="tl">Prossima manut. / Note</th></tr></thead>
+      <tbody>${righe(fermi, rFer, ed ? 5 : 4, true)}</tbody></table></section>` : "";
+    tab = `<div class="mp${!volano.length || !fermi.length ? " uno" : ""}">${pVol}${pFer}</div>`;
     K = [["Programmate", hh(T3[0]) || "0:00"], ["Volate", fut ? "" : fh(T3[1])], [pas ? "Differenza" : "Da volare", pas ? fh(T3[2]) : hh(T3[2]) || "0:00"]];
   }
   const ml = MESI_L[+m.slice(5) - 1], tt = `<div class="tt"><img src="img/${tipo(linee[0].tipo)[0]}.webp" alt=""><h1><span>PPL</span>${esc(fl)}</h1>
