@@ -181,7 +181,8 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .nw{white-space:nowrap}
 .bf .mese{height:auto;table-layout:auto}
 .bf .mp{display:grid;grid-template-columns:46fr 54fr;gap:.75em;align-items:start;padding-bottom:.35em}
-.bf .mp.uno{grid-template-columns:1fr}
+.bf .mp.uno,.bf .mp.col{grid-template-columns:1fr}
+.bf .pn tbody tr:not(.grp){height:var(--rh)} /* adatta(): righe più alte, tutte uguali, per riempire lo schermo */
 .bf .pn{border:1px solid var(--l);border-radius:.45em;overflow:hidden;background:#fff}
 .bf .ph{display:flex;align-items:center;justify-content:space-between;gap:.6em;padding:.3em .65em;background:var(--z);border-bottom:2px solid var(--n);font-size:.82em;color:var(--m);white-space:nowrap;overflow:hidden}
 .bf .ph .bg{display:inline-flex;align-items:center;gap:.38em;font-weight:700;color:var(--n);font-size:1.04em}
@@ -414,9 +415,18 @@ const rigaS = (s, ed) => { const r = Piano.pplMesi(S.ppl)[s] || [];
   const a = S.g.linee.flatMap((l) => l.aerei).find((x) => x.sigla === s); // in sola lettura conta anche cosa è fermo oggi per la giornaliera
   return a && a.stato !== "IN LINEA" && a.attivita && ["ineff", "ind"].includes(eff(a).c) ? Piano.conGiornaliera(r, S.g.data.slice(0, 7), a.attivita) : r; };
 const minPx = () => KIOSK ? 10 : zoom() === "anno" ? (S.mod ? 9 : 10) : 12;
-function adatta(bf, z, min) { // carattere più grande (fino a 26 px) con la tabella intera a schermo, ma non sotto min
-  const tw = bf.querySelector(".tw"); let px = Math.max(min, Math.min(26, Math.round(bf.clientWidth * (z === "anno" ? 1.15 : 1.5) / 100)));
-  do bf.style.fontSize = px + "px"; while ((tw.scrollHeight > tw.clientHeight || [...bf.querySelectorAll(".pn")].some((p) => p.scrollWidth > p.clientWidth + 1)) && --px >= min); // anche i pannelli del Mese non devono tagliare colonne
+function adatta(bf, z, min) { // carattere più grande con la tabella intera a schermo, ma non sotto min
+  const tw = bf.querySelector(".tw"), mp = bf.querySelector(".mp:not(.uno)");
+  const fuori = () => tw.scrollHeight > tw.clientHeight || [...bf.querySelectorAll(".pn")].some((p) => p.scrollWidth > p.clientWidth + 1); // anche i pannelli del Mese non devono tagliare colonne
+  const prova = () => { let px = Math.max(min, Math.min(z === "anno" ? 26 : 44, Math.round(bf.clientWidth * (z === "anno" ? 1.15 : 2.4) / 100)));
+    do bf.style.fontSize = px + "px"; while (fuori() && --px >= min); return px; };
+  bf.style.removeProperty("--rh"); mp?.classList.remove("col");
+  const px = prova();
+  if (mp) { mp.classList.add("col"); if (prova() <= px) { mp.classList.remove("col"); bf.style.fontSize = px + "px"; } } // Mese: pannelli affiancati o uno sopra l'altro, vince il carattere più grande
+  const rr = [...bf.querySelectorAll(".pn tbody tr:not(.grp)")]; // lo spazio che avanza in basso va alle righe, fino a 1,8 volte
+  if (rr.length && !fuori()) { let h = Math.min(...rr.map((r) => r.offsetHeight)); const max = h * 1.8;
+    while (h + 2 <= max) { bf.style.setProperty("--rh", h + 2 + "px"); if (fuori()) break; h += 2; }
+    bf.style.setProperty("--rh", h + "px"); }
 }
 addEventListener("resize", () => { const b = $(".bf"); if (b) adatta(b, zoom(), minPx()); });
 function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA-MM", ed = ore e lavorazioni modificabili → { tt, tab }
