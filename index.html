@@ -194,6 +194,9 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .mese tbody .s{font-size:1em;padding:.34em .6em}
 .bf .mese .tl{text-align:left;white-space:normal}
 .bf .mese .per{font-weight:400;opacity:.82}
+.bf .mese td.pe{text-align:left;white-space:nowrap}
+.bf .mese td.tl{white-space:nowrap} /* voci su una riga, righe tutte alte uguali: se non ci stanno adatta() rimpicciolisce */
+.bf .mese td.tl:last-child{white-space:normal;min-width:8em}
 .bf .mese .lav{font-size:1em;line-height:1.2}
 .bf .mese td b{font-weight:600}
 .bf .mese .nw b{font-weight:700}
@@ -413,7 +416,7 @@ const rigaS = (s, ed) => { const r = Piano.pplMesi(S.ppl)[s] || [];
 const minPx = () => KIOSK ? 10 : zoom() === "anno" ? (S.mod ? 9 : 10) : 12;
 function adatta(bf, z, min) { // carattere più grande (fino a 26 px) con la tabella intera a schermo, ma non sotto min
   const tw = bf.querySelector(".tw"); let px = Math.max(min, Math.min(26, Math.round(bf.clientWidth * (z === "anno" ? 1.15 : 1.5) / 100)));
-  do bf.style.fontSize = px + "px"; while (tw.scrollHeight > tw.clientHeight && --px >= min);
+  do bf.style.fontSize = px + "px"; while ((tw.scrollHeight > tw.clientHeight || [...bf.querySelectorAll(".pn")].some((p) => p.scrollWidth > p.clientWidth + 1)) && --px >= min); // anche i pannelli del Mese non devono tagliare colonne
 }
 addEventListener("resize", () => { const b = $(".bf"); if (b) adatta(b, zoom(), minPx()); });
 function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA-MM", ed = ore e lavorazioni modificabili → { tt, tab }
@@ -497,15 +500,10 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       T3[0] += p; T3[1] += w || 0; T3[2] += dv || 0;
       return { l, a, s, x, c, p, w, rs, rt, dv, f, fIn, nx, nxIn, mot, nt };
     });
-    const rtCnt = {};
-    dati.forEach((d) => { if (d.rs != null && d.rt) rtCnt[d.rt] = (rtCnt[d.rt] || 0) + 1; });
-    const rtOrd = Object.entries(rtCnt).sort((a, b) => b[1] - a[1]), rtTot = rtOrd.reduce((s, [, n]) => s + n, 0);
-    const rtHead = rtOrd.length === 1 || (rtOrd.length > 1 && rtOrd[0][1] / rtTot >= 0.6) ? rtOrd[0][0] : "";
-    const cRes = (rs, rt) => {
+    const cRes = (rs) => {
       if (rs == null) return "";
       const cls = rs <= 0 ? "neg" : rs < ORE_WARN ? "wrn" : "";
-      const num = `<b${cls ? ` class="${cls}"` : ""}>${fh(rs)}</b>`;
-      return rt && rt !== rtHead ? `${num} ${esc(rt)}` : num;
+      return `<b${cls ? ` class="${cls}"` : ""}>${fh(rs)}</b>`;
     };
     const volano = dati.filter((d) => d.x.c === "eff"), fermi = dati.filter((d) => d.x.c !== "eff"), cnt = {};
     fermi.forEach((d) => cnt[d.mot] = (cnt[d.mot] || 0) + 1);
@@ -514,18 +512,20 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
     const celle = (d) => {
       const [bg, fg] = COL_EFF[d.x.c], thTitle = CAT[d.x.c][2] + (linee.length > 1 ? " · " + d.l.tipo : "");
       const lavObj = d.f ? { t: d.f.testo, p: per(d.f, d.fIn) } : m === m0 && d.x.c !== "eff" && d.x.m ? { t: d.x.m, p: "" } : null;
-      const lavTxt = lavObj ? `<b>${esc(breve(lavObj.t))}</b>${lavObj.p ? ` <span class="per">${esc(lavObj.p)}</span>` : ""}` : "";
-      const lavFull = lavObj ? lavObj.t + (lavObj.p ? " · " + lavObj.p : "") : "";
-      const nxP = d.nx ? per(d.nx, d.nxIn) : "", nxFull = d.nx ? d.nx.testo + " · " + nxP : "";
-      const lav = `<td class="tl${lavObj ? " lav" : ""}${ed ? " ed" : ""}"${lv(d.s)} title="${esc(lavFull)}"${lavObj ? ` style="${lc(lavObj.t)}"` : ""}>${lavTxt}</td>`;
-      const nx = `<td class="tl${ed ? " ed" : ""}"${lv(d.s)} title="${esc(nxFull)}">${d.nx ? `<b>${esc(breve(d.nx.testo))}</b> <span class="per">${esc(nxP)}</span>` : ""}</td>`;
+      const nxObj = d.nx ? { t: d.nx.testo, p: per(d.nx, d.nxIn) } : null;
+      const voce = (o, col) => { // nome e periodo in due colonne allineate, colorate solo per la lavorazione del mese
+        const a = `${ed ? " ed" : ""}"${lv(d.s)} title="${esc(o ? o.t + (o.p ? " · " + o.p : "") : "")}"${o && col ? ` style="${lc(o.t)}"` : ""}`;
+        return [`<td class="tl${o && col ? " lav" : ""}${a}>${o ? `<b>${esc(breve(o.t))}</b>` : ""}</td>`, `<td class="pe${a}>${o && o.p ? `<span class="per">${esc(o.p)}</span>` : ""}</td>`];
+      };
+      const [lav, lavP] = voce(lavObj, true), [nx, nxP] = voce(nxObj, false);
+      const [man, manP] = d.f ? [lav, lavP] : voce(nxObj, false); // efficienti: la manutenzione del mese se c'è, altrimenti la prossima
       return {
         s: `<th class="s${ed ? " ed" : ""}" title="${esc(thTitle)}"${ed ? ` data-lv="${esc(d.s)}"` : ` data-d="${esc(d.s)}"`} style="background:${bg};color:${fg}">${esc(d.s)}${ed ? `<button data-lv="${esc(d.s)}">Lavorazioni</button>` : ""}</th>`,
         p: `<td class="p">${cOre(d.s, { ...d.c, ore: d.c.lav ? d.c.ore : d.p })}</td>`,
         w: `<td>${fut || d.w == null || (!d.w && !d.p) ? "" : fh(d.w)}</td>`,
         dv: `<td class="dv${d.dv < 0 ? " neg" : ""}">${d.dv == null ? "" : pas ? fh(d.dv) : hh(d.dv)}</td>`,
-        rs: `<td class="nw">${cRes(d.rs, d.rt)}</td>`,
-        lav, nx, man: d.f ? lav : nx, // efficienti: la manutenzione del mese se c'è, altrimenti la prossima
+        rs: `<td class="nw" title="${esc(d.rt)}">${cRes(d.rs)}</td>`,
+        lav, lavP, nx, nxP, man, manP,
         nt: `<td class="tl" title="${esc(d.nt)}">${esc(d.nt)}</td>`,
       };
     };
@@ -542,12 +542,11 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       return `<section class="pn ${cls}"><div class="ph">${titolo}</div><table class="mese">
         <thead><tr>${col.map(([k, h]) => `<th${k === "s" ? ' class="s"' : /lav|nx|man|nt/.test(k) ? ' class="tl"' : ""}>${h}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></section>`;
     };
-    const resH = `Ore residue${rtHead ? `<span>${esc(rtHead)}</span>` : ""}`;
     const gc = Object.entries(cnt).filter(([k, n]) => k && n > 1).sort((a, b) => b[1] - a[1]).map(([k, n]) => `<b>${n}</b> ${esc(k)}`).join(" · ");
     const pVol = volano.length ? pannello(volano, "pv", `<span class="bg" style="color:#2e9d57">EFFICIENTI · ${volano.length}</span>`,
-      [["s", "EI"], ["p", "Prog."], ["w", "Volate"], ["dv", pas ? "Diff." : "Da volare"], ["rs", resH], ["man", "Manutenzione"], ["nt", "Note"]]) : "";
+      [["s", "EI"], ["p", "Prog."], ["w", "Volate"], ["dv", pas ? "Diff." : "Da volare"], ["man", "Manutenzione"], ["manP", "Quando"], ["rs", "Ore residue"], ["nt", "Note"]]) : "";
     const pFer = fermi.length ? pannello(fermi, "pf", `<span class="bg" style="color:#b42318">FERMI · ${fermi.length}</span><span class="gs">${gc}</span>`,
-      [["s", "EI"], ["p", "Prog."], ["w", "Volate"], ["lav", "Manutenzione nel mese"], ["rs", resH], ["nx", "Prossima manutenzione"], ["nt", "Note"]]) : "";
+      [["s", "EI"], ["p", "Prog."], ["w", "Volate"], ["lav", "Manutenzione nel mese"], ["lavP", "Quando"], ["rs", "Ore residue"], ["nx", "Prossima manutenzione"], ["nxP", "Quando"], ["nt", "Note"]]) : "";
     tab = `<div class="mp${!volano.length || !fermi.length ? " uno" : ""}">${pVol}${pFer}</div>`;
     K = [["Programmate", hh(T3[0]) || "0:00"], ["Volate", fut ? "" : fh(T3[1])], [pas ? "Differenza" : "Da volare", pas ? fh(T3[2]) : hh(T3[2]) || "0:00"]];
   }
