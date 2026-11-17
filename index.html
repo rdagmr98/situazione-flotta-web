@@ -117,7 +117,11 @@ td:last-child{text-align:right}
 .note.on{outline:2px solid #7aa2ff}
 .note p{margin:0;flex:1;white-space:pre-wrap;overflow-wrap:anywhere}
 .note small{color:var(--mu);display:block}
-.note button{background:none;border:0;color:var(--mu);font-size:18px;cursor:pointer;padding:0 4px}
+.note button[data-del]{background:none;border:0;color:var(--mu);font-size:18px;cursor:pointer;padding:0 4px}
+.np-b{align-self:center;flex:none;font:inherit;font-size:11px;font-weight:600;padding:2px 7px;border-radius:6px;border:1px solid #7aa2ff66;background:#7aa2ff18;color:#7aa2ff;cursor:pointer;white-space:nowrap}
+.np-b.off{border-color:var(--line);background:transparent;color:var(--mu);opacity:.65;text-decoration:line-through}
+.chk{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;color:var(--mu);cursor:pointer}
+.chk input{width:auto;margin:0;accent-color:#7aa2ff}
 textarea,input{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:9px;font:inherit}
 textarea{min-height:70px;resize:vertical}
 .msg{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222c44;border:1px solid var(--line);padding:9px 14px;border-radius:10px;max-width:calc(100vw - 32px)}
@@ -327,6 +331,9 @@ async function aggiorna(file, sigla, fn) { // rilegge, modifica, scrive: le modi
   await scrivi(file + ".json", cur, file + " " + sigla);
   S[file] = cur;
 }
+const notaPpl = (n, on) => on ? { d: n.d, t: n.t } : { d: n.d, t: n.t, ppl: false };
+const invNotaPpl = (idx) => (arr = []) => arr.map((n, i) => i === idx ? notaPpl(n, n.ppl === false) : n);
+const btnNotaPpl = (n, i, s) => `<button class="np-b${n.ppl === false ? " off" : ""}" data-np="${i}"${s ? ` data-np-s="${esc(s)}"` : ""} type="button" title="Mostra o nascondi nella PPL">${n.ppl === false ? "No PPL" : "PPL"}</button>`;
 
 // --- viste ---
 function toast(t) { const d = document.createElement("div"); d.className = "msg"; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 3500); }
@@ -370,6 +377,8 @@ function render() {
   document.querySelectorAll("[data-s]").forEach((e) => e.onclick = () => dettaglio(e.dataset.s));
   document.querySelectorAll("[data-h]").forEach((b) => b.onclick = (ev) => { ev.stopPropagation();
     const N = nascoste(); N[b.dataset.h] = firma(b.dataset.h); ls("sf_nascoste", JSON.stringify(N)); render(); });
+  document.querySelectorAll("[data-np-s]").forEach((b) => b.onclick = async (ev) => { ev.stopPropagation(); b.disabled = true;
+    try { await aggiorna("note", b.dataset.npS, invNotaPpl(+b.dataset.np)); render(); } catch (e) { toast(e.message); b.disabled = false; } });
   if ($("#rn")) $("#rn").onclick = () => { ls("sf_nascoste", "{}"); render(); };
   $("#file").onchange = importa;
   $("#bb").onclick = () => vai("brief");
@@ -450,7 +459,7 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
   const pulisci = (s, lavs, testi) => {
     const tk = new Set(testi.flatMap((t) => [...toks(t), ...toks(breve(t))])), gi = {};
     const rid = (t) => { if (!testi.length) return false; const sw = sigWords(t); if (sw.length) return sw.every((w) => tk.has(w)); const gm = notaGiorno(t); return !!gm && lavs.some((v) => +v.in.slice(5, 7) === gm[1]); };
-    let nt = ((S.note[s] || []).slice(-1)[0] || {}).t || "";
+    let nt = ((S.note[s] || []).filter((n) => n.ppl !== false).slice(-1)[0] || {}).t || "";
     if (nt && rid(nt)) { const gm = notaGiorno(nt), v = gm && lavs.find((v) => +v.in.slice(5, 7) === gm[1]);
       if (v && +v.in.slice(8) === 1) gi[v.in] = v.in.slice(0, 8) + String(gm[0]).padStart(2, "0");
       if (!gm || v) nt = ""; } // nessuna lavorazione nel mese della nota: la nota resta
@@ -716,7 +725,7 @@ function pagina(l) { // una pagina dello swipe per ogni flotta: efficienti a sin
 function annotata([l, a]) { // riga della pagina Note: sigla, motivo, note, efficienza
   const x = eff(a), [c, s] = CAT[x.c], mot = x.man ? (x.m || "cambiata a mano") + " · " + fd(x.man.d).slice(0, 5) : x.m;
   return `<div class="row nr" data-s="${esc(a.sigla)}" style="--lv:var(--${c})"><div class="a"><b>${esc(a.sigla)}</b><span class="sub">${esc(l.tipo)}</span></div>
-    <div class="m">${mot ? `<span class="sub">${esc(mot)}</span>` : ""}${(S.note[a.sigla] || []).map((n) => `<div>${esc(n.t)} <span class="sub">${fd(n.d).slice(0, 5)}</span></div>`).join("")}</div>
+    <div class="m">${mot ? `<span class="sub">${esc(mot)}</span>` : ""}${(S.note[a.sigla] || []).map((n, i) => `<div>${esc(n.t)} <span class="sub">${fd(n.d).slice(0, 5)}</span> ${btnNotaPpl(n, i, a.sigla)}</div>`).join("")}</div>
     <div class="v"><b style="color:var(--${c})">${s}${x.man ? "*" : ""}</b></div><button class="x" data-h="${esc(a.sigla)}" aria-label="Nascondi">×</button></div>`;
 }
 function tile(a) {
@@ -774,8 +783,9 @@ function dettaglio(sigla) {
     ${scad.length ? `<h3>Prossime scadenze</h3><table>${scad.map((sc) => { const lv = livello(sc);
       return `<tr><td><span class="dot" style="background:${lv < 0 ? "var(--off)" : LV[lv]}"></span>${esc(sc.tipo)}</td><td>${valore(sc)}</td></tr>`; }).join("")}</table>` : ""}
     <div class="det-sh"><h3>Note${note.length ? ` (${note.length})` : ""}</h3><button class="btn btn-xs pri" id="bt-nt" type="button">+ Aggiungi nota</button></div>
-    ${note.map((n, i) => `<div class="note"><p data-ed="${i}"><small>${fd(n.d)} · tocca per modificare</small>${esc(n.t)}</p><button data-del="${i}" aria-label="Elimina nota">×</button></div>`).join("") || '<p class="sub" id="no-nt" style="margin:0">Nessuna nota.</p>'}
+    ${note.map((n, i) => `<div class="note"><p data-ed="${i}"><small>${fd(n.d)} · tocca per modificare</small>${esc(n.t)}</p>${btnNotaPpl(n, i)}<button data-del="${i}" aria-label="Elimina nota">×</button></div>`).join("") || '<p class="sub" id="no-nt" style="margin:0">Nessuna nota.</p>'}
     <div id="nf" hidden style="margin-top:8px"><textarea id="nt" placeholder="Annota qualcosa su ${esc(sigla)}..."></textarea>
+     <label class="chk"><input type="checkbox" id="np" checked> Mostra nella PPL</label>
      <div class="det-act"><button class="btn pri" id="ns" type="button">Salva nota</button><button class="btn" id="nc" type="button">Annulla</button></div></div>
     <details ${S.info ? "open" : ""}><summary>Configurazione e motori</summary>
     ${a.motori.length ? `<h3>Turbomotori</h3><table>${a.motori.map((m) => tr(esc((m.tipo ? m.tipo + " " : "") + m.sn), m.fh != null ? fh(m.fh) + " h" : "–")).join("")}</table>` : ""}
@@ -787,6 +797,7 @@ function dettaglio(sigla) {
     $("#nf").hidden = false; $("#bt-nt").hidden = true;
     if ($("#no-nt")) $("#no-nt").hidden = true;
     $("#nt").value = idx < 0 ? "" : note[idx].t;
+    $("#np").checked = idx < 0 || note[idx].ppl !== false;
     $("#ns").textContent = idx < 0 ? "Salva nota" : "Salva modifica";
     $("#nf").scrollIntoView({ block: "nearest" }); $("#nt").focus();
   };
@@ -794,10 +805,11 @@ function dettaglio(sigla) {
   d.querySelector("details").ontoggle = (e) => S.info = e.target.open;
   if ($("#bt-st")) $("#bt-st").onclick = () => { const box = $("#ed-st"); box.hidden = !box.hidden; $("#bt-st").textContent = box.hidden ? (x.man ? "Modifica stato" : "Cambia stato") : "Chiudi modifica"; if (!box.hidden) box.scrollIntoView({ block: "nearest" }); };
   $("#bt-nt").onclick = () => apriNota(-1);
-  $("#nc").onclick = () => { ed = -1; segnaEd(-1); $("#nt").value = ""; $("#nf").hidden = true; $("#bt-nt").hidden = false; if ($("#no-nt")) $("#no-nt").hidden = false; };
+  $("#nc").onclick = () => { ed = -1; segnaEd(-1); $("#nt").value = ""; $("#np").checked = true; $("#nf").hidden = true; $("#bt-nt").hidden = false; if ($("#no-nt")) $("#no-nt").hidden = false; };
   d.querySelectorAll("[data-ed]").forEach((p) => p.onclick = () => apriNota(+p.dataset.ed));
-  $("#ns").onclick = () => { const t = $("#nt").value.trim(); if (!t) return $("#nt").focus();
-    salva(sigla, "note", (arr = []) => ed < 0 ? [...arr, { d: giornoIso(), t }] : arr.map((n, i) => i === ed ? { ...n, t } : n)); };
+  d.querySelectorAll("[data-np]").forEach((b) => b.onclick = () => salva(sigla, "note", invNotaPpl(+b.dataset.np)));
+  $("#ns").onclick = () => { const t = $("#nt").value.trim(), on = $("#np").checked; if (!t) return $("#nt").focus();
+    salva(sigla, "note", (arr = []) => ed < 0 ? [...arr, notaPpl({ d: giornoIso(), t }, on)] : arr.map((n, i) => i === ed ? notaPpl({ d: n.d, t }, on) : n)); };
   d.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => salva(sigla, "note", (arr = []) => arr.filter((_, i) => i !== +b.dataset.del)));
   d.querySelectorAll("[data-e]").forEach((b) => b.onclick = () => salva(sigla, "stati", () => ({ e: b.dataset.e === "1", m: $("#mo").value.trim(), d: giornoIso() })));
   if ($("#rp")) $("#rp").onclick = () => salva(sigla, "stati", () => null);
