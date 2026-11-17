@@ -13,8 +13,8 @@
 :root{--bg:#0b1220;--card:#131c2e;--card2:#1a2540;--line:#26324d;--tx:#e8edf7;--mu:#8b97b0;
 --ok:#3ccf6e;--warn:#f5b942;--ko:#ff5a5a;--ind:#b48cff;--off:#6b7280}
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-main{max-width:1100px;margin:0 auto;padding:12px 16px calc(24px + env(safe-area-inset-bottom))}
+html,body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
+main{max-width:1100px;min-width:0;margin:0 auto;padding:12px 16px calc(24px + env(safe-area-inset-bottom))}
 header{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;margin-bottom:12px}
 h1{font-size:20px;margin:0;flex:1 1 auto}
 .sub{color:var(--mu);font-size:13px}
@@ -22,7 +22,8 @@ h1{font-size:20px;margin:0;flex:1 1 auto}
 padding:8px 12px;border-radius:10px;font:inherit;cursor:pointer}
 .btn.pri{background:#2b5cff;border-color:#2b5cff}
 .btn:disabled{opacity:.5}
-.tabs{display:flex;gap:6px;margin:4px 0 12px}
+.tabs{display:flex;gap:6px;margin:4px 0 12px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
 .tabs button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;border:1px solid var(--line);border-bottom:3px solid var(--line);
 background:var(--card);color:var(--mu);padding:6px 2px;border-radius:10px;font:inherit;font-size:12px;cursor:pointer}
 .tabs button b{font-size:13px;color:var(--mu);white-space:nowrap}
@@ -40,10 +41,6 @@ details summary{cursor:pointer;color:#7aa2ff;font-weight:600;margin:16px 0 4px}
 .pager{display:flex;gap:16px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;align-items:flex-start;overscroll-behavior-x:contain}
 .pager::-webkit-scrollbar{display:none}
 .pager>*{flex:0 0 100%;min-width:0;scroll-snap-align:start;scroll-snap-stop:always}
-.nr{align-items:flex-start}
-.nr .m{white-space:normal}
-.nr .x{background:none;border:0;color:var(--mu);font-size:20px;line-height:1;padding:0 0 0 6px;cursor:pointer}
-.nr .m div{margin-top:2px;overflow-wrap:anywhere}
 .linea{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
 .lh{display:flex;align-items:center;gap:12px;padding:10px 12px;border-bottom:1px solid var(--line)}
 .lh img{width:96px;height:48px;object-fit:contain;flex:none}
@@ -63,6 +60,10 @@ details summary{cursor:pointer;color:#7aa2ff;font-weight:600;margin:16px 0 4px}
 .fp-box{background:var(--bg);border:1px solid var(--line);border-radius:12px;overflow:hidden}
 .fp-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--card2);border-bottom:1px solid var(--line);font-size:13px;font-weight:700}
 .fp-h span{display:inline-flex;align-items:center;gap:6px}
+.fp-sub{display:flex;align-items:center;justify-content:space-between;padding:5px 10px;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--mu);background:var(--card);border-top:1px solid var(--line)}
+.fp-box>.fp-h+.fp-sub{border-top:0}
+.fp-sub.corr{color:var(--ko)}
+.fp-sub.prog{color:var(--warn)}
 .fg{border-bottom:1px solid var(--line)}
 .fg:last-child{border-bottom:0}
 .fg-h{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 10px;font-size:12px;font-weight:600;color:var(--mu)}
@@ -74,8 +75,8 @@ details summary{cursor:pointer;color:#7aa2ff;font-weight:600;margin:16px 0 4px}
 .frow .fa .st{font-size:11px;font-weight:600;color:var(--st);white-space:nowrap}
 .frow .fm{flex:1;min-width:0;font-size:13px;color:var(--mu)}
 .frow .fm .fn{color:var(--tx);overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.frow .fv{text-align:right;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
-.frow .fv small{display:block;font-size:11px;font-weight:600}
+.frow .fv{display:flex;flex-direction:column;align-items:flex-end;gap:3px;text-align:right;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;flex:none;max-width:44%}
+.frow .fv small{display:block;font-size:11px;font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis}
 .al-box{margin:0 10px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:0 8px}
 .al-box summary{margin:0;padding:8px 2px;font-size:13px;color:var(--mu)}
 .al-box[open] summary{border-bottom:1px solid var(--line)}
@@ -89,17 +90,29 @@ details summary{cursor:pointer;color:#7aa2ff;font-weight:600;margin:16px 0 4px}
 .row .a b{display:block}
 .row .m{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row .v{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.nr{align-items:flex-start}
+.nr .m{white-space:normal;overflow-wrap:anywhere}
+.nr .x{background:none;border:0;color:var(--mu);font-size:20px;line-height:1;padding:0 0 0 6px;cursor:pointer}
+.nr .m div{margin-top:3px;overflow-wrap:anywhere;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px}
 dialog{background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:16px;padding:0;width:min(560px,calc(100vw - 24px));max-height:calc(100dvh - 24px)}
 dialog::backdrop{background:#000a}
 .dh{display:flex;align-items:center;gap:10px;padding:12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card);z-index:2}
 .dh img{width:72px;height:36px;object-fit:contain;flex:none}
 .dh .t{flex:1;min-width:0}
-@media (max-width:460px){.dh{gap:8px;padding:10px 12px}.dh img{width:48px;height:24px}.dh .sub{font-size:12px}}
+@media (max-width:460px){
+ main{padding:10px 10px calc(24px + env(safe-area-inset-bottom))}
+ header{gap:6px 8px;margin-bottom:10px}h1{font-size:18px}.btn{padding:7px 10px}
+ .tabs{gap:4px}.tabs button{padding:5px 2px;font-size:11px}.tabs button b{font-size:11.5px}.tabs button[data-p="0"]{flex:.65}
+ .lh{gap:8px;padding:8px 10px}.lh img{width:64px;height:32px}.lh .btn{padding:6px 9px;font-size:13px}
+ .row{gap:7px;padding:8px 10px}.row .a{width:54px}
+ .frow{gap:8px;padding:8px 9px}.frow .fa{width:48px}
+ dialog{width:calc(100vw - 16px)}
+ .dh{gap:8px;padding:10px 12px}.dh img{width:48px;height:24px}.dh .sub{font-size:12px}}
 .db{padding:4px 12px 14px}
 .db h3{font-size:13px;color:var(--mu);text-transform:uppercase;letter-spacing:.04em;margin:14px 0 6px}
 .btn-xs{padding:4px 9px;font-size:12px;border-radius:8px;flex:none}
 .det-box{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-top:10px}
-.det-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.det-top{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:6px 8px}
 .det-top>div{flex:1;min-width:0}
 .det-sh{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:14px 0 6px}
 .det-sh h3{margin:0}
@@ -108,6 +121,14 @@ dialog::backdrop{background:#000a}
 .det-ov span{display:block;font-size:12px;color:var(--mu)}
 .det-ov b{font-size:16px}
 .det-ed{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.det-av{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:13px}
+.det-av-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 8px}
+.det-av-row>div{flex:1;min-width:140px;overflow-wrap:anywhere}
+.det-av-act{display:flex;gap:6px;align-items:center;flex:none}
+.av-warn{color:var(--warn);font-size:12px;font-weight:600;margin-top:2px}
+.av-sug{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px}
+.av-sug button{border:1px solid var(--line);background:var(--bg);color:var(--tx);padding:5px 9px;border-radius:8px;font:inherit;font-size:12px;cursor:pointer;text-align:left}
+.av-sug button:hover{border-color:#7aa2ff;background:var(--card)}
 .det-act{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 [hidden]{display:none!important}
 table{width:100%;border-collapse:collapse;font-size:14px}
@@ -124,7 +145,7 @@ td:last-child{text-align:right}
 .chk input{width:auto;margin:0;accent-color:#7aa2ff}
 textarea,input{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:9px;font:inherit}
 textarea{min-height:70px;resize:vertical}
-.msg{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222c44;border:1px solid var(--line);padding:9px 14px;border-radius:10px;max-width:calc(100vw - 32px)}
+.msg{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#222c44;border:1px solid var(--line);padding:9px 14px;border-radius:10px;max-width:calc(100vw - 32px);display:flex;align-items:center;gap:10px;z-index:20}
 .empty{color:var(--mu);text-align:center;padding:40px 10px}
 a{color:#7aa2ff}
 select{width:100%;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:9px;font:inherit}
@@ -205,6 +226,7 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .mese td b{font-weight:600}
 .bf .mese .nw b{font-weight:700}
 .bf .mese tbody tr.grp th,.bf .anno tbody tr.grp th{text-align:left;background:#fff;color:var(--n);font-size:.8em;font-weight:700;letter-spacing:.03em;padding:.55em .5em .12em;border-bottom:1px solid #cbd5e1}
+.bf .mese tbody tr.grp.corr th{color:#b42318}
 .bf.mod .mese tbody .s{padding:.18em .3em}
 .bf.mod .mese .s button{margin:.18em auto 0;font-size:.66em;padding:.14em .42em;border-radius:4px;white-space:nowrap}
 .bf.mod .mese td input{padding:.14em .2em;line-height:1.15;box-sizing:border-box}
@@ -250,14 +272,30 @@ const TIPI = { // silhouette e colori di AVES Tecnici (helicopter_catalog.dart)
 const STATI = { "IN LINEA": ["ok", "IN LINEA"], "DISPONIBILE": ["warn", "DISP."], "INDISPONIBILE": ["ko", "INDISP."],
   "INDUSTRIA": ["ind", "INDUSTRIA"], "ALIENAZIONE": ["off", "ALIEN."] };
 const CAT = { eff: ["ok", "EFF", "Efficiente"], ineff: ["ko", "INEFF", "Inefficiente"], ind: ["ind", "IND.", "In industria"], alien: ["off", "ALIEN.", "In alienazione"] };
-const FILTRI = [["tutti", "Tutti", () => true], ["eff", "Efficienti", (c) => c === "eff"], ["ineff", "Inefficienti", (c) => c === "ineff" || c === "ind"],
-  ["ind", "Industria", (c) => c === "ind"], ["alien", "Alienazione", (c) => c === "alien"]];
+const CAT_VIS = {
+  eff: ["ok", "EFF", "Efficiente"],
+  corr: ["ko", "AVARIA", "Fermo correttivo"],
+  prog: ["warn", "PROG", "Fermo programmato"],
+  altro: ["warn", "CESS.", "Cessione temporanea"],
+  ind: ["ind", "IND.", "In industria"],
+  alien: ["off", "ALIEN.", "In alienazione"]
+};
+const catVis = (x) => CAT_VIS[x.c === "eff" ? "eff" : x.c === "ind" ? "ind" : x.c === "alien" ? "alien" : x.kind === "corr" ? "corr" : x.kind === "altro" ? "altro" : "prog"];
+const FILTRI = [
+  ["tutti", "Tutti", () => true],
+  ["eff", "Efficienti", (x) => x.c === "eff"],
+  ["corr", "Avarie", (x) => x.kind === "corr"],
+  ["ineff", "Fermi", (x) => x.c === "ineff" || x.c === "ind"],
+  ["ind", "Industria", (x) => x.c === "ind"],
+  ["alien", "Alienazione", (x) => x.c === "alien"]
+];
 const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 let PAT = ""; // in chiaro solo in memoria: nella pagina pubblica c'è cifrato (pat.js)
 const ls = (k, v) => { try { return v === undefined ? localStorage.getItem(k) || "" : localStorage.setItem(k, v); } catch (_) { return ""; } };
-// stati.json = { sigla: { e: efficiente?, m: motivo, d: giorno } }: correzione a mano, vale finché non arriva una giornaliera più recente
-const S = { g: null, note: {}, stati: {}, vista: "macchine", flotta: ls("sf_flotta"), filtro: ls("sf_filtro") || "tutti", info: false };
+// stati.json = { sigla: { e: efficiente?, m: motivo, d: giorno, ppl? } }: correzione giornaliera o avaria pregressa
+// avarie.json = { sigla: [{ d: giorno, t: testo, ppl? }] }: avarie aperte a mano (non spariscono alla nuova giornaliera)
+const S = { g: null, note: {}, stati: {}, avarie: {}, ppl: {}, vol: {}, vista: "macchine", flotta: ls("sf_flotta"), filtro: ls("sf_filtro") || "tutti", info: false };
 S.pag = ls("sf_pag");
 const KIOSK = new URLSearchParams(location.search).has("ppl"); // ?ppl: solo la PPL in sola lettura, per il Web Viewer di PowerPoint
 if (KIOSK) { S.pag = "brief"; setInterval(() => carica().then(render).catch(() => {}), 6e5); } // si aggiorna da sola ogni 10 minuti
@@ -267,6 +305,8 @@ const fh = (m) => m == null ? "–" : (m < 0 ? "-" : "") + Math.floor(Math.abs(m
 const fd = (d) => d ? d.slice(8, 10) + "/" + d.slice(5, 7) + "/" + d.slice(0, 4) : "–";
 const oggi = () => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); };
 const giorni = (d) => Math.round((new Date(d + "T00:00:00") - oggi()) / 864e5);
+const diffGg = (d) => d ? Math.max(0, -giorni(d)) : null;
+const txtGg = (d) => { const g = diffGg(d); return g == null ? "" : g === 0 ? "da oggi" : g === 1 ? "da 1 g" : `da ${g} gg`; };
 const tipo = (t) => TIPI[t] || ["ab206", "#8b97b0"];
 const stato = (s) => STATI[s] || ["off", s || "?"];
 function livello(sc) { // 2 = scaduta, 1 = vicina, 0 = ok, -1 = senza valore
@@ -279,21 +319,50 @@ const valore = (sc) => sc.ore != null ? fh(sc.ore) + " h" : sc.data ? fd(sc.data
 const vive = (a) => a.stato !== "ALIENAZIONE";
 const disp = (a) => { const o = a.scadenze.filter((s) => s.ore != null).map((s) => s.ore); return o.length ? Math.min(...o) : null; }; // ore alla prossima scadenza a ore
 const scadDataUrg = (a) => a.scadenze.filter((s) => s.data && livello(s) >= 1).sort((x, y) => x.data.localeCompare(y.data))[0] || null; // scadenza a data imminente o scaduta
-const motivoFermo = (a, x) => x.m ? breve(x.m) : x.man ? "Cambiata a mano" : x.c === "ind" ? "In industria" : stato(a.stato)[1];
+const motivoFermo = (a, x) => x.m ? breve(x.m) : x.man ? "Segnalata a mano" : x.c === "ind" ? "In industria" : stato(a.stato)[1];
 // righe nascoste della pagina Note (solo su questo dispositivo): ricompaiono se cambiano note o efficienza
-const firma = (s) => JSON.stringify([S.note[s] || null, S.stati[s] || null]);
+const firma = (s) => JSON.stringify([S.note[s] || null, S.stati[s] || null, S.avarie[s] || null]);
 const nascoste = () => { try { return JSON.parse(ls("sf_nascoste") || "{}"); } catch (_) { return {}; } };
 const giornoIso = () => new Date().toLocaleDateString("sv-SE"); // AAAA-MM-GG locale, non UTC
-function eff(a, aMano = true) { // { c: chiave di CAT, m: motivo, man: correzione a mano valida }
-  if (!vive(a)) return { c: "alien", m: "" };
-  const o = aMano && S.stati[a.sigla];
-  if (o && o.d >= S.g.data) return { c: o.e ? "eff" : "ineff", m: o.m, man: o };
-  if (a.stato === "INDUSTRIA") return { c: "ind", m: a.attivita };
-  if (a.stato !== "IN LINEA") return { c: "ineff", m: a.attivita };
-  const z = a.scadenze.find((s) => s.ore != null && s.ore <= 0); // in linea ma senza ore: non può volare
-  return z ? { c: "ineff", m: "ore a zero, " + z.tipo } : { c: "eff", m: "" };
+function avarieMan(sigla) {
+  const list = (S.avarie[sigla] || []).map((x, i) => ({ ...x, _src: "avarie", _i: i }));
+  const o = S.stati[sigla];
+  if (o && !o.e && S.g && o.d >= S.g.data) list.push({ d: o.d, t: o.m || "Segnalata a mano", ppl: o.ppl, _src: "stati", _i: 0 });
+  return list;
 }
-function conta(aerei) { const v = aerei.filter(vive), e = v.filter((a) => eff(a).c === "eff").length; return [e, v.length, Math.round(100 * e / (v.length || 1))]; }
+function eff(a, opt = true) { // { c, kind, m, da, man, av, smentita, confermata }
+  if (!vive(a)) return { c: "alien", kind: "alien", m: "", da: "" };
+  const aMano = typeof opt === "boolean" ? opt : opt.aMano !== false;
+  const brief = typeof opt === "object" && !!opt.brief;
+  const gKind = Giornaliera.classificaFermo(a);
+  let auto;
+  if (a.stato === "INDUSTRIA") auto = { c: "ind", kind: "ind", m: a.attivita, da: a.inizio || "" };
+  else if (a.stato !== "IN LINEA") auto = { c: "ineff", kind: gKind || "corr", m: a.attivita, da: a.inizio || (a.cessione && a.cessione.dal) || "" };
+  else {
+    const z = a.scadenze.find((s) => s.ore != null && s.ore <= 0); // in linea ma senza ore: non può volare
+    auto = z ? { c: "ineff", kind: gKind || "prog", m: "ore a zero, " + z.tipo, da: "" } : { c: "eff", kind: "eff", m: "", da: "" };
+  }
+  if (!aMano) return auto;
+  const avAll = avarieMan(a.sigla), avVis = brief ? avAll.filter((v) => v.ppl !== false) : avAll;
+  const o = S.stati[a.sigla];
+  if (o && o.e && S.g && o.d >= S.g.data && !avVis.length) return { c: "eff", kind: "eff", m: o.m, da: o.d, man: o };
+  if (!avVis.length) return auto;
+  const av0 = avVis[0], daMin = [auto.da, ...avVis.map((v) => v.d)].filter(Boolean).sort()[0] || "";
+  if (auto.c === "eff") {
+    return { c: "ineff", kind: "corr", m: avVis.map((v) => v.t).join(" · "), da: daMin, man: av0, av: avVis, smentita: S.g.data > av0.d };
+  }
+  const conf = S.g.data > av0.d;
+  if (conf && auto.kind !== "corr") {
+    return { c: auto.c, kind: auto.kind, m: auto.m || av0.t, da: auto.da || daMin, av: avVis, confermata: true };
+  }
+  const testi = [...new Set([auto.m, ...avVis.map((v) => v.t)].filter(Boolean))];
+  return {
+    c: "ineff", kind: "corr",
+    m: auto.kind === "corr" && auto.m ? (conf ? auto.m : testi.join(" · ")) : avVis.map((v) => v.t).join(" · "),
+    da: daMin, man: conf ? null : av0, av: avVis, confermata: conf
+  };
+}
+function conta(aerei, brief = false) { const v = aerei.filter(vive), e = v.filter((a) => eff(a, { brief }).c === "eff").length; return [e, v.length, Math.round(100 * e / (v.length || 1))]; }
 
 // --- dati: repo privato via GitHub Contents API ---
 async function gh(path, opts = {}) {
@@ -313,8 +382,11 @@ async function scrivi(path, data, msg) {
 async function carica() {
   const dir = (await gh("giornaliere")) || [];
   const nomi = dir.map((f) => f.name).filter((n) => /\.json$/.test(n)).sort(), ult = nomi[nomi.length - 1];
-  const [g, n, s, q] = await Promise.all([ult ? leggi("giornaliere/" + ult) : { data: null }, leggi("note.json"), leggi("stati.json"), leggi("ppl.json")]);
-  S.g = g.data; S.note = n.data || {}; S.stati = s.data || {}; S.ppl = q.data || {}; S.vol = {};
+  const [g, n, s, q, av] = await Promise.all([
+    ult ? leggi("giornaliere/" + ult) : { data: null },
+    leggi("note.json"), leggi("stati.json"), leggi("ppl.json"), leggi("avarie.json")
+  ]);
+  S.g = g.data; S.note = n.data || {}; S.stati = s.data || {}; S.ppl = q.data || {}; S.avarie = av.data || {}; S.vol = {};
   if (!S.g) return;
   S.g.linee.sort((a, b) => ordine(a.tipo) - ordine(b.tipo));
   // volato per la PPL: ore mese dell'ultima giornaliera di ogni mese, dal primo anno di PPL
@@ -332,12 +404,64 @@ async function aggiorna(file, sigla, fn) { // rilegge, modifica, scrive: le modi
   await scrivi(file + ".json", cur, file + " " + sigla);
   S[file] = cur;
 }
+const AV_TIPICI = ["Spia chip detector", "Perdita olio", "Attesa materiale", "Vibrazioni eccessive", "Avaria avionica", "Ricerca guasti"];
+function salvaRecAvaria(t) {
+  try {
+    const cur = JSON.parse(ls("sf_av_rec") || "[]").filter((x) => x.toLowerCase() !== t.toLowerCase());
+    ls("sf_av_rec", JSON.stringify([t, ...cur].slice(0, 8)));
+  } catch (_) {}
+}
+function suggerimentiAvarie() {
+  const rec = (() => { try { return JSON.parse(ls("sf_av_rec") || "[]"); } catch (_) { return []; } })();
+  const daDati = [
+    ...Object.values(S.avarie).flat().map((x) => x.t),
+    ...Object.values(S.stati).filter((x) => !x.e && x.m).map((x) => x.m),
+    ...(S.g ? S.g.linee.flatMap((l) => l.aerei).filter((a) => Giornaliera.classificaFermo(a) === "corr" && a.attivita).map((a) => breve(a.attivita)) : [])
+  ];
+  const seen = new Set(), out = [];
+  for (const t of [...rec, ...daDati, ...AV_TIPICI]) {
+    const s = String(t || "").trim(), k = s.toLowerCase();
+    if (!s || seen.has(k)) continue;
+    seen.add(k); out.push(s);
+    if (out.length >= 8) break;
+  }
+  return out;
+}
+const conPpl = (n, on) => { const r = { ...n }; if (on) delete r.ppl; else r.ppl = false; return r; };
 const notaPpl = (n, on) => on ? { d: n.d, t: n.t } : { d: n.d, t: n.t, ppl: false };
-const invNotaPpl = (idx) => (arr = []) => arr.map((n, i) => i === idx ? notaPpl(n, n.ppl === false) : n);
-const btnNotaPpl = (n, i, s) => `<button class="np-b${n.ppl === false ? " off" : ""}" data-np="${i}"${s ? ` data-np-s="${esc(s)}"` : ""} type="button" title="Mostra o nascondi nella PPL">${n.ppl === false ? "No PPL" : "PPL"}</button>`;
+const invPpl = (idx) => (arr = []) => arr.map((n, i) => i === idx ? conPpl(n, n.ppl === false) : n);
+const btnPpl = (n, kind, idx, s) => `<button class="np-b${n.ppl === false ? " off" : ""}" data-ppl-k="${kind}" data-ppl-i="${idx}"${s ? ` data-ppl-s="${esc(s)}"` : ""} type="button" title="Mostra o nascondi al briefing (PPL)">${n.ppl === false ? "No PPL" : "PPL"}</button>`;
+async function chiudiAvaria(sigla, item, reopenDet = false) {
+  const snap = item._src === "stati" ? { ...(S.stati[sigla] || {}) } : { d: item.d, t: item.t, ...(item.ppl === false ? { ppl: false } : {}) };
+  const fn = item._src === "stati"
+    ? () => null
+    : (arr = []) => arr.filter((x, idx) => !(idx === item._i && x.t === item.t && x.d === item.d));
+  try {
+    await aggiorna(item._src, sigla, fn);
+    render();
+    if (reopenDet) dettaglio(sigla);
+    toast("Avaria su " + sigla + " chiusa", async () => {
+      try {
+        await aggiorna(item._src, sigla, (cur) => item._src === "stati" ? snap : [...(cur || []), snap]);
+        render();
+        if (reopenDet && $("#dlg").open) dettaglio(sigla);
+      } catch (e) { toast(e.message); }
+    });
+  } catch (e) { toast(e.message); if (reopenDet) dettaglio(sigla); }
+}
 
 // --- viste ---
-function toast(t) { const d = document.createElement("div"); d.className = "msg"; d.textContent = t; document.body.append(d); setTimeout(() => d.remove(), 3500); }
+function toast(t, undoFn) {
+  document.querySelectorAll(".msg").forEach((el) => el.remove());
+  const d = document.createElement("div"); d.className = "msg";
+  d.append(Object.assign(document.createElement("span"), { textContent: t }));
+  if (undoFn) {
+    const b = document.createElement("button"); b.className = "btn btn-xs"; b.type = "button"; b.textContent = "Annulla";
+    b.onclick = () => { d.remove(); undoFn(); };
+    d.append(b);
+  }
+  document.body.append(d); setTimeout(() => d.remove(), undoFn ? 5500 : 3500);
+}
 function vistaFrase(err) {
   $("#app").innerHTML = `<header><h1>Situazione flotta</h1></header>
   <form class="list" style="padding:14px" id="fr">
@@ -346,6 +470,34 @@ function vistaFrase(err) {
    <input type="password" id="tok" autocomplete="current-password" autocapitalize="none">
    <p><button class="btn pri">Entra</button></p></form>`;
   $("#fr").onsubmit = (e) => { e.preventDefault(); ls("sf_frase", $("#tok").value.trim().toLowerCase()); avvia(); };
+}
+function oggiPage(g, ann, nn) {
+  const corr = g.linee.flatMap((l) => l.aerei.map((a) => ({ l, a, x: eff(a) })).filter(({ x }) => x.kind === "corr"))
+    .sort((u, v) => (!!v.x.smentita - !!u.x.smentita) || (!!(v.x.av && v.x.av.length) - !!(u.x.av && u.x.av.length)) || (u.x.da || "9999").localeCompare(v.x.da || "9999") || u.a.sigla.localeCompare(v.a.sigla));
+  const avHtml = corr.map(({ l, a, x }) => {
+    const [, stL, stT] = catVis(x), av0 = x.av && x.av[0], gg = txtGg(x.da), dt = x.da ? (gg ? gg + " · " : "") + "dal " + fd(x.da).slice(0, 5) : "in giorn. " + fd(g.data).slice(0, 5);
+    const meta = [dt, x.smentita ? "In giorn. risulta IN LINEA" : "", x.confermata ? "Confermata da giorn." : ""].filter(Boolean).join(" · ");
+    const btnClose = av0 ? `<button class="btn btn-xs" type="button" data-close-av="${esc(a.sigla)}" data-av-src="${av0._src}" data-av-i="${av0._i}" data-av-d="${esc(av0.d)}" data-av-t="${esc(av0.t)}" title="Chiudi avaria in 1 tocco">Risolta</button>` : "";
+    return `<div class="row nr" data-s="${esc(a.sigla)}" style="--lv:var(--ko)" title="${esc(stT)}">
+      <div class="a"><b>${esc(a.sigla)}</b><span class="sub">${esc(l.tipo)}</span></div>
+      <div class="m"><b>${esc(x.m || "Avaria")}</b><div><span class="sub">${esc(meta)}</span>${av0 ? btnPpl(av0, av0._src, av0._i, a.sigla) : ""}</div></div>
+      <div class="v">${btnClose || `<b style="color:var(--ko)">${stL}</b>`}</div></div>`;
+  }).join("");
+  const scadUrg = g.linee.flatMap((l) => l.aerei.filter((a) => eff(a).c === "eff").map((a) => {
+    const h = disp(a), du = scadDataUrg(a), hUrg = h != null && h < ORE_WARN;
+    const zo = hUrg ? a.scadenze.find((s) => s.ore === h) : null; // la scadenza a ore più vicina
+    return (hUrg || du) ? { l, a, h, du, zo, score: hUrg ? h : 10000 + giorni(du.data) } : null;
+  }).filter(Boolean)).sort((u, v) => u.score - v.score);
+  const scadHtml = scadUrg.map(({ l, a, h, du, zo }) => `<div class="row" data-s="${esc(a.sigla)}" style="--lv:var(--warn)">
+    <div class="a"><b>${esc(a.sigla)}</b><span class="sub">${esc(l.tipo)}</span></div>
+    <div class="m">${[zo && esc(zo.tipo), du && esc(du.tipo) + " (" + giorni(du.data) + " gg)"].filter(Boolean).join(" · ")}</div>
+    <div class="v">${zo ? `<b style="color:${LV[livello({ ore: h })]}">${fh(h)} h</b>` : ""}</div></div>`).join("");
+  return `<div class="oggi-col">
+    <section class="list"><h2>Avarie aperte · ${corr.length}</h2>${avHtml || '<p class="empty">Nessuna avaria aperta su tutta la flotta.</p>'}</section>
+    ${scadUrg.length ? `<section class="list"><h2>Efficienti in scadenza · ${scadUrg.length}</h2>${scadHtml}</section>` : ""}
+    <section class="list"><h2>Note e correzioni</h2>${ann.map(annotata).join("")
+      || '<p class="empty">Nessuna nota: tocca una macchina per aggiungerne.</p>'}${nn ? `<p style="text-align:center"><button class="btn" id="rn">Mostra nascoste (${nn})</button></p>` : ""}</section>
+  </div>`;
 }
 function render() {
   const g = S.g;
@@ -358,15 +510,15 @@ function render() {
   document.body.classList.toggle("chiaro", S.pag === "brief");
   if (S.pag === "brief") return renderBrief();
   const [E, T, P] = conta(g.linee.flatMap((l) => l.aerei));
+  const nAv = g.linee.flatMap((l) => l.aerei).filter((a) => eff(a).kind === "corr").length;
   const pag = ["note", ...g.linee.map((l) => l.tipo)], k0 = pag.indexOf(S.flotta), i = k0 < 0 ? 1 : k0;
-  const N = nascoste(), tutte = g.linee.flatMap((l) => l.aerei.filter((a) => S.note[a.sigla] || eff(a).man).map((a) => [l, a]));
+  const N = nascoste(), tutte = g.linee.flatMap((l) => l.aerei.filter((a) => (S.note[a.sigla] && S.note[a.sigla].length) || (eff(a).man && eff(a).c === "eff")).map((a) => [l, a]));
   const ann = tutte.filter(([, a]) => N[a.sigla] !== firma(a.sigla)), nn = tutte.length - ann.length;
   $("#app").innerHTML = `<header><h1>Situazione flotta</h1><button class="btn pri" id="bb">PPL</button>${imp}
-    <div class="sub" style="flex-basis:100%">Giornaliera del <b>${fd(g.data)}</b> · efficienti ${E} su ${T} (${P}%)</div></header>
-   <nav class="tabs"><button data-p="0" style="--c:#7aa2ff"><b>Note</b>${ann.length}</button>${g.linee.map((x, k) => { const [a, b] = conta(x.aerei);
+    <div class="sub" style="flex-basis:100%">Giornaliera del <b>${fd(g.data)}</b> · efficienti ${E} su ${T} (${P}%)${nAv ? ` · <span style="color:var(--ko);font-weight:600">${nAv} avari${nAv === 1 ? "a" : "e"}</span>` : ""}</div></header>
+   <nav class="tabs"><button data-p="0" style="--c:#7aa2ff"><b>Oggi</b>${nAv ? `<span style="color:var(--ko)">${nAv}</span>` : ann.length}</button>${g.linee.map((x, k) => { const [a, b] = conta(x.aerei);
      return `<button data-p="${k + 1}" style="--c:${tipo(x.tipo)[1]}"><b>${esc(x.tipo)}</b>${a}/${b}</button>`; }).join("")}</nav>
-   <div class="pager" id="pg"><section class="list"><h2>Note e correzioni a mano</h2>${ann.map(annotata).join("")
-     || '<p class="empty">Nessuna nota: tocca una macchina per aggiungerne.</p>'}${nn ? `<p style="text-align:center"><button class="btn" id="rn">Mostra nascoste (${nn})</button></p>` : ""}</section>${g.linee.map(pagina).join("")}</div>
+   <div class="pager" id="pg">${oggiPage(g, ann, nn)}${g.linee.map(pagina).join("")}</div>
    <p class="sub" style="text-align:center">Importata ${new Date(g.importata).toLocaleString("it-IT")}</p>`;
   const pg = $("#pg"), tabs = document.querySelectorAll("[data-p]"), passo = () => pg.clientWidth + 16; // 16 = gap del pager
   const segna = (k) => { tabs.forEach((b, j) => b.classList.toggle("on", j === k)); if (pag[k] !== S.flotta) { S.flotta = pag[k]; ls("sf_flotta", S.flotta); } };
@@ -375,11 +527,18 @@ function render() {
   pg.scrollLeft = i * passo(); segna(i);
   document.querySelectorAll("[data-k]").forEach((b) => b.onclick = () => { S.filtro = b.dataset.k; ls("sf_filtro", S.filtro); render(); });
   document.querySelectorAll("[data-vi]").forEach((b) => b.onclick = () => { S.vista = S.vista === "macchine" ? "scad" : "macchine"; render(); });
-  document.querySelectorAll("[data-s]").forEach((e) => e.onclick = () => dettaglio(e.dataset.s));
+  document.querySelectorAll("[data-s]").forEach((e) => {
+    e.onclick = () => dettaglio(e.dataset.s);
+    if (e.getAttribute("role") === "button") e.onkeydown = (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); dettaglio(e.dataset.s); } };
+  });
   document.querySelectorAll("[data-h]").forEach((b) => b.onclick = (ev) => { ev.stopPropagation();
     const N = nascoste(); N[b.dataset.h] = firma(b.dataset.h); ls("sf_nascoste", JSON.stringify(N)); render(); });
-  document.querySelectorAll("[data-np-s]").forEach((b) => b.onclick = async (ev) => { ev.stopPropagation(); b.disabled = true;
-    try { await aggiorna("note", b.dataset.npS, invNotaPpl(+b.dataset.np)); render(); } catch (e) { toast(e.message); b.disabled = false; } });
+  document.querySelectorAll("[data-ppl-s]").forEach((b) => b.onclick = async (ev) => { ev.stopPropagation(); b.disabled = true;
+    const k = b.dataset.pplK, idx = +b.dataset.pplI, sig = b.dataset.pplS;
+    try { await aggiorna(k, sig, k === "stati" ? (o) => o ? conPpl(o, o.ppl === false) : null : invPpl(idx)); render(); }
+    catch (e) { toast(e.message); b.disabled = false; } });
+  document.querySelectorAll("[data-close-av]").forEach((b) => b.onclick = (ev) => { ev.stopPropagation(); b.disabled = true;
+    chiudiAvaria(b.dataset.closeAv, { _src: b.dataset.avSrc, _i: +b.dataset.avI, d: b.dataset.avD, t: b.dataset.avT }); });
   if ($("#rn")) $("#rn").onclick = () => { ls("sf_nascoste", "{}"); render(); };
   $("#file").onchange = importa;
   $("#bb").onclick = () => vai("brief");
@@ -393,7 +552,11 @@ const gruppo = (t) => t.replace(/^(UH-169)[BD]$/, "$1 B+D"); // B e D insieme, c
 const ordine = (t) => { const i = ["UH-169", "RH-206", "UH-205"].findIndex((p) => t.startsWith(p)); return i < 0 ? 9 : i; }; // ordine chiesto dall'utente
 const gruppi = () => [...new Set(S.g.linee.map((l) => gruppo(l.tipo)))];
 const COL_EFF = { eff: ["#2e9d57", "#fff"], ineff: ["#fde4e2", "#b42318"], ind: ["#ece5fb", "#5b3aa8"], alien: ["#eceff3", "#5d6678"] }; // efficiente pieno, il resto tenue
-const colLav = (t) => /TBD/i.test(t) ? ["#eceff3", "#4a5466"] : /ATTESA/i.test(t) ? ["#ffe9d6", "#8a4510"] : /MAGG/i.test(t) ? ["#fde4e2", "#9b1c1c"] : ["#fff1c2", "#6b5300"]; // pastello: niente muri rossi
+const colLav = (t, kind) => kind === "corr" ? ["#fde4e2", "#9b1c1c"]
+  : kind === "ind" || /\bINDUSTRIA\b|\bIN DITTA\b/i.test(t) ? ["#ece5fb", "#5b3aa8"]
+  : kind === "altro" || /CESSIONE|TBD/i.test(t) ? ["#eceff3", "#4a5466"]
+  : /ATTESA/i.test(t) ? ["#ffe9d6", "#8a4510"]
+  : ["#fff1c2", "#6b5300"]; // pastello: rosso solo ai correttivi, giallo/arancio ai programmati
 // etichette lavorazione a schermo, su una riga (il testo intero resta nel title): «CESSIONE TEMPORANEA AL 1°IDRA PER ISP. MAGG.» -> «ISP. MAGG. · 1°IDRA»
 const BREVE = [[/^CESSIONE TEMPORANEA AL\s*(.+?) PER (.+)$/, "$2 · $1"], [/CESSIONE TEMPORANEA/, "CESSIONE"], [/\bIN ATTESA\b/, "ATTESA"], [/RICOVERO AL P\.?T\.?L\.? PER (.+)/, "$1 PTL"],
   [/ISPEZIONE|ISPEZ\./g, "ISP."], [/INTERMEDIA|INTERM\./g, "INT."], [/MAGGIORE/g, "MAGG."], [/P\.T\.L\./g, "PTL"], [/CONDIZIONALE/g, "COND."], [/ATTERRAGGIO PESANTE/g, "ATT. PESANTE"], [/SOSTI?ZIONE/g, "SOST."]];
@@ -421,7 +584,8 @@ function tuttiMesi(s) { // mesi consecutivi che la riga della bozza può toccare
 const rigaS = (s, ed) => { const r = Piano.pplMesi(S.ppl)[s] || [];
   if (ed) return S.bozza[s] ? Piano.riga(S.bozza[s], tuttiMesi(s)) : r;
   const a = S.g.linee.flatMap((l) => l.aerei).find((x) => x.sigla === s); // in sola lettura conta anche cosa è fermo oggi per la giornaliera
-  return a && a.stato !== "IN LINEA" && a.attivita && ["ineff", "ind"].includes(eff(a).c) ? Piano.conGiornaliera(r, S.g.data.slice(0, 7), a.attivita) : r; };
+  const x = a && eff(a, { brief: true });
+  return a && a.stato !== "IN LINEA" && a.attivita && x && ["ineff", "ind"].includes(x.c) ? Piano.conGiornaliera(r, S.g.data.slice(0, 7), a.attivita) : r; };
 const minPx = () => KIOSK ? 10 : zoom() === "anno" ? (S.mod ? 9 : 10) : 12;
 function adatta(bf, z, min) { // carattere più grande con la tabella intera a schermo, ma non sotto min
   const tw = bf.querySelector(".tw"), mp = bf.querySelector(".mp:not(.uno)");
@@ -442,12 +606,12 @@ function adatta(bf, z, min) { // carattere più grande con la tabella intera a s
 addEventListener("resize", () => { const b = $(".bf"); if (b) adatta(b, zoom(), minPx()); });
 function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA-MM", ed = ore e lavorazioni modificabili → { tt, tab }
   const g = S.g, m0 = g.data.slice(0, 7), y = m.slice(0, 4), linee = g.linee.filter((l) => gruppo(l.tipo) === fl);
-  const tutti = linee.flatMap((l) => l.aerei.filter(vive).map((a) => [l, a])), [E, T] = conta(tutti.map(([, a]) => a));
+  const tutti = linee.flatMap((l) => l.aerei.filter(vive).map((a) => [l, a])), [E, T] = conta(tutti.map(([, a]) => a), !ed);
   const vol = (s, k) => S.vol[k] ? S.vol[k].o[s] ?? null : null, hh = (v) => v ? fh(v) : "", som = (xs) => xs.reduce((t, x) => t + (x || 0), 0);
   const inp = (s, k, v) => `<input type="number" min="0" step="any" inputmode="decimal" data-s="${esc(s)}" data-m="${k}" value="${v == null ? "" : +(v / 60).toFixed(2)}" aria-label="Ore ${esc(s)} ${nMese(k)}">`;
   const cOre = (s, c) => ed && (!c.lav || +(c.dal || "").slice(8) > 1) ? inp(s, c.m, c.ore) : hh(c.ore); // nella lavorazione da un giorno > 1: le ore prima
-  const lv = (s) => ed ? ` data-lv="${esc(s)}"` : "", lc = (t) => { const [bg, fg] = colLav(t); return `background:${bg};color:${fg}`; };
-  const th = (l, a, rs) => { const c = eff(a).c, [bg, fg] = COL_EFF[c]; return `<th class="s" rowspan="${rs}" title="${esc(CAT[c][2] + (linee.length > 1 ? " · " + l.tipo : ""))}"${ed ? "" : ` data-d="${esc(a.sigla)}"`} style="background:${bg};color:${fg}">${esc(a.sigla)}${ed ? `<button data-lv="${esc(a.sigla)}">Lavorazioni</button>` : ""}</th>`; };
+  const lv = (s) => ed ? ` data-lv="${esc(s)}"` : "", lc = (t, kind) => { const [bg, fg] = colLav(t, kind); return `background:${bg};color:${fg}`; };
+  const th = (l, a, rs) => { const x = eff(a, { brief: !ed }), c = x.c, [bg, fg] = COL_EFF[c], [, , desc] = catVis(x); return `<th class="s" rowspan="${rs}" title="${esc(desc + (linee.length > 1 ? " · " + l.tipo : ""))}"${ed ? "" : ` data-d="${esc(a.sigla)}"`} style="background:${bg};color:${fg}">${esc(a.sigla)}${ed ? `<button data-lv="${esc(a.sigla)}">Lavorazioni</button>` : ""}</th>`; };
   const STOP = new Set("il lo la i gli le un uno una di a da in con su per tra fra del dello della dei degli delle al allo alla ai agli alle dal dallo dalla dai dagli dalle nel nello nella nei negli nelle sul sullo sulla sui sugli sulle e ed o ad".split(" "));
   const MESI_N = { gen: 1, gennaio: 1, feb: 2, febbraio: 2, mar: 3, marzo: 3, apr: 4, aprile: 4, mag: 5, maggio: 5, giu: 6, giugno: 6, lug: 7, luglio: 7, ago: 8, agosto: 8, set: 9, settembre: 9, ott: 10, ottobre: 10, nov: 11, novembre: 11, dic: 12, dicembre: 12 };
   const toks = (s) => String(s || "").toLowerCase().match(/[a-zàèéìòù0-9]+/g) || [];
@@ -477,8 +641,10 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
     const fmtRp = (v, tip) => `<span class="rp${v < 0 ? " neg" : ""}"${tip ? ` title="${esc(tip)}"` : ""}>(${v > 0 ? "+" : ""}${fh(v)})</span>`;
     const righe = tutti.map(([l, a], ri) => {
       const s = a.sigla, r = rigaS(s, ed), v = Object.fromEntries(r), pr = mY.map((k) => Piano.pm(v[k])), vo = mY.map((k) => vol(s, k));
-      const x = eff(a), fe = Piano.fermiPpl(r), lavs = fe.filter((f) => f.in < (+y + 1) + "-01-01" && f.out > y + "-01-01");
-      const mot = x.c !== "eff" && x.m && !fe.some((f) => f.testo === x.m) ? x.m : "", P = pulisci(s, lavs, [...lavs.map((f) => f.testo), mot].filter(Boolean));
+      const x = eff(a, { brief: !ed }), fe = Piano.fermiPpl(r), lavs = fe.filter((f) => f.in < (+y + 1) + "-01-01" && f.out > y + "-01-01");
+      const inM0 = !ed && y === y0 && x.kind === "corr";
+      const mot = x.c !== "eff" && x.m && !fe.some((f) => f.testo === x.m) ? (inM0 ? `Avaria (${txtGg(x.da) || fd(g.data).slice(0, 5)})` : x.m) : "";
+      const P = pulisci(s, lavs, [...lavs.map((f) => f.testo), x.m].filter(Boolean));
       const rm = !ed ? Piano.residui(r, m0, (k) => vol(s, k), mY[11]) : null;
       mY.forEach((k, i) => {
         if (vo[i] != null) tv[i] = (tv[i] || 0) + vo[i];
@@ -514,9 +680,14 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
             ore = fh(q.res);
           }
         }
+        const avM0 = !ed && !c.lav && c.m === m0 && x.kind === "corr" && x.m;
+        if (avM0) {
+          return `<td class="lav" style="${lc(x.m, "corr")}" title="${esc(x.m + (tip ? " · " + tip : ""))}">${neg ? `<span class="neg">${ore}</span>` : ore}${ore ? "<br>" : ""}<span class="lt">${esc(breve(x.m))}</span></td>`;
+        }
+        const kindC = c.lav ? (c.m === m0 && x.kind === "corr" ? "corr" : c.m === m0 && x.c === "ind" ? "ind" : c.m === m0 && x.kind === "altro" ? "altro" : Giornaliera.classificaFermo(c.lav)) : null;
         const og = !c.lav && c.m === m0 ? " og" : "";
         return !c.lav ? `<td class="p${og}${neg ? " neg" : ""}"${tip ? ` title="${esc(tip)}"` : ""}>${ore}</td>`
-          : `<td colspan="${c.n}" class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(c.lav)}" title="${esc(c.lav + (tip ? " · " + tip : ""))}">${neg ? `<span class="neg">${ore}</span>` : ore}${ore ? "<br>" : ""}<span class="lt">${esc(breve(c.lav))}${gd > 1 ? " dal " + gd : ""}</span></td>`;
+          : `<td colspan="${c.n}" class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(c.lav, kindC)}" title="${esc(c.lav + (tip ? " · " + tip : ""))}">${neg ? `<span class="neg">${ore}</span>` : ore}${ore ? "<br>" : ""}<span class="lt">${esc(breve(c.lav))}${gd > 1 ? " dal " + gd : ""}</span></td>`;
       };
       const cls = ri % 2 ? ' class="alt"' : "";
       const grp = linee.length > 1 && (ri === 0 || tutti[ri - 1][0] !== l) ? `<tr class="grp"><th colspan="15">${esc(l.tipo)}</th></tr>` : ""; // tipo in una riga di gruppo, non sotto ogni sigla
@@ -546,9 +717,16 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
     const per = (f, ini) => { const d0 = ini || f.in; let a = mp(d0); const b = f.aperto ? "" : mp(Piano.addG(f.out, -1));
       if (+d0.slice(8) > 1) a = fd(d0).slice(0, 5); else if (b && b !== a && b.slice(4) === a.slice(4)) a = a.slice(0, 3);
       return !b ? "da " + a : b === a ? a : a + " – " + b; }; // 23/11 – dic 2026, gen – feb 2027, da gen 2027 (senza fine)
+    const perCorr = (x) => {
+      if (!x.da) return `giorn. ${fd(g.data).slice(0, 5)}`;
+      const gg = diffGg(x.da);
+      return `dal ${fd(x.da).slice(0, 5)} · ${gg === 0 ? "oggi" : gg === 1 ? "1 g" : gg + " gg"}`;
+    };
     const normRt = (t) => String(t || "").toUpperCase().replace(/\bISP\.?\s*/g, "ISP. ").replace(/(\d)\s*H\.?\b/g, "$1 H").replace(/\s+/g, " ").replace(/\.+$/, "").trim();
     const dati = tutti.map(([l, a]) => {
-      const s = a.sigla, x = eff(a), r = rigaS(s, ed), c = Piano.celleMesi(r, [m])[0], qm = !ed ? Piano.residui(r, m0, (k) => vol(s, k), m)[m] : null;
+      const s = a.sigla, x = eff(a, { brief: !ed }), r = rigaS(s, ed), rPpl = Piano.pplMesi(S.ppl)[s] || [];
+      const hasPplF = Piano.fermiPpl(rPpl).some((fx) => fx.in < fm && fx.out > m + "-01");
+      const c = Piano.celleMesi(r, [m])[0], qm = !ed ? Piano.residui(r, m0, (k) => vol(s, k), m)[m] : null;
       const p = qm ? qm.eff : Piano.pm(Object.fromEntries(r)[m]), w = vol(s, m), [rs, rt0] = residuo(a);
       const pTip = qm && qm.carry ? `PPL ${fh(qm.pr)} ${(qm.carry > 0 ? "+" : "") + fh(qm.carry)} da ${nMese(Piano.piuMesi(m, -1)).toLowerCase()}` : "";
       const rt = normRt(rt0), dv = pas ? (w == null ? null : w - p) : Math.max(p - (w || 0), 0), fe = Piano.fermiPpl(r);
@@ -559,7 +737,7 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       const xmExtra = m === m0 && f && x.c !== "eff" && x.m && !P.rid(x.m) ? x.m : "";
       const nt = [xmExtra, P.nt].filter(Boolean).join(" · ");
       T3[0] += p; T3[1] += w || 0; T3[2] += dv || 0;
-      return { l, a, s, x, c, p, pTip, w, rs, rt, dv, f, fIn, nx, nxIn, mot, nt };
+      return { l, a, s, x, hasPplF, c, p, pTip, w, rs, rt, dv, f, fIn, nx, nxIn, mot, nt };
     });
     const cRes = (rs) => {
       if (rs == null) return "";
@@ -569,13 +747,14 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
     const volano = dati.filter((d) => d.x.c === "eff"), fermi = dati.filter((d) => d.x.c !== "eff"), cnt = {};
     fermi.forEach((d) => cnt[d.mot] = (cnt[d.mot] || 0) + 1);
     const ordT = Object.fromEntries(linee.map((l, i) => [l.tipo, i]));
-    fermi.sort((a, b) => (ordT[a.l.tipo] - ordT[b.l.tipo]) || (cnt[b.mot] - cnt[a.mot]) || a.mot.localeCompare(b.mot) || a.s.localeCompare(b.s));
+    fermi.sort((a, b) => (ordT[a.l.tipo] - ordT[b.l.tipo]) || ((b.x.kind === "corr") - (a.x.kind === "corr")) || (cnt[b.mot] - cnt[a.mot]) || a.mot.localeCompare(b.mot) || a.s.localeCompare(b.s));
     const celle = (d) => {
-      const [bg, fg] = COL_EFF[d.x.c], thTitle = CAT[d.x.c][2] + (linee.length > 1 ? " · " + d.l.tipo : "");
-      const lavObj = d.f ? { t: d.f.testo, p: per(d.f, d.fIn) } : m === m0 && d.x.c !== "eff" && d.x.m ? { t: d.x.m, p: "" } : null;
+      const [bg, fg] = COL_EFF[d.x.c], thTitle = catVis(d.x)[2] + (linee.length > 1 ? " · " + d.l.tipo : "");
+      const lavObj = d.f ? { t: d.f.testo, p: m === m0 && d.x.kind === "corr" && !d.hasPplF ? perCorr(d.x) : per(d.f, d.fIn), k: m === m0 ? d.x.kind : Giornaliera.classificaFermo(d.f.testo) }
+        : m === m0 && d.x.c !== "eff" && d.x.m ? { t: d.x.m, p: d.x.kind === "corr" ? perCorr(d.x) : "", k: d.x.kind } : null;
       const nxObj = d.nx ? { t: d.nx.testo, p: per(d.nx, d.nxIn) } : null;
       const voce = (o, col) => { // nome e periodo in due colonne allineate, colorate solo per la lavorazione del mese
-        const a = `${ed ? " ed" : ""}"${lv(d.s)} title="${esc(o ? o.t + (o.p ? " · " + o.p : "") : "")}"${o && col ? ` style="${lc(o.t)}"` : ""}`;
+        const a = `${ed ? " ed" : ""}"${lv(d.s)} title="${esc(o ? o.t + (o.p ? " · " + o.p : "") : "")}"${o && col ? ` style="${lc(o.t, o.k)}"` : ""}`;
         return [`<td class="tl${o && col ? " lav" : ""}${a}>${o ? `<b>${esc(breve(o.t))}</b>` : ""}</td>`, `<td class="pe${a}>${o && o.p ? `<span class="per">${esc(o.p)}</span>` : ""}</td>`];
       };
       const [lav, lavP] = voce(lavObj, true), [nx, nxP] = voce(nxObj, false);
@@ -591,23 +770,27 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       };
     };
     // due pannelli affiancati, efficienti a sinistra e fermi a destra, con la stessa griglia; col = [chiave, intestazione]; larghezze dal contenuto (table-layout:auto), così i numeri non si troncano
-    const pannello = (lista, cls, titolo, col) => {
-      let t = "";
+    const nCorr = fermi.filter((d) => d.x.kind === "corr").length, nProg = fermi.length - nCorr;
+    const pannello = (lista, cls, titolo, col, divCorr) => {
+      let prevG = "";
       const cc = lista.map(celle), vuota = (k) => !cc.some((c) => c[k].replace(/<[^>]*>/g, "").trim());
       col = col.filter(([k]) => k === "s" || (ed && k === "p") || !vuota(k)); // via le colonne vuote in tutto il pannello
       const body = lista.map((d, i) => {
-        const g = linee.length > 1 && d.l.tipo !== t ? `<tr class="grp"><th colspan="${col.length}">${esc(d.l.tipo)}</th></tr>` : "", c = cc[i];
-        t = d.l.tipo;
-        return `${g}<tr${i % 2 ? ' class="alt"' : ""}>${col.map(([k]) => c[k]).join("")}</tr>`;
+        const sec = divCorr && nCorr && nProg ? (d.x.kind === "corr" ? "corr" : "prog") : "";
+        const gk = (linee.length > 1 ? d.l.tipo : "") + (sec ? "|" + sec : "");
+        const gLabel = [linee.length > 1 ? d.l.tipo : "", sec === "corr" ? "CORRETTIVI (AVARIE)" : sec === "prog" ? "PROGRAMMATI / ALTRI" : ""].filter(Boolean).join(" · ");
+        const gRow = gk && gk !== prevG ? `<tr class="grp${sec === "corr" ? " corr" : ""}"><th colspan="${col.length}">${esc(gLabel)}</th></tr>` : "", c = cc[i];
+        prevG = gk;
+        return `${gRow}<tr${i % 2 ? ' class="alt"' : ""}>${col.map(([k]) => c[k]).join("")}</tr>`;
       }).join("");
       return `<section class="pn ${cls}"><div class="ph">${titolo}</div><table class="mese">
         <thead><tr>${col.map(([k, h]) => `<th${k === "s" ? ' class="s"' : /lav|nx|man|nt/.test(k) ? ' class="tl"' : ""}>${h}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></section>`;
     };
-    const gc = Object.entries(cnt).filter(([k, n]) => k && n > 1).sort((a, b) => b[1] - a[1]).map(([k, n]) => `<b>${n}</b> ${esc(k)}`).join(" · ");
+    const gsFermi = [nCorr && `<b>${nCorr}</b> ${nCorr === 1 ? "correttivo" : "correttivi"}`, nProg && `<b>${nProg}</b> ${nProg === 1 ? "programmato" : "programmati"}`].filter(Boolean).join(" · ");
     const pVol = volano.length ? pannello(volano, "pv", `<span class="bg" style="color:#2e9d57">EFFICIENTI · ${volano.length}</span>`,
-      [["s", "EI"], ["p", "Prog."], ["w", "Volate"], ["dv", pas ? "Diff." : "Da volare"], ["man", "Manutenzione"], ["manP", "Quando"], ["rs", "Ore residue"], ["nt", "Note"]]) : "";
-    const pFer = fermi.length ? pannello(fermi, "pf", `<span class="bg" style="color:#b42318">FERMI · ${fermi.length}</span><span class="gs">${gc}</span>`,
-      [["s", "EI"], ["p", "Prog."], ["w", "Volate"], ["lav", "Manutenzione nel mese"], ["lavP", "Quando"], ["rs", "Ore residue"], ["nx", "Prossima manutenzione"], ["nxP", "Quando"], ["nt", "Note"]]) : "";
+      [["s", "EI"], ["p", "Prog."], ["w", "Volate"], ["dv", pas ? "Diff." : "Da volare"], ["man", "Manutenzione"], ["manP", "Quando"], ["rs", "Ore residue"], ["nt", "Note"]], false) : "";
+    const pFer = fermi.length ? pannello(fermi, "pf", `<span class="bg" style="color:#b42318">FERMI · ${fermi.length}</span><span class="gs">${gsFermi}</span>`,
+      [["s", "EI"], ["p", "Prog."], ["w", "Volate"], ["lav", "Manutenzione nel mese"], ["lavP", "Quando"], ["rs", "Ore residue"], ["nx", "Prossima manutenzione"], ["nxP", "Quando"], ["nt", "Note"]], true) : "";
     tab = `<div class="mp${!volano.length || !fermi.length ? " uno" : ""}">${pVol}${pFer}</div>`;
     K = [["Programmate", hh(T3[0]) || "0:00"], ["Volate", fut ? "" : fh(T3[1])], [pas ? "Differenza" : "Da volare", pas ? fh(T3[2]) : hh(T3[2]) || "0:00"]];
   }
@@ -685,37 +868,47 @@ addEventListener("keydown", (e) => { // frecce: ← → periodo, ↑ ↓ flotta 
 });
 
 function fermoRow(a) {
-  const x = eff(a), [c, s] = CAT[x.c], h = disp(a), du = scadDataUrg(a), note = S.note[a.sigla] || [];
-  const meta = [a.perc, a.fine && "fine " + a.fine, !a.perc && !a.fine && (x.man ? "dal " + fd(x.man.d).slice(0, 5) : a.inizio && "dal " + fd(a.inizio).slice(0, 5))].filter(Boolean).join(" · ");
+  const x = eff(a), [c, s] = catVis(x), h = disp(a), du = scadDataUrg(a), note = S.note[a.sigla] || [];
+  const av0 = x.av && x.av[0], gg = x.kind === "corr" ? txtGg(x.da) : "";
+  const daTxt = x.da ? (gg ? gg + " · " : "") + "dal " + fd(x.da).slice(0, 5) : x.kind === "corr" ? "in giorn. " + fd(S.g.data).slice(0, 5) : "";
+  const meta = [a.perc, a.fine && "fine " + a.fine, !a.perc && !a.fine && daTxt, x.smentita ? "In giorn. IN LINEA" : ""].filter(Boolean).join(" · ");
   const last = note.length ? note[note.length - 1] : null;
-  return `<button class="frow" data-s="${esc(a.sigla)}" style="--st:var(--${c})">
+  const btnR = av0 ? `<button class="btn btn-xs" type="button" data-close-av="${esc(a.sigla)}" data-av-src="${av0._src}" data-av-i="${av0._i}" data-av-d="${esc(av0.d)}" data-av-t="${esc(av0.t)}" title="Chiudi avaria in 1 tocco">Risolta</button>` : "";
+  return `<div class="frow" role="button" tabindex="0" data-s="${esc(a.sigla)}" style="--st:var(--${c})">
     <div class="fa"><b>${esc(a.sigla)}</b><span class="st">${s}${x.man ? "*" : ""}</span></div>
     <div class="fm">${meta ? `<div>${esc(meta)}</div>` : ""}${last ? `<div class="fn">✎ ${esc(last.t)}${note.length > 1 ? ` (+${note.length - 1})` : ""}</div>` : ""}</div>
-    <div class="fv">${h != null ? `<span style="color:${LV[livello({ ore: h })]}">${fh(h)} h</span>` : ""}${du ? `<small style="color:${LV[livello(du)]}">${esc(du.tipo)} ${giorni(du.data)} gg</small>` : ""}</div>
-  </button>`;
+    <div class="fv">${btnR}${h != null ? `<span style="color:${LV[livello({ ore: h })]}">${fh(h)} h</span>` : ""}${du ? `<small style="color:${LV[livello(du)]}">${esc(du.tipo)} ${giorni(du.data)} gg</small>` : ""}</div>
+  </div>`;
 }
-function pagina(l) { // una pagina dello swipe per ogni flotta: efficienti a sinistra, fermi raggruppati per motivo a destra
-  const [img, col] = tipo(l.tipo), [e, t, pc] = conta(l.aerei), cats = l.aerei.map((a) => eff(a).c);
+function pagina(l) { // una pagina dello swipe per ogni flotta: efficienti a sinistra, fermi raggruppati (correttivi prima, programmati dopo)
+  const [img, col] = tipo(l.tipo), [e, t, pc] = conta(l.aerei), effs = l.aerei.map((a) => eff(a));
   const urg = l.aerei.filter(vive).flatMap((a) => a.scadenze).filter((s) => livello(s) >= 1).length;
   const filtro = FILTRI.find((f) => f[0] === S.filtro) || FILTRI[0], mac = S.vista === "macchine";
   let corpo = "";
   if (mac) {
-    const vis = l.aerei.filter((a) => filtro[2](eff(a).c));
+    const vis = l.aerei.filter((a) => filtro[2](eff(a)));
     const effList = vis.filter((a) => eff(a).c === "eff");
     const fermiList = vis.filter((a) => { const c = eff(a).c; return c === "ineff" || c === "ind"; });
     const alienList = vis.filter((a) => eff(a).c === "alien");
-    const gruppiF = new Map();
-    fermiList.forEach((a) => {
-      const x = eff(a), mot = motivoFermo(a, x);
-      if (!gruppiF.has(mot)) gruppiF.set(mot, { mot, raw: x.m || mot, items: [] });
-      gruppiF.get(mot).items.push(a);
-    });
-    const fOrd = [...gruppiF.values()].sort((a, b) => (b.items.length - a.items.length) || a.mot.localeCompare(b.mot));
+    const raggruppa = (arr) => {
+      const m = new Map();
+      arr.forEach((a) => {
+        const x = eff(a), mot = motivoFermo(a, x);
+        if (!m.has(mot)) m.set(mot, { mot, raw: x.m || mot, items: [] });
+        m.get(mot).items.push(a);
+      });
+      return [...m.values()].sort((a, b) => (b.items.length - a.items.length) || a.mot.localeCompare(b.mot));
+    };
+    const corrList = fermiList.filter((a) => eff(a).kind === "corr"), progList = fermiList.filter((a) => eff(a).kind !== "corr");
+    const cOrd = raggruppa(corrList), pOrd = raggruppa(progList);
+    const renderGrp = (g) => `<div class="fg"><div class="fg-h" title="${esc(g.raw)}"><span>${esc(g.mot)}</span><b>${g.items.length}</b></div>${g.items.map(fermoRow).join("")}</div>`;
+    const subCorr = cOrd.length ? `<div class="fp-sub corr"><span>Avarie / Correttivi</span><span>${corrList.length}</span></div>${cOrd.map(renderGrp).join("")}` : "";
+    const subProg = pOrd.length ? `${cOrd.length ? `<div class="fp-sub prog"><span>Programmati / Altri</span><span>${progList.length}</span></div>` : ""}${pOrd.map(renderGrp).join("")}` : "";
     const pEff = effList.length ? `<div class="fp-box"><div class="fp-h"><span><i class="dot" style="background:var(--ok)"></i>Efficienti</span><span>${effList.length}</span></div><div class="grid">${effList.map(tile).join("")}</div></div>` : "";
-    const pFer = fOrd.length ? `<div class="fp-box"><div class="fp-h"><span><i class="dot" style="background:var(--ko)"></i>Fermi</span><span>${fermiList.length}</span></div>${fOrd.map((g) => `<div class="fg"><div class="fg-h" title="${esc(g.raw)}"><span>${esc(g.mot)}</span><b>${g.items.length}</b></div>${g.items.map(fermoRow).join("")}</div>`).join("")}</div>` : "";
+    const pFer = fermiList.length ? `<div class="fp-box"><div class="fp-h"><span><i class="dot" style="background:var(--ko)"></i>Fermi</span><span>${fermiList.length}</span></div>${subCorr}${subProg}</div>` : "";
     const pan = pEff || pFer ? `<div class="fp${!pEff || !pFer ? " uno" : ""}">${pEff}${pFer}</div>` : "";
     const al = alienList.length ? (filtro[0] === "alien" ? `<div class="grid">${alienList.map(tile).join("")}</div>` : `<details class="al-box"><summary>In alienazione · ${alienList.length}</summary><div class="grid">${alienList.map(tile).join("")}</div></details>`) : "";
-    corpo = `<div class="chips">${FILTRI.map(([k, n, f]) => { const c = cats.filter(f).length;
+    corpo = `<div class="chips">${FILTRI.map(([k, n, f]) => { const c = effs.filter(f).length;
       return c || k === "tutti" || k === "eff" || k === "ineff" || k === filtro[0] ? `<button data-k="${k}" class="${k === filtro[0] ? "on" : ""}">${n} ${c}</button>` : ""; }).join("")}</div>
       ${pan || al ? pan + al : '<p class="empty">Nessun aeromobile</p>'}`;
   } else {
@@ -726,14 +919,14 @@ function pagina(l) { // una pagina dello swipe per ogni flotta: efficienti a sin
      <div class="bar"><i style="width:${pc}%;background:${col}"></i></div></div>
      <button class="btn" data-vi>${mac ? `Scadenze${urg ? ` <b style="color:var(--warn)">${urg}</b>` : ""}` : "Macchine"}</button></div>${corpo}</section>`;
 }
-function annotata([l, a]) { // riga della pagina Note: sigla, motivo, note, efficienza
-  const x = eff(a), [c, s] = CAT[x.c], mot = x.man ? (x.m || "cambiata a mano") + " · " + fd(x.man.d).slice(0, 5) : x.m;
+function annotata([l, a]) { // riga della sezione Note: sigla, motivo, note, efficienza
+  const x = eff(a), [c, s] = catVis(x), mot = x.man ? (x.m || "cambiata a mano") + " · " + fd(x.man.d).slice(0, 5) : x.m;
   return `<div class="row nr" data-s="${esc(a.sigla)}" style="--lv:var(--${c})"><div class="a"><b>${esc(a.sigla)}</b><span class="sub">${esc(l.tipo)}</span></div>
-    <div class="m">${mot ? `<span class="sub">${esc(mot)}</span>` : ""}${(S.note[a.sigla] || []).map((n, i) => `<div>${esc(n.t)} <span class="sub">${fd(n.d).slice(0, 5)}</span> ${btnNotaPpl(n, i, a.sigla)}</div>`).join("")}</div>
+    <div class="m">${mot ? `<span class="sub">${esc(mot)}</span>` : ""}${(S.note[a.sigla] || []).map((n, i) => `<div><span>${esc(n.t)} <span class="sub">${fd(n.d).slice(0, 5)}</span></span>${btnPpl(n, "note", i, a.sigla)}</div>`).join("")}</div>
     <div class="v"><b style="color:var(--${c})">${s}${x.man ? "*" : ""}</b></div><button class="x" data-h="${esc(a.sigla)}" aria-label="Nascondi">×</button></div>`;
 }
 function tile(a) {
-  const x = eff(a), [c, s] = CAT[x.c], n = (S.note[a.sigla] || []).length, h = vive(a) ? disp(a) : null, du = vive(a) ? scadDataUrg(a) : null;
+  const x = eff(a), [c, s] = catVis(x), n = (S.note[a.sigla] || []).length, h = vive(a) ? disp(a) : null, du = vive(a) ? scadDataUrg(a) : null;
   return `<button class="tile" data-s="${esc(a.sigla)}" style="--st:var(--${c})"><b>${esc(a.sigla)}</b>
     <span class="st">${s}${x.man ? "*" : ""}</span>${n ? `<span class="pill">✎${n}</span>` : ""}
     ${h != null ? `<span class="h" style="color:${LV[livello({ ore: h })]}">${fh(h)} h</span>` : ""}${du ? `<span class="dt" style="color:${LV[livello(du)]}">${esc(du.tipo)} ${giorni(du.data)} gg</span>` : ""}</button>`;
@@ -749,10 +942,12 @@ function scadenze(l) {
 }
 function dettaglio(sigla) {
   const l = S.g.linee.find((x) => x.aerei.some((a) => a.sigla === sigla)), a = l.aerei.find((x) => x.sigla === sigla);
-  const [img, col] = tipo(l.tipo), x = eff(a), auto = eff(a, false), [c, , s] = CAT[x.c], note = S.note[sigla] || [];
+  const [img, col] = tipo(l.tipo), x = eff(a), auto = eff(a, false), [c, , s] = catVis(x), note = S.note[sigla] || [], avMan = avarieMan(sigla);
+  const manEff = S.stati[sigla] && S.stati[sigla].e && S.g && S.stati[sigla].d >= S.g.data ? S.stati[sigla] : null;
   const tr = (k, v) => v ? `<tr><td>${k}</td><td>${v}</td></tr>` : "";
   const mmTxt = a.mm ? (/^MM/i.test(a.mm) ? a.mm : "MM " + a.mm) : "";
-  const detAtt = [a.attivita && a.attivita !== auto.m ? esc(a.attivita) : "", a.inizio ? "dal " + fd(a.inizio) : "",
+  const autoKindLbl = auto.kind === "corr" ? `Fermo correttivo${auto.da ? " · " + txtGg(auto.da) : ""}` : auto.kind === "prog" ? "Fermo programmato" : auto.kind === "altro" ? "Cessione temporanea" : auto.kind === "ind" ? "In industria" : "";
+  const detAtt = [autoKindLbl, a.attivita && a.attivita !== auto.m ? esc(a.attivita) : "", a.inizio ? "dal " + fd(a.inizio) : "",
     a.perc ? "lavorazione " + esc(a.perc) : "", a.fine ? "termine stimato " + esc(a.fine) : ""].filter(Boolean).join(" · ");
   const ces = a.cessione ? [a.cessione.da && "da " + esc(a.cessione.da), a.cessione.a && "a " + esc(a.cessione.a),
     a.cessione.dal && "dal " + fd(a.cessione.dal)].filter(Boolean).join(" ") : "";
@@ -763,6 +958,18 @@ function dettaglio(sigla) {
     if (u.data && v.data) return u.data.localeCompare(v.data);
     return u.ore != null ? -1 : v.ore != null ? 1 : 0;
   });
+  const avHtml = avMan.map((v, idx) => {
+    const sment = S.g.data > v.d && auto.c === "eff";
+    const conf = S.g.data > v.d && auto.c !== "eff";
+    return `<div class="det-av"><div class="det-av-row">
+      <div><b style="color:var(--ko)">Avaria a mano (${txtGg(v.d) || "oggi"} · ${fd(v.d).slice(0, 5)})</b>: ${esc(v.t)}
+       ${sment ? `<div class="av-warn">In giornaliera del ${fd(S.g.data).slice(0, 5)} risulta IN LINEA — ancora aperta?</div>` : ""}
+       ${conf ? `<div class="sub">Confermata dalla giornaliera del ${fd(S.g.data).slice(0, 5)}</div>` : ""}
+       ${v.ppl === false ? `<div class="sub">Nascosta al briefing (PPL)</div>` : ""}</div>
+      <div class="det-av-act">${btnPpl(v, v._src, v._i)}<button class="btn btn-xs" type="button" data-av-cls="${idx}">Risolta</button></div>
+    </div></div>`;
+  }).join("");
+  const sugs = suggerimentiAvarie();
   const d = $("#dlg");
   d.innerHTML = `<div class="dh"><img src="img/${img}.webp" alt=""><div class="t"><b style="font-size:20px">${esc(sigla)}</b>
     <div class="sub" style="color:${col}">${esc(l.tipo)}${mmTxt ? " · " + esc(mmTxt) : ""}</div></div>
@@ -770,27 +977,33 @@ function dettaglio(sigla) {
    <div class="db">
     <div class="det-box">
      <div class="det-top"><div><span class="sub">Giornaliera:</span> <b>${esc(stato(a.stato)[1])}</b>${auto.m ? `<span class="sub"> · ${esc(auto.m)}</span>` : ""}</div>
-      ${vive(a) ? `<button class="btn btn-xs" id="bt-st" type="button">${x.man ? "Modifica stato" : "Cambia stato"}</button>` : ""}</div>
+      ${vive(a) ? `<div class="det-av-act"><button class="btn btn-xs pri" id="bt-av" type="button">+ Segna avaria</button>${auto.c !== "eff" || manEff ? `<button class="btn btn-xs" id="bt-st" type="button">${manEff ? "Stato" : "Efficiente?"}</button>` : ""}</div>` : ""}</div>
      ${detAtt ? `<div class="sub" style="margin-top:4px">${detAtt}</div>` : ""}
      ${ces ? `<div class="sub" style="margin-top:4px">Cessione temporanea: ${ces}</div>` : ""}
-     ${x.man ? `<div class="det-top" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:13px">
-       <div><b style="color:var(--${c})">Corretta a mano (${fd(x.man.d).slice(0, 5)})</b>${x.man.m ? `: ${esc(x.man.m)}` : ""}<div class="sub">Vale fino alla prossima giornaliera</div></div>
-       <button class="btn btn-xs" id="rp" type="button">Ripristina</button></div>` : ""}
-     ${vive(a) ? `<div class="det-ed" id="ed-st" hidden>
-       <label class="sub" for="mo">Motivo (si salva toccando Efficiente o Inefficiente)</label>
-       <input id="mo" placeholder="es. guasto a fine giornata, attesa messa in moto" value="${esc(x.man ? x.man.m : "")}">
-       <div class="seg"><button data-e="1" type="button" class="${x.c === "eff" ? "on" : ""}">Efficiente</button><button data-e="0" type="button" class="${x.c !== "eff" ? "on" : ""}">Inefficiente</button></div>
-      </div>` : ""}
+     ${avHtml}
+     ${manEff ? `<div class="det-av"><div class="det-av-row">
+       <div><b style="color:var(--ok)">Segnata efficiente oggi (${fd(manEff.d).slice(0, 5)})</b>${manEff.m ? `: ${esc(manEff.m)}` : ""}<div class="sub">Vale fino alla prossima giornaliera</div></div>
+       <button class="btn btn-xs" id="rp" type="button">Ripristina</button></div></div>` : ""}
+     ${vive(a) ? `<div class="det-ed" id="av-box" hidden>
+       <div class="sub">Tocca un'avaria tipica per salvare subito, oppure scrivi:</div>
+       <div class="av-sug">${sugs.map((t) => `<button type="button" data-av-q="${esc(t)}">${esc(t)}</button>`).join("")}</div>
+       <input id="av-t" placeholder="Descrivi l'avaria (es. perdita olio, spia chip)...">
+       <div class="det-act"><button class="btn pri" id="av-sv" type="button">Salva avaria</button><button class="btn" id="av-sv-no" type="button">Salva · no briefing</button><button class="btn" id="av-an" type="button">Annulla</button></div>
+     </div>
+     <div class="det-ed" id="ed-st" hidden>
+       <label class="sub" for="mo">Segna efficiente oggi (fino alla prossima giornaliera)</label>
+       <input id="mo" placeholder="es. riparata dopo la giornaliera, pronta al volo" value="${esc(manEff ? manEff.m : "")}">
+       <div class="det-act"><button class="btn pri" data-e="1" type="button">Segna efficiente oggi</button><button class="btn" id="st-an" type="button">Annulla</button></div>
+     </div>` : ""}
     </div>
     <h3>Ore di volo</h3>
     <div class="det-ov"><div><span>Nel mese</span><b>${fh(a.oreMese)}</b></div><div><span>Totali</span><b>${fh(a.oreTot)}</b></div></div>
     ${scad.length ? `<h3>Prossime scadenze</h3><table>${scad.map((sc) => { const lv = livello(sc);
       return `<tr><td><span class="dot" style="background:${lv < 0 ? "var(--off)" : LV[lv]}"></span>${esc(sc.tipo)}</td><td>${valore(sc)}</td></tr>`; }).join("")}</table>` : ""}
     <div class="det-sh"><h3>Note${note.length ? ` (${note.length})` : ""}</h3><button class="btn btn-xs pri" id="bt-nt" type="button">+ Aggiungi nota</button></div>
-    ${note.map((n, i) => `<div class="note"><p data-ed="${i}"><small>${fd(n.d)} · tocca per modificare</small>${esc(n.t)}</p>${btnNotaPpl(n, i)}<button data-del="${i}" aria-label="Elimina nota">×</button></div>`).join("") || '<p class="sub" id="no-nt" style="margin:0">Nessuna nota.</p>'}
+    ${note.map((n, i) => `<div class="note"><p data-ed="${i}"><small>${fd(n.d)} · tocca per modificare</small>${esc(n.t)}</p>${btnPpl(n, "note", i)}<button data-del="${i}" aria-label="Elimina nota">×</button></div>`).join("") || '<p class="sub" id="no-nt" style="margin:0">Nessuna nota.</p>'}
     <div id="nf" hidden style="margin-top:8px"><textarea id="nt" placeholder="Annota qualcosa su ${esc(sigla)}..."></textarea>
-     <label class="chk"><input type="checkbox" id="np" checked> Mostra nella PPL</label>
-     <div class="det-act"><button class="btn pri" id="ns" type="button">Salva nota</button><button class="btn" id="nc" type="button">Annulla</button></div></div>
+     <div class="det-act"><button class="btn pri" id="ns" type="button">Salva nota</button><button class="btn" id="ns-no" type="button">Salva · no briefing</button><button class="btn" id="nc" type="button">Annulla</button></div></div>
     <details ${S.info ? "open" : ""}><summary>Configurazione e motori</summary>
     ${a.motori.length ? `<h3>Turbomotori</h3><table>${a.motori.map((m) => tr(esc((m.tipo ? m.tipo + " " : "") + m.sn), m.fh != null ? fh(m.fh) + " h" : "–")).join("")}</table>` : ""}
     <h3>Configurazione</h3><table>${tr("Config", esc(a.config))}${tr("Verricello", esc(a.verr))}${tr("Gancio", esc(a.gancio))}${tr("NVG", esc(a.nvg))}${a.ggLinea || a.ggPres ? tr("GG in linea / presenza", esc((a.ggLinea || "–") + " / " + (a.ggPres || "–"))) : ""}</table></details></div>`;
@@ -801,21 +1014,39 @@ function dettaglio(sigla) {
     $("#nf").hidden = false; $("#bt-nt").hidden = true;
     if ($("#no-nt")) $("#no-nt").hidden = true;
     $("#nt").value = idx < 0 ? "" : note[idx].t;
-    $("#np").checked = idx < 0 || note[idx].ppl !== false;
-    $("#ns").textContent = idx < 0 ? "Salva nota" : "Salva modifica";
+    $("#ns").textContent = idx < 0 ? "Salva nota" : "Salva (PPL)";
     $("#nf").scrollIntoView({ block: "nearest" }); $("#nt").focus();
+  };
+  const salvaAv = (t, on) => {
+    const txt = String(t || "").trim(); if (!txt) return $("#av-t").focus();
+    salvaRecAvaria(txt);
+    salva(sigla, "avarie", (arr = []) => [...arr, notaPpl({ d: giornoIso(), t: txt }, on)]);
+  };
+  const salvaNt = (on) => {
+    const t = $("#nt").value.trim(); if (!t) return $("#nt").focus();
+    salva(sigla, "note", (arr = []) => ed < 0 ? [...arr, notaPpl({ d: giornoIso(), t }, on)] : arr.map((n, i) => i === ed ? notaPpl({ d: n.d, t }, on) : n));
   };
   $("#cl").onclick = () => d.close();
   d.querySelector("details").ontoggle = (e) => S.info = e.target.open;
-  if ($("#bt-st")) $("#bt-st").onclick = () => { const box = $("#ed-st"); box.hidden = !box.hidden; $("#bt-st").textContent = box.hidden ? (x.man ? "Modifica stato" : "Cambia stato") : "Chiudi modifica"; if (!box.hidden) box.scrollIntoView({ block: "nearest" }); };
+  if ($("#bt-av")) $("#bt-av").onclick = () => { $("#av-box").hidden = !$("#av-box").hidden; if ($("#ed-st")) $("#ed-st").hidden = true; if (!$("#av-box").hidden) { $("#av-box").scrollIntoView({ block: "nearest" }); $("#av-t").focus(); } };
+  if ($("#av-an")) $("#av-an").onclick = () => { $("#av-box").hidden = true; $("#av-t").value = ""; };
+  d.querySelectorAll("[data-av-q]").forEach((b) => b.onclick = () => salvaAv(b.dataset.avQ, true));
+  if ($("#av-sv")) $("#av-sv").onclick = () => salvaAv($("#av-t").value, true);
+  if ($("#av-sv-no")) $("#av-sv-no").onclick = () => salvaAv($("#av-t").value, false);
+  d.querySelectorAll("[data-av-cls]").forEach((b) => b.onclick = () => { document.querySelectorAll("#dlg button").forEach((x) => x.disabled = true); chiudiAvaria(sigla, avMan[+b.dataset.avCls], true); });
+  if ($("#bt-st")) $("#bt-st").onclick = () => { const box = $("#ed-st"); box.hidden = !box.hidden; if ($("#av-box")) $("#av-box").hidden = true; if (!box.hidden) box.scrollIntoView({ block: "nearest" }); };
+  if ($("#st-an")) $("#st-an").onclick = () => { $("#ed-st").hidden = true; };
   $("#bt-nt").onclick = () => apriNota(-1);
-  $("#nc").onclick = () => { ed = -1; segnaEd(-1); $("#nt").value = ""; $("#np").checked = true; $("#nf").hidden = true; $("#bt-nt").hidden = false; if ($("#no-nt")) $("#no-nt").hidden = false; };
+  $("#nc").onclick = () => { ed = -1; segnaEd(-1); $("#nt").value = ""; $("#nf").hidden = true; $("#bt-nt").hidden = false; if ($("#no-nt")) $("#no-nt").hidden = false; };
   d.querySelectorAll("[data-ed]").forEach((p) => p.onclick = () => apriNota(+p.dataset.ed));
-  d.querySelectorAll("[data-np]").forEach((b) => b.onclick = () => salva(sigla, "note", invNotaPpl(+b.dataset.np)));
-  $("#ns").onclick = () => { const t = $("#nt").value.trim(), on = $("#np").checked; if (!t) return $("#nt").focus();
-    salva(sigla, "note", (arr = []) => ed < 0 ? [...arr, notaPpl({ d: giornoIso(), t }, on)] : arr.map((n, i) => i === ed ? notaPpl({ d: n.d, t }, on) : n)); };
+  d.querySelectorAll("[data-ppl-k]").forEach((b) => b.onclick = () => {
+    const k = b.dataset.pplK, idx = +b.dataset.pplI;
+    salva(sigla, k, k === "stati" ? (o) => o ? conPpl(o, o.ppl === false) : null : invPpl(idx));
+  });
+  $("#ns").onclick = () => salvaNt(true);
+  $("#ns-no").onclick = () => salvaNt(false);
   d.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => salva(sigla, "note", (arr = []) => arr.filter((_, i) => i !== +b.dataset.del)));
-  d.querySelectorAll("[data-e]").forEach((b) => b.onclick = () => salva(sigla, "stati", () => ({ e: b.dataset.e === "1", m: $("#mo").value.trim(), d: giornoIso() })));
+  d.querySelectorAll("[data-e]").forEach((b) => b.onclick = () => salva(sigla, "stati", () => ({ e: true, m: $("#mo").value.trim(), d: giornoIso() })));
   if ($("#rp")) $("#rp").onclick = () => salva(sigla, "stati", () => null);
   if (!d.open) d.showModal();
 }
@@ -829,10 +1060,17 @@ async function importa(ev) {
   try {
     const g = await Giornaliera.leggiGiornaliera(await f.arrayBuffer());
     if (!g.data) throw new Error("Data della giornaliera non trovata nel file");
+    const aMap = Object.fromEntries(g.linee.flatMap((l) => l.aerei.map((a) => [a.sigla, a])));
+    const avNote = Object.entries(S.avarie).flatMap(([sig, arr]) => arr.filter((v) => g.data > v.d && aMap[sig]).map((v) => {
+      const st = aMap[sig].stato;
+      return st === "IN LINEA" ? `${sig} (${v.t}): in questa giornaliera risulta IN LINEA — resterà segnata come avaria finché non la chiudi.`
+        : `${sig} (${v.t}): confermata ferma (${stato(st)[1]}).`;
+    }));
     const d = $("#dlg");
     d.innerHTML = `<div class="dh"><div class="t"><b>Giornaliera del ${fd(g.data)}</b><div class="sub">${esc(f.name)}</div></div></div>
       <div class="db"><table>${g.linee.map((l) => `<tr><td>${esc(l.tipo)}</td><td>${l.aerei.length} aeromobili · ore mese ${fh(l.totMese)}</td></tr>`).join("")}</table>
       ${S.g && S.g.data > g.data ? `<p style="color:var(--warn)">È più vecchia di quella attuale (${fd(S.g.data)}): viene archiviata, la vista resta sull'ultima.</p>` : ""}
+      ${avNote.length ? `<div class="det-box" style="font-size:13px"><b>Avarie a mano coinvolte</b>${avNote.map((x) => `<div class="sub" style="margin-top:4px">• ${esc(x)}</div>`).join("")}</div>` : ""}
       <p><button class="btn pri" id="sv">Salva</button> <button class="btn" id="an">Annulla</button></p></div>`;
     $("#an").onclick = () => d.close();
     $("#sv").onclick = async () => {

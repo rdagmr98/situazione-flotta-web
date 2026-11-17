@@ -199,6 +199,31 @@
     return out;
   }
 
-  var api = { leggiGiornaliera: leggiGiornaliera, leggiPpl: leggiPpl, minuti: minuti, iso: iso };
+  // Classificazione pura di una macchina ferma in giornaliera:
+  // "alien" | "ind" | "altro" (cessioni) | "prog" (ispezioni, PTL, condizionali) | "corr" (avaria / correttivo) | null (IN LINEA con ore > 0)
+  var RX_ALIEN = /\bALIENAZION[EI]\b|\bFUORI\s+USO\b/i;
+  var RX_IND = /\bINDUSTRIA\b|\bREVISIONE\s+(?:GENERALE\s+)?IN\s+DITTA\b|\bIN\s+DITTA\b/i;
+  var RX_CESS = /\bCESSION[EI]\b|\bCEDUT[OA]\b/i;
+  var RX_PROG = /\bISP(?:EZ(?:IONE)?)?\.?\b|\b(?:INTERMEDIA|INTERM\.|MAGGIORE|MAGG\.|PERIODIC[AO]|CALENDARIC[AO]|PROGRAMMAT[AO]|CONDIZIONAL[EI]|COND\.|REVISIONE|PESATA)\b|\bP\.?\s*T\.?\s*L\.?\b|\b\d+\s*F?H\b|\bATTERRAGGIO\s+PESANTE\b/i;
+
+  function classificaFermo(a) {
+    var x = typeof a === "string" ? { stato: "DISPONIBILE", attivita: a } : (a || {});
+    var st = String(x.stato || "").toUpperCase().trim();
+    var att = String(x.attivita || "").trim();
+    if (st === "ALIENAZIONE" || RX_ALIEN.test(att)) return "alien";
+    if (st === "INDUSTRIA" || RX_IND.test(att)) return "ind";
+    if (st === "IN LINEA") { // efficiente, salvo ore a zero (anche se ricevuta in cessione)
+      var z = (x.scadenze || []).find(function (s) { return s.ore != null && s.ore <= 0; });
+      if (!z) return null;
+      return RX_PROG.test(z.tipo || "") ? "prog" : "corr";
+    }
+    if (RX_CESS.test(att)) return "altro";
+    var clean = att.replace(/\bSCATOLA\s+INTERMEDIA\b/gi, "SCATOLA_INT");
+    if (RX_PROG.test(clean)) return "prog";
+    // campo cessione senza testo: ceduta altrove; con testo vale il testo (una macchina ricevuta può essere in ispezione)
+    return !att && x.cessione && (x.cessione.a || x.cessione.da) ? "altro" : "corr";
+  }
+
+  var api = { leggiGiornaliera: leggiGiornaliera, leggiPpl: leggiPpl, minuti: minuti, iso: iso, classificaFermo: classificaFermo };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else g.Giornaliera = api;
 })(typeof window !== "undefined" ? window : globalThis);
