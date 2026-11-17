@@ -542,12 +542,12 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       return `<section class="pn ${cls}"><div class="ph">${titolo}</div><table class="mese">
         <thead><tr>${col.map(([k, h]) => `<th${k === "s" ? ' class="s"' : /lav|nx|man|nt/.test(k) ? ' class="tl"' : ""}>${h}</th>`).join("")}</tr></thead><tbody>${body}</tbody></table></section>`;
     };
-    const resH = `Ore residue${rtHead ? `<span>${esc(rtHead)}</span>` : ""}`, fVol = fermi.some((d) => d.w);
+    const resH = `Ore residue${rtHead ? `<span>${esc(rtHead)}</span>` : ""}`;
     const gc = Object.entries(cnt).filter(([k, n]) => k && n > 1).sort((a, b) => b[1] - a[1]).map(([k, n]) => `<b>${n}</b> ${esc(k)}`).join(" · ");
     const pVol = volano.length ? pannello(volano, "pv", `<span class="bg" style="color:#2e9d57">EFFICIENTI · ${volano.length}</span>`,
       [["s", "EI"], ["p", "Prog."], ["w", "Volate"], ["dv", pas ? "Diff." : "Da volare"], ["rs", resH], ["man", "Manutenzione"], ["nt", "Note"]]) : "";
     const pFer = fermi.length ? pannello(fermi, "pf", `<span class="bg" style="color:#b42318">FERMI · ${fermi.length}</span><span class="gs">${gc}</span>`,
-      [["s", "EI"], ["p", "Prog."], ...(fVol ? [["w", "Volate"]] : []), ["lav", "Manutenzione nel mese"], ["rs", resH], ["nx", "Prossima manutenzione"], ["nt", "Note"]]) : "";
+      [["s", "EI"], ["p", "Prog."], ["w", "Volate"], ["lav", "Manutenzione nel mese"], ["rs", resH], ["nx", "Prossima manutenzione"], ["nt", "Note"]]) : "";
     tab = `<div class="mp${!volano.length || !fermi.length ? " uno" : ""}">${pVol}${pFer}</div>`;
     K = [["Programmate", hh(T3[0]) || "0:00"], ["Volate", fut ? "" : fh(T3[1])], [pas ? "Differenza" : "Da volare", pas ? fh(T3[2]) : hh(T3[2]) || "0:00"]];
   }
