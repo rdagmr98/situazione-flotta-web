@@ -159,7 +159,6 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf thead th{overflow-wrap:normal;color:var(--m);font-weight:600;font-size:.75em;text-transform:uppercase;letter-spacing:.03em;border-bottom:2px solid var(--n);position:sticky;top:0;z-index:2}
 .bf thead th.og{color:var(--n);background:#fff4cc}
 .bf tbody tr:nth-child(even)>*{background:var(--z)}
-.bf tr:has(+.v)>td:not([rowspan]){border-bottom-color:transparent}
 .bf .s{position:sticky;left:0;z-index:1;font-size:1.2em;font-weight:700;color:var(--n)}
 .bf thead .s{z-index:3;font-size:.75em}
 .bf .s button{display:block;margin:.3em auto 0;font:inherit;font-size:.5em;font-weight:500;padding:.2em .5em;border-radius:6px;border:1px solid var(--l);background:#fff;color:var(--t);cursor:pointer}
@@ -169,7 +168,6 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .lav{font-weight:600;font-size:.85em;line-height:1.15}
 .bf .ed{cursor:pointer}
 .bf .ed:hover{box-shadow:inset 0 0 0 2px var(--n)}
-.bf .v td{color:var(--m)}
 .bf td small{display:block;font-size:.7em;color:var(--m)}
 .bf .nt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-align:left;font-size:.8em;line-height:1.2;color:var(--m)}
 .bf td input{width:100%;min-width:0;padding:.2em;margin:0;text-align:center;font:inherit;font-weight:600;color:var(--t);background:#fffbe6;border:1px solid #c9a227;border-radius:4px;color-scheme:light}
@@ -208,12 +206,12 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf .anno td,.bf .anno th{padding:.08em .26em}
 .bf .anno tbody tr:nth-child(even)>*{background:#fff}
 .bf .anno tbody tr.alt>*{background:var(--z)}
-.bf .anno tbody tr.sep>*{border-top:2px solid #cbd5e1}
 .bf .anno tbody tr>td.og,.bf .anno td.og{background:#fffbeb}
 .bf .anno tbody tr.alt>td.og{background:#fcf5d8}
 .bf .anno tfoot td.og{background:#f7ebc2}
 .bf .anno tfoot td{white-space:nowrap}
-.bf .anno td small.neg{color:#b42318}
+.bf .anno .rp{color:var(--m);opacity:.72;font-weight:400}
+.bf .anno .rp.neg{color:#b42318;font-weight:600}
 .bf .anno .s button{white-space:nowrap}
 .bf.mod .anno td,.bf.mod .anno th{padding:.06em .22em}
 .bf.mod .anno td input{padding:.08em .12em;line-height:1.15}
@@ -460,36 +458,74 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
   };
   const nota = (rs, t) => `<td rowspan="${rs}" title="${esc(t)}"><div class="nt">${esc(t)}</div></td>`;
   let tab, K;
-  if (z === "anno") { // per macchina due righe: sopra programmate e lavorazioni (celle unite sui mesi in cui continuano), sotto volate
+  if (z === "anno") { // per macchina una riga: in lettura ore residue (i mesi chiusi in parentesi/trasparenza riportano il residuo col suo segno al mese dopo), in Modifica ore editabili
     const mY = MESI_L.map((_, i) => y + "-" + String(i + 1).padStart(2, "0")), tp = mY.map(() => 0), tv = mY.map(() => null), y0 = m0.slice(0, 4);
-    const fmtTot = (v, p) => v == null || (!v && !p) ? "" : fh(v) + (p > 0 ? (y < y0 ? `<small class="${v < p ? "neg" : ""}">${(v > p ? "+" : "") + fh(v - p)}</small>` : `<small>${Math.round(100 * v / p)}%</small>`) : "");
+    const tc = mY.map(() => false), ta = mY.map(() => false); let totP = 0, totR = 0, hasTotR = false;
+    const fmtRp = (v, tip) => `<span class="rp${v < 0 ? " neg" : ""}"${tip ? ` title="${esc(tip)}"` : ""}>(${v > 0 ? "+" : ""}${fh(v)})</span>`;
     const righe = tutti.map(([l, a], ri) => {
       const s = a.sigla, r = rigaS(s, ed), v = Object.fromEntries(r), pr = mY.map((k) => Piano.pm(v[k])), vo = mY.map((k) => vol(s, k));
       const x = eff(a), fe = Piano.fermiPpl(r), lavs = fe.filter((f) => f.in < (+y + 1) + "-01-01" && f.out > y + "-01-01");
       const mot = x.c !== "eff" && x.m && !fe.some((f) => f.testo === x.m) ? x.m : "", P = pulisci(s, lavs, [...lavs.map((f) => f.testo), mot].filter(Boolean));
-      mY.forEach((_, i) => { tp[i] += pr[i]; if (vo[i] != null) tv[i] = (tv[i] || 0) + vo[i]; });
-      const skipV = Array(12).fill(false); let idx = 0;
+      const rm = !ed ? Piano.residui(r, m0, (k) => vol(s, k), mY[11]) : null;
+      mY.forEach((k, i) => {
+        if (vo[i] != null) tv[i] = (tv[i] || 0) + vo[i];
+        if (ed) { tp[i] += pr[i]; totP += pr[i]; return; }
+        const q = rm[k];
+        if (q) {
+          totP += q.pr + (i === 0 ? q.carry : 0);
+          if (!q.vuoto && q.res != null) { tp[i] += q.res; if (q.chiuso) tc[i] = true; else ta[i] = true; }
+        } else totP += pr[i];
+      });
+      let rowR = 0, rowHasR = false, rowClosed = true;
+      if (ed) { rowR = som(pr); rowHasR = !!rowR; }
+      else mY.forEach((k) => {
+        const q = rm[k]; if (!q || q.vuoto || q.res == null) return;
+        const mNx = Piano.piuMesi(k, 1), assorbito = q.chiuso && mNx.slice(0, 4) === y && rm[mNx] && q.vol != null;
+        if (y >= y0 ? !q.chiuso : !assorbito) { rowR += q.res; rowHasR = true; if (!q.chiuso) rowClosed = false; }
+      });
+      if (!ed && rowHasR) { totR += rowR; hasTotR = true; }
       const cel = (c) => {
-        const ore = cOre(s, c), gd = +(c.dal ? P.gi[c.dal] || c.dal : "").slice(8), span2 = !!c.lav && !ore && mY.slice(idx, idx + c.n).every((_, k) => { const j = idx + k; return vo[j] == null || (!vo[j] && !pr[j]); });
-        if (span2) for (let k = 0; k < c.n; k++) skipV[idx + k] = true;
-        idx += c.n;
+        const gd = +(c.dal ? P.gi[c.dal] || c.dal : "").slice(8), q = rm && rm[c.m];
+        let ore = "", tip = "", neg = false;
+        if (ed) ore = cOre(s, c);
+        else if (q && !q.vuoto) {
+          if (q.chiuso) {
+            if (q.vol == null) ore = q.eff ? `<span class="rp" title="Nessuna giornaliera in ${nMese(c.m)}">${fh(q.eff)}</span>` : "";
+            else {
+              tip = `Prog. ${fh(q.pr)}${q.carry ? ` (${q.carry > 0 ? "+" : ""}${fh(q.carry)})` : ""} · Volate ${fh(q.vol)} · Residuo ${(q.res > 0 ? "+" : "") + fh(q.res)}`;
+              ore = fmtRp(q.res, tip);
+            }
+          } else {
+            neg = q.res < 0;
+            if (c.m === m0 || q.carry) tip = `Prog. ${fh(q.pr)}${q.carry ? ` (${q.carry > 0 ? "+" : ""}${fh(q.carry)} da mese prec.)` : ""}${q.vol != null ? ` · Volate ${fh(q.vol)}` : ""} · Residue ${fh(q.res)}`;
+            ore = fh(q.res);
+          }
+        }
         const og = !c.lav && c.m === m0 ? " og" : "";
-        return !c.lav ? `<td class="p${og}">${ore}</td>`
-          : `<td colspan="${c.n}"${span2 ? ' rowspan="2"' : ""} class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(c.lav)}" title="${esc(c.lav)}">${ore}${ore ? "<br>" : ""}<span class="lt">${esc(breve(c.lav))}${gd > 1 ? " dal " + gd : ""}</span></td>`;
+        return !c.lav ? `<td class="p${og}${neg ? " neg" : ""}"${tip ? ` title="${esc(tip)}"` : ""}>${ore}</td>`
+          : `<td colspan="${c.n}" class="lav${ed ? " ed" : ""}"${lv(s)} style="${lc(c.lav)}" title="${esc(c.lav + (tip ? " · " + tip : ""))}">${neg ? `<span class="neg">${ore}</span>` : ore}${ore ? "<br>" : ""}<span class="lt">${esc(breve(c.lav))}${gd > 1 ? " dal " + gd : ""}</span></td>`;
       };
-      const cls1 = [ri > 0 && "sep", ri % 2 && "alt"].filter(Boolean).join(" "), cls2 = ["v", ri % 2 && "alt"].filter(Boolean).join(" ");
-      const totPr = som(pr), totVo = vo.some((x) => x != null) ? som(vo) : null;
+      const cls = ri % 2 ? ' class="alt"' : "";
       const grp = linee.length > 1 && (ri === 0 || tutti[ri - 1][0] !== l) ? `<tr class="grp"><th colspan="15">${esc(l.tipo)}</th></tr>` : ""; // tipo in una riga di gruppo, non sotto ogni sigla
-      return `${grp}<tr${cls1 ? ` class="${cls1}"` : ""}>${th(l, a, 2)}${Piano.celleMesi(r, mY).map(cel).join("")}<td class="p">${hh(totPr)}</td>${nota(2, [mot, P.nt].filter(Boolean).join(" · "))}</tr>
-       <tr class="${cls2}">${vo.map((x, i) => skipV[i] ? "" : `<td${mY[i] === m0 ? ' class="og"' : ""}>${x == null || (!x && !pr[i]) ? "" : fh(x)}</td>`).join("")}<td>${fmtTot(totVo, totPr)}</td></tr>`;
+      const totCell = ed ? hh(rowR) : !rowHasR ? "" : rowClosed ? fmtRp(rowR) : `<span${rowR < 0 ? ' class="neg"' : ""}>${fh(rowR)}</span>`;
+      return `${grp}<tr${cls}>${th(l, a, 1)}${Piano.celleMesi(r, mY).map(cel).join("")}<td class="p">${totCell}</td>${nota(1, [mot, P.nt].filter(Boolean).join(" · "))}</tr>`;
     });
-    const totP = som(tp), totV = tv.every((x) => x == null) ? null : som(tv);
-    const k3 = y < y0 || (totV || 0) > totP ? ["Differenza", totV == null ? "–" : fh(totV - totP)] : ["Da volare nell'anno", hh(totP - (totV || 0)) || "0:00"];
+    const totV = tv.every((x) => x == null) ? null : som(tv);
+    const k3 = ed ? (y < y0 || (totV || 0) > totP ? ["Differenza", totV == null ? "–" : fh(totV - totP)] : ["Da volare nell'anno", hh(totP - (totV || 0)) || "0:00"])
+      : y < y0 ? ["Residuo nell'anno", !hasTotR ? "–" : (totR > 0 ? "+" : "") + fh(totR)]
+      : totR < 0 ? ["Differenza", fh(totR)] : ["Da volare nell'anno", hh(totR) || "0:00"];
     const cols = `<col style="width:${ed ? "6.2em" : "7%"}">${"<col>".repeat(12)}<col style="width:6.5%"><col style="width:13%">`;
     K = [["Programmate nell'anno", hh(totP) || "0:00"], ["Volate nell'anno", totV == null ? "–" : hh(totV)], k3];
     const head = `<th class="s">EI</th>${mY.map((k) => `<th class="${k === m0 ? "og" : ""}">${MESI_L[+k.slice(5) - 1].slice(0, 3)}</th>`).join("")}<th>Totale</th><th>Note</th>`;
-    const foot = `<tr><th class="s">Programmate</th>${tp.map((x, i) => `<td${mY[i] === m0 ? ' class="og"' : ""}>${hh(x)}</td>`).join("")}<td>${hh(totP)}</td><td rowspan="2"></td></tr>
-      <tr><th class="s">Volate</th>${tv.map((x, i) => `<td${mY[i] === m0 ? ' class="og"' : ""}>${x == null ? "" : fh(x)}</td>`).join("")}<td>${fmtTot(totV, totP)}</td></tr>`;
+    const footC = mY.map((k, i) => {
+      const og = k === m0;
+      if (ed) return `<td${og ? ' class="og"' : ""}>${hh(tp[i])}</td>`;
+      if (ta[i]) { const cls = [og && "og", tp[i] < 0 && "neg"].filter(Boolean).join(" "); return `<td${cls ? ` class="${cls}"` : ""}>${fh(tp[i])}</td>`; }
+      if (tc[i]) return `<td${og ? ' class="og"' : ""}>${fmtRp(tp[i])}</td>`;
+      return `<td${og ? ' class="og"' : ""}></td>`;
+    }).join("");
+    const footTot = ed ? hh(totP) : !hasTotR ? "" : y < y0 ? fmtRp(totR) : `<span${totR < 0 ? ' class="neg"' : ""}>${fh(totR)}</span>`;
+    const foot = `<tr><th class="s">${ed ? "Programmate" : "Ore residue"}</th>${footC}<td>${footTot}</td><td></td></tr>`;
     tab = `<table class="anno" style="min-width:max(58em,780px)"><colgroup>${cols}</colgroup><thead><tr>${head}</tr></thead><tbody>${righe.join("")}</tbody><tfoot>${foot}</tfoot></table>`;
   } else { // Mese: due pannelli (efficienti a sinistra, fermi a destra), righe di gruppo per tipo se la flotta ne ha più d.uno
     const pas = m < m0, fut = m > m0, fm = Piano.primoDopo(m), T3 = [0, 0, 0];
@@ -499,7 +535,9 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       return !b ? "da " + a : b === a ? a : a + " – " + b; }; // 23/11 – dic 2026, gen – feb 2027, da gen 2027 (senza fine)
     const normRt = (t) => String(t || "").toUpperCase().replace(/\bISP\.?\s*/g, "ISP. ").replace(/(\d)\s*H\.?\b/g, "$1 H").replace(/\s+/g, " ").replace(/\.+$/, "").trim();
     const dati = tutti.map(([l, a]) => {
-      const s = a.sigla, x = eff(a), r = rigaS(s, ed), c = Piano.celleMesi(r, [m])[0], p = Piano.pm(Object.fromEntries(r)[m]), w = vol(s, m), [rs, rt0] = residuo(a);
+      const s = a.sigla, x = eff(a), r = rigaS(s, ed), c = Piano.celleMesi(r, [m])[0], qm = !ed ? Piano.residui(r, m0, (k) => vol(s, k), m)[m] : null;
+      const p = qm ? qm.eff : Piano.pm(Object.fromEntries(r)[m]), w = vol(s, m), [rs, rt0] = residuo(a);
+      const pTip = qm && qm.carry ? `PPL ${fh(qm.pr)} ${(qm.carry > 0 ? "+" : "") + fh(qm.carry)} da ${nMese(Piano.piuMesi(m, -1)).toLowerCase()}` : "";
       const rt = normRt(rt0), dv = pas ? (w == null ? null : w - p) : Math.max(p - (w || 0), 0), fe = Piano.fermiPpl(r);
       const f = fe.find((x) => x.in < fm && x.out > m + "-01"), nx = fe.find((x) => x.in >= fm && x !== f);
       const mot = f ? breve(f.testo) : x.m ? breve(x.m) : "";
@@ -508,7 +546,7 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       const xmExtra = m === m0 && f && x.c !== "eff" && x.m && !P.rid(x.m) ? x.m : "";
       const nt = [xmExtra, P.nt].filter(Boolean).join(" · ");
       T3[0] += p; T3[1] += w || 0; T3[2] += dv || 0;
-      return { l, a, s, x, c, p, w, rs, rt, dv, f, fIn, nx, nxIn, mot, nt };
+      return { l, a, s, x, c, p, pTip, w, rs, rt, dv, f, fIn, nx, nxIn, mot, nt };
     });
     const cRes = (rs) => {
       if (rs == null) return "";
@@ -531,7 +569,7 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
       const [man, manP] = d.f ? [lav, lavP] : voce(nxObj, false); // efficienti: la manutenzione del mese se c'è, altrimenti la prossima
       return {
         s: `<th class="s${ed ? " ed" : ""}" title="${esc(thTitle)}"${ed ? ` data-lv="${esc(d.s)}"` : ` data-d="${esc(d.s)}"`} style="background:${bg};color:${fg}">${esc(d.s)}${ed ? `<button data-lv="${esc(d.s)}">Lavorazioni</button>` : ""}</th>`,
-        p: `<td class="p">${cOre(d.s, { ...d.c, ore: d.c.lav ? d.c.ore : d.p })}</td>`,
+        p: `<td class="p"${d.pTip ? ` title="${esc(d.pTip)}"` : ""}>${cOre(d.s, { ...d.c, ore: d.c.lav ? (d.c.ore ? d.p : null) : (ed ? d.c.ore : d.p) })}</td>`,
         w: `<td>${fut || d.w == null || (!d.w && !d.p) ? "" : fh(d.w)}</td>`,
         dv: `<td class="dv${d.dv < 0 ? " neg" : ""}">${d.dv == null ? "" : pas ? fh(d.dv) : hh(d.dv)}</td>`,
         rs: `<td class="nw" title="${esc(d.rt)}">${cRes(d.rs)}</td>`,
@@ -561,7 +599,7 @@ function tavola(fl, z, m, ed) { // PPL di una flotta: z "mese" | "anno", m "AAAA
     K = [["Programmate", hh(T3[0]) || "0:00"], ["Volate", fut ? "" : fh(T3[1])], [pas ? "Differenza" : "Da volare", pas ? fh(T3[2]) : hh(T3[2]) || "0:00"]];
   }
   const ml = MESI_L[+m.slice(5) - 1], tt = `<div class="tt"><img src="img/${tipo(linee[0].tipo)[0]}.webp" alt=""><h1><span>PPL</span>${esc(fl)}</h1>
-    <div><b>${z === "anno" ? "Anno " + y : ml[0] + ml.slice(1).toLowerCase() + " " + y}</b>giornaliera del ${fd(g.data)}${z === "anno" ? " · in grigio le ore volate" : ""}</div></div>
+    <div><b>${z === "anno" ? "Anno " + y : ml[0] + ml.slice(1).toLowerCase() + " " + y}</b>giornaliera del ${fd(g.data)}${z === "anno" && !ed ? " · ore residue (tra parentesi i mesi chiusi)" : ""}</div></div>
     <div class="kp">${[...K, ["Efficienti oggi (in verde)", E + " su " + T]].map(([a, b]) => `<div><span>${a}</span><b>${b || "&nbsp;"}</b></div>`).join("")}</div>`;
   return { tt, tab };
 }

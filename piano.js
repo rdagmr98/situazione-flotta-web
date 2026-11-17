@@ -76,6 +76,30 @@
       .sort(function (a, b) { return a[0] < b[0] ? -1 : 1; });
   }
 
-  var api = { addG: addG, pplMesi: pplMesi, fermiPpl: fermiPpl, celleMesi: celleMesi, piuMesi: piuMesi, pm: pm, modello: modello, riga: riga, primoDopo: primoDopo, conGiornaliera: conGiornaliera };
+  // ore residue mese per mese: ogni mese chiuso (m < m0, con volato noto) riporta il residuo col suo segno nel mese successivo;
+  // una lavorazione senza ore programmate (o mese null) azzera il riporto.
+  // vol: { "AAAA-MM": minuti } o fn(m) -> minuti|null. Ritorna { "AAAA-MM": { pr, carry, eff, vol, res, chiuso, vuoto } }
+  function residui(mesi, m0, vol, fin) {
+    if (!mesi.length) return {};
+    var val = {}, fe = fermiPpl(mesi), out = {}, carry = 0, getV = typeof vol === "function" ? vol : function (m) { return vol && vol[m] != null ? vol[m] : null; };
+    mesi.forEach(function (x) { val[x[0]] = x[1]; });
+    var last = mesi[mesi.length - 1][0], stop = fin && fin < last ? fin : last;
+    for (var m = mesi[0][0]; m <= stop; m = piuMesi(m, 1)) {
+      var raw = val[m], pr = pm(raw);
+      var f = fe.some(function (x) { return x.in < primoDopo(m) && x.out > m + "-01"; });
+      if (raw == null || (f && !pr)) { carry = 0; continue; }
+      var v = m > m0 ? null : getV(m), chiuso = m < m0;
+      if (chiuso && v == null) {
+        out[m] = { pr: pr, carry: carry, eff: pr + carry, vol: null, res: null, chiuso: true, vuoto: !pr && !carry };
+        carry = 0; continue;
+      }
+      var eff = pr + carry, vuoto = !pr && !carry && !(v > 0), res = eff - (v || 0);
+      out[m] = { pr: pr, carry: carry, eff: eff, vol: v, res: res, chiuso: chiuso, vuoto: vuoto };
+      carry = chiuso ? res : 0;
+    }
+    return out;
+  }
+
+  var api = { addG: addG, pplMesi: pplMesi, fermiPpl: fermiPpl, celleMesi: celleMesi, piuMesi: piuMesi, pm: pm, modello: modello, riga: riga, primoDopo: primoDopo, conGiornaliera: conGiornaliera, residui: residui };
   if (typeof module !== "undefined" && module.exports) module.exports = api; else g.Piano = api;
 })(typeof window !== "undefined" ? window : globalThis);
