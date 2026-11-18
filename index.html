@@ -248,12 +248,13 @@ color:var(--t);background:#fff;height:100dvh;display:flex;flex-direction:column;
 .bf.mod .anno .lav .lt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:.12em}
 .bf tfoot .s{font-size:.75em;overflow-wrap:normal;white-space:nowrap}
 @media (max-width:700px){.bf .tt div,.bf .ctl i{display:none}.bf .kp{flex-wrap:wrap}.bf .kp div{flex-basis:40%}}
+.bf.pr{width:1060px;height:720px} /* solo mentre si stampa: adatta() misura su A4 orizzontale */
 @media print{
-.bf{height:auto;font-size:11px}
+.bf{height:auto!important;width:auto!important}.bf .tw{overflow:visible}
 :root{--bg:#fff;--card:#fff;--card2:#f3f4f6;--line:#ccc;--tx:#000;--mu:#555}
 .noprint,header .btn{display:none!important}
 body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-@page{size:landscape}
+@page{size:A4 landscape;margin:8mm}
 }
 </style>
 </head>
@@ -821,7 +822,7 @@ function renderBrief() {
     <span class="nav">${ZOOM.map(([k, n]) => `<button data-z="${k}" class="${k === z ? "on" : ""}">${n}</button>`).join("")}
      <button data-y="-1" title="Prima (freccia sinistra)">‹</button><b>${z === "anno" ? m.slice(0, 4) : nMese(m)}</b><button data-y="1" title="Dopo (freccia destra)">›</button></span><span class="sp"></span>
     ${S.mod ? `<i>Scrivi le ore nelle celle gialle, le lavorazioni da «Lavorazioni»</i><label>Importa PPL<input type="file" accept=".xlsx" id="fp" hidden></label><button id="an">Annulla</button><button id="sv" class="on">Salva${nb ? ` (${nb})` : ""}</button>`
-      : KIOSK ? "" : `<button id="fs">Schermo intero</button><button id="ed">Modifica</button><button id="fv">Flotta</button>`}</div>
+      : KIOSK ? "" : `<button id="fs">Schermo intero</button><button id="pr">Stampa</button><button id="ex" title="PPL in CSV per Excel">Esporta</button><button id="ed">Modifica</button><button id="fv">Flotta</button>`}</div>
    ${t.tt}<div class="tw">${t.tab}</div></div>`;
   document.querySelectorAll("[data-fl]").forEach((b) => b.onclick = () => { S.bf = b.dataset.fl; ls("sf_bf", S.bf); render(); });
   document.querySelectorAll("[data-z]").forEach((b) => b.onclick = () => { S.zoom = b.dataset.z; ls("sf_zoom", S.zoom); render(); });
@@ -836,6 +837,19 @@ function renderBrief() {
   if (S.mod) { $("#sv").onclick = salvaTutto; $("#an").onclick = () => { S.bozza = {}; S.mod = false; render(); }; $("#fp").onchange = importaPpl; return; }
   $("#fs").onclick = () => document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen();
   $("#ed").onclick = () => { S.mod = true; render(); }; $("#fv").onclick = () => vai("");
+  $("#pr").onclick = () => print(); $("#ex").onclick = () => esportaPpl(fl, m.slice(0, 4));
+}
+addEventListener("beforeprint", () => { const bf = $(".bf"); if (bf) { bf.classList.add("pr"); adatta(bf, zoom(), 6); } }); // anche con Ctrl+P
+addEventListener("afterprint", () => { if ($(".bf")) render(); });
+function esportaPpl(fl, y) { // CSV per Excel italiano (; e BOM): una riga per macchina, come nel foglio PPL (ore, o la lavorazione nel mese in cui inizia)
+  const q = (v) => `"${String(v).replace(/"/g, '""')}"`, h = (v) => String(+(v / 60).toFixed(2)).replace(".", ",");
+  const cella = (v) => v == null ? "" : Array.isArray(v) ? v[0] + (v[1] > 1 ? " dal " + v[1] : "") + (v[2] ? " + " + h(v[2]) + " h" : "") : h(v);
+  const ri = Object.keys(S.ppl).filter((k) => k.endsWith("|" + y) && gruppo(k.split("|")[0]) === fl)
+    .flatMap((k) => Object.entries(S.ppl[k].righe).map(([s, r]) => [s, k.split("|")[0], ...MESI_L.map((_, i) => cella(r[String(i + 1).padStart(2, "0")]))]));
+  if (!ri.length) return toast(`Nessuna PPL ${fl} ${y}`);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob(["\ufeff" + [["EI", "Tipo", ...MESI_L.map((x) => x.slice(0, 3))], ...ri].map((r) => r.map(q).join(";")).join("\r\n")], { type: "text/csv" }));
+  a.download = `PPL ${fl} ${y}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 1e4);
 }
 function dlgLav(s) { // lavorazioni di una macchina, in bozza: si scrivono con «Salva» della PPL
   const b = bozza(s), d = $("#dlg"), m0 = S.g.data.slice(0, 7);
