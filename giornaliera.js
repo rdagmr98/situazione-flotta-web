@@ -110,13 +110,23 @@
       };
       ["R", "S", "S2"].forEach(function (k) {
         if (L[k] === undefined || !c(r, k)) return;
+        // UH-169 dal 18/11/2026: intestazione «PROSSIMO L.I.C. e L.O.F. ISP.400H 1 ANNO», in prima riga la data (L.I.C.),
+        // poi una riga di giorni non affidabile (date del 1900, «DISP.»), poi le ore (L.O.F.): due scadenze, a ore e a data
+        var h = /L\.?\s*I\.?\s*C[\s\S]*?ISP\.?\s*(\d+)\s*H\s*(.*)$/i.exec(head[L[k]] || "");
+        if (h) {
+          var t = "ISP. " + h[1] + " H", lof = blk.slice(1).map(function (x) { return c(x, k); }).filter(function (x) { return minuti(x) !== null; })[0];
+          if (lof) a.scadenze.push({ tipo: t, raw: lof, ore: minuti(lof) });
+          if (iso(c(r, k))) a.scadenze.push({ tipo: t + (h[2].trim() ? " · " + h[2].trim() : ""), raw: c(r, k), data: iso(c(r, k)) });
+          return;
+        }
         var raw = dopo(k), s = { tipo: c(r, k), raw: raw };
         if (iso(raw)) s.data = iso(raw); else if (minuti(raw) !== null) s.ore = minuti(raw);
         a.scadenze.push(s);
       });
       if (twin) ["T", "U"].forEach(function (k) { if (c(r, k)) a.motori.push({ sn: c(r, k), fh: minuti(dopo(k)) }); });
       else if (c(r, "U")) a.motori.push({ tipo: c(r, "T"), sn: c(r, "U"), fh: minuti(c(r, "V")) });
-      if (c(r, "Z") || c(r, "X")) a.cessione = { da: c(r, "Z"), a: c(r, "X"), dal: iso(dopo("Z")) };
+      if (c(r, "Z") || c(r, "X")) a.cessione = iso(c(r, "Z")) // UH-169: data in prima riga, da/a sotto (gli altri fogli al contrario)
+        ? { da: dopo("Z"), a: dopo("X"), dal: iso(c(r, "Z")) } : { da: c(r, "Z"), a: c(r, "X"), dal: iso(dopo("Z")) };
       aerei.push(a);
       blk = null;
     };
