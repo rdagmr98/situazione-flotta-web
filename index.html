@@ -125,6 +125,7 @@ dialog::backdrop{background:#000a}
 .det-av-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 8px}
 .det-av-row>div{flex:1;min-width:140px;overflow-wrap:anywhere}
 .det-av-act{display:flex;gap:6px;align-items:center;flex:none}
+.chiedi{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;margin:0 0 10px;padding:10px 12px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:10px;font-size:14px}
 .av-warn{color:var(--warn);font-size:12px;font-weight:600;margin-top:2px}
 .av-sug{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px}
 .av-sug button{border:1px solid var(--line);background:var(--bg);color:var(--tx);padding:5px 9px;border-radius:8px;font:inherit;font-size:12px;cursor:pointer;text-align:left}
@@ -330,7 +331,7 @@ function avarieMan(sigla) {
   if (o && !o.e && S.g && o.d >= S.g.data) list.push({ d: o.d, t: o.m || "Segnalata a mano", ppl: o.ppl, _src: "stati", _i: 0 });
   return list;
 }
-function eff(a, opt = true) { // { c, kind, m, da, man, av, smentita, confermata }
+function eff(a, opt = true) { // { c, kind, m, da, man, av, confermata, chiedi }
   if (!vive(a)) return { c: "alien", kind: "alien", m: "", da: "" };
   const aMano = typeof opt === "boolean" ? opt : opt.aMano !== false;
   const brief = typeof opt === "object" && !!opt.brief;
@@ -343,13 +344,16 @@ function eff(a, opt = true) { // { c, kind, m, da, man, av, smentita, confermata
     auto = z ? { c: "ineff", kind: gKind || "prog", m: "ore a zero, " + z.tipo, da: "" } : { c: "eff", kind: "eff", m: "", da: "" };
   }
   if (!aMano) return auto;
-  const avAll = avarieMan(a.sigla), avVis = brief ? avAll.filter((v) => v.ppl !== false) : avAll;
+  const avAll = avarieMan(a.sigla);
+  // la giornaliera comanda: se dopo l'avaria dà la macchina IN LINEA è efficiente, e l'app chiede «risolta?» finché non rispondi (No = ok: data giornaliera)
+  const chiedi = auto.c === "eff" ? avAll.filter((v) => S.g.data > v.d && !(v.ok >= S.g.data)) : [];
+  const avVis = avAll.filter((v) => !chiedi.includes(v) && !(brief && v.ppl === false));
   const o = S.stati[a.sigla];
-  if (o && o.e && S.g && o.d >= S.g.data && !avVis.length) return { c: "eff", kind: "eff", m: o.m, da: o.d, man: o };
-  if (!avVis.length) return auto;
+  if (o && o.e && S.g && o.d >= S.g.data && !avVis.length) return { c: "eff", kind: "eff", m: o.m, da: o.d, man: o, chiedi };
+  if (!avVis.length) return { ...auto, chiedi };
   const av0 = avVis[0], daMin = [auto.da, ...avVis.map((v) => v.d)].filter(Boolean).sort()[0] || "";
   if (auto.c === "eff") {
-    return { c: "ineff", kind: "corr", m: avVis.map((v) => v.t).join(" · "), da: daMin, man: av0, av: avVis, smentita: S.g.data > av0.d };
+    return { c: "ineff", kind: "corr", m: avVis.map((v) => v.t).join(" · "), da: daMin, man: av0, av: avVis, chiedi };
   }
   const conf = S.g.data > av0.d;
   if (conf && auto.kind !== "corr") {
@@ -395,8 +399,12 @@ async function carica() {
   const mesi = Object.keys(um).filter((m) => a0 && m >= a0 && m < m1);
   S.vol = Object.fromEntries(await Promise.all(mesi.map(async (m) => [m, oreG((await leggi("giornaliere/" + um[m])).data)])));
   S.vol[m1] = oreG(S.g);
+  // mese con giornaliere incomplete (es. ottobre 2026 solo al 7): volato = ore totali a inizio mese dopo − a inizio mese
+  for (const m of mesi) { const a = S.vol[m], b = S.vol[Piano.piuMesi(m, 1)];
+    if (b) for (const s in a.o) if (a.i[s] != null && b.i[s] != null) a.o[s] = Math.max(a.o[s], b.i[s] - a.i[s]); }
 }
-const oreG = (g) => ({ d: g.data, o: Object.fromEntries(g.linee.flatMap((l) => l.aerei.map((a) => [a.sigla, a.oreMese || 0]))) });
+const oreG = (g) => { const ae = g.linee.flatMap((l) => l.aerei); // o = ore del mese, i = ore totali a inizio mese
+  return { d: g.data, o: Object.fromEntries(ae.map((a) => [a.sigla, a.oreMese || 0])), i: Object.fromEntries(ae.filter((a) => a.oreTot != null).map((a) => [a.sigla, a.oreTot - (a.oreMese || 0)])) }; };
 async function aggiorna(file, sigla, fn) { // rilegge, modifica, scrive: le modifiche dell'altro dispositivo non si perdono
   const cur = (await leggi(file + ".json")).data || {};
   const v = fn(cur[sigla]);
@@ -431,6 +439,7 @@ const conPpl = (n, on) => { const r = { ...n }; if (on) delete r.ppl; else r.ppl
 const notaPpl = (n, on) => on ? { d: n.d, t: n.t } : { d: n.d, t: n.t, ppl: false };
 const invPpl = (idx) => (arr = []) => arr.map((n, i) => i === idx ? conPpl(n, n.ppl === false) : n);
 const btnPpl = (n, kind, idx, s) => `<button class="np-b${n.ppl === false ? " off" : ""}" data-ppl-k="${kind}" data-ppl-i="${idx}"${s ? ` data-ppl-s="${esc(s)}"` : ""} type="button" title="Mostra o nascondi al briefing (PPL)">${n.ppl === false ? "No PPL" : "PPL"}</button>`;
+const ancoraFerma = (sigla, v) => aggiorna("avarie", sigla, (arr = []) => arr.map((x, i) => i === v._i && x.t === v.t && x.d === v.d ? { ...x, ok: S.g.data } : x));
 async function chiudiAvaria(sigla, item, reopenDet = false) {
   const snap = item._src === "stati" ? { ...(S.stati[sigla] || {}) } : { d: item.d, t: item.t, ...(item.ppl === false ? { ppl: false } : {}) };
   const fn = item._src === "stati"
@@ -473,10 +482,10 @@ function vistaFrase(err) {
 }
 function oggiPage(g, ann, nn) {
   const corr = g.linee.flatMap((l) => l.aerei.map((a) => ({ l, a, x: eff(a) })).filter(({ x }) => x.kind === "corr"))
-    .sort((u, v) => (!!v.x.smentita - !!u.x.smentita) || (!!(v.x.av && v.x.av.length) - !!(u.x.av && u.x.av.length)) || (u.x.da || "9999").localeCompare(v.x.da || "9999") || u.a.sigla.localeCompare(v.a.sigla));
+    .sort((u, v) => (!!(v.x.av && v.x.av.length) - !!(u.x.av && u.x.av.length)) || (u.x.da || "9999").localeCompare(v.x.da || "9999") || u.a.sigla.localeCompare(v.a.sigla));
   const avHtml = corr.map(({ l, a, x }) => {
     const [, stL, stT] = catVis(x), av0 = x.av && x.av[0], gg = txtGg(x.da), dt = x.da ? (gg ? gg + " · " : "") + "dal " + fd(x.da).slice(0, 5) : "in giorn. " + fd(g.data).slice(0, 5);
-    const meta = [dt, x.smentita ? "In giorn. risulta IN LINEA" : "", x.confermata ? "Confermata da giorn." : ""].filter(Boolean).join(" · ");
+    const meta = [dt, x.confermata ? "Confermata da giorn." : ""].filter(Boolean).join(" · ");
     const btnClose = av0 ? `<button class="btn btn-xs" type="button" data-close-av="${esc(a.sigla)}" data-av-src="${av0._src}" data-av-i="${av0._i}" data-av-d="${esc(av0.d)}" data-av-t="${esc(av0.t)}" title="Chiudi avaria in 1 tocco">Risolta</button>` : "";
     return `<div class="row nr" data-s="${esc(a.sigla)}" style="--lv:var(--ko)" title="${esc(stT)}">
       <div class="a"><b>${esc(a.sigla)}</b><span class="sub">${esc(l.tipo)}</span></div>
@@ -511,11 +520,14 @@ function render() {
   if (S.pag === "brief") return renderBrief();
   const [E, T, P] = conta(g.linee.flatMap((l) => l.aerei));
   const nAv = g.linee.flatMap((l) => l.aerei).filter((a) => eff(a).kind === "corr").length;
+  const dom = g.linee.flatMap((l) => l.aerei.flatMap((a) => (eff(a).chiedi || []).map((v) => ({ a, v }))));
   const pag = ["note", ...g.linee.map((l) => l.tipo)], k0 = pag.indexOf(S.flotta), i = k0 < 0 ? 1 : k0;
   const N = nascoste(), tutte = g.linee.flatMap((l) => l.aerei.filter((a) => (S.note[a.sigla] && S.note[a.sigla].length) || (eff(a).man && eff(a).c === "eff")).map((a) => [l, a]));
   const ann = tutte.filter(([, a]) => N[a.sigla] !== firma(a.sigla)), nn = tutte.length - ann.length;
   $("#app").innerHTML = `<header><h1>Situazione flotta</h1><button class="btn pri" id="bb">PPL</button>${imp}
     <div class="sub" style="flex-basis:100%">Giornaliera del <b>${fd(g.data)}</b> · efficienti ${E} su ${T} (${P}%)${nAv ? ` · <span style="color:var(--ko);font-weight:600">${nAv} avari${nAv === 1 ? "a" : "e"}</span>` : ""}</div></header>
+   ${dom.map(({ a, v }, i) => `<div class="chiedi"><span><b>${esc(a.sigla)}</b> · avaria «${esc(v.t)}» del ${fd(v.d).slice(0, 5)}: la giornaliera del ${fd(g.data).slice(0, 5)} la dà IN LINEA. Risolta?</span>
+     <span class="det-av-act"><button class="btn btn-xs pri" type="button" data-ch-si="${i}">Sì, risolta</button><button class="btn btn-xs" type="button" data-ch-no="${i}">No, ancora ferma</button></span></div>`).join("")}
    <nav class="tabs"><button data-p="0" style="--c:#7aa2ff"><b>Oggi</b>${nAv ? `<span style="color:var(--ko)">${nAv}</span>` : ann.length}</button>${g.linee.map((x, k) => { const [a, b] = conta(x.aerei);
      return `<button data-p="${k + 1}" style="--c:${tipo(x.tipo)[1]}"><b>${esc(x.tipo)}</b>${a}/${b}</button>`; }).join("")}</nav>
    <div class="pager" id="pg">${oggiPage(g, ann, nn)}${g.linee.map(pagina).join("")}</div>
@@ -539,6 +551,9 @@ function render() {
     catch (e) { toast(e.message); b.disabled = false; } });
   document.querySelectorAll("[data-close-av]").forEach((b) => b.onclick = (ev) => { ev.stopPropagation(); b.disabled = true;
     chiudiAvaria(b.dataset.closeAv, { _src: b.dataset.avSrc, _i: +b.dataset.avI, d: b.dataset.avD, t: b.dataset.avT }); });
+  document.querySelectorAll("[data-ch-si]").forEach((b) => b.onclick = () => { b.disabled = true; const { a, v } = dom[+b.dataset.chSi]; chiudiAvaria(a.sigla, v); });
+  document.querySelectorAll("[data-ch-no]").forEach((b) => b.onclick = () => { b.disabled = true; const { a, v } = dom[+b.dataset.chNo];
+    ancoraFerma(a.sigla, v).then(render, (e) => { toast(e.message); b.disabled = false; }); });
   if ($("#rn")) $("#rn").onclick = () => { ls("sf_nascoste", "{}"); render(); };
   $("#file").onchange = importa;
   $("#bb").onclick = () => vai("brief");
@@ -871,7 +886,7 @@ function fermoRow(a) {
   const x = eff(a), [c, s] = catVis(x), h = disp(a), du = scadDataUrg(a), note = S.note[a.sigla] || [];
   const av0 = x.av && x.av[0], gg = x.kind === "corr" ? txtGg(x.da) : "";
   const daTxt = x.da ? (gg ? gg + " · " : "") + "dal " + fd(x.da).slice(0, 5) : x.kind === "corr" ? "in giorn. " + fd(S.g.data).slice(0, 5) : "";
-  const meta = [a.perc, a.fine && "fine " + a.fine, !a.perc && !a.fine && daTxt, x.smentita ? "In giorn. IN LINEA" : ""].filter(Boolean).join(" · ");
+  const meta = [a.perc, a.fine && "fine " + a.fine, !a.perc && !a.fine && daTxt].filter(Boolean).join(" · ");
   const last = note.length ? note[note.length - 1] : null;
   const btnR = av0 ? `<button class="btn btn-xs" type="button" data-close-av="${esc(a.sigla)}" data-av-src="${av0._src}" data-av-i="${av0._i}" data-av-d="${esc(av0.d)}" data-av-t="${esc(av0.t)}" title="Chiudi avaria in 1 tocco">Risolta</button>` : "";
   return `<div class="frow" role="button" tabindex="0" data-s="${esc(a.sigla)}" style="--st:var(--${c})">
@@ -959,14 +974,15 @@ function dettaglio(sigla) {
     return u.ore != null ? -1 : v.ore != null ? 1 : 0;
   });
   const avHtml = avMan.map((v, idx) => {
-    const sment = S.g.data > v.d && auto.c === "eff";
+    const ch = (x.chiedi || []).some((w) => w._src === v._src && w._i === v._i), okF = auto.c === "eff" && v.ok >= S.g.data;
     const conf = S.g.data > v.d && auto.c !== "eff";
     return `<div class="det-av"><div class="det-av-row">
       <div><b style="color:var(--ko)">Avaria a mano (${txtGg(v.d) || "oggi"} · ${fd(v.d).slice(0, 5)})</b>: ${esc(v.t)}
-       ${sment ? `<div class="av-warn">In giornaliera del ${fd(S.g.data).slice(0, 5)} risulta IN LINEA — ancora aperta?</div>` : ""}
+       ${ch ? `<div class="av-warn">La giornaliera del ${fd(S.g.data).slice(0, 5)} la dà IN LINEA: contata efficiente. Risolta?</div>` : ""}
+       ${okF ? `<div class="sub">Ancora ferma (confermato sulla giornaliera del ${fd(S.g.data).slice(0, 5)})</div>` : ""}
        ${conf ? `<div class="sub">Confermata dalla giornaliera del ${fd(S.g.data).slice(0, 5)}</div>` : ""}
        ${v.ppl === false ? `<div class="sub">Nascosta al briefing (PPL)</div>` : ""}</div>
-      <div class="det-av-act">${btnPpl(v, v._src, v._i)}<button class="btn btn-xs" type="button" data-av-cls="${idx}">Risolta</button></div>
+      <div class="det-av-act">${btnPpl(v, v._src, v._i)}<button class="btn btn-xs" type="button" data-av-cls="${idx}">Risolta</button>${ch ? `<button class="btn btn-xs" type="button" data-av-no="${idx}">Ancora ferma</button>` : ""}</div>
     </div></div>`;
   }).join("");
   const sugs = suggerimentiAvarie();
@@ -1033,6 +1049,8 @@ function dettaglio(sigla) {
   d.querySelectorAll("[data-av-q]").forEach((b) => b.onclick = () => salvaAv(b.dataset.avQ, true));
   if ($("#av-sv")) $("#av-sv").onclick = () => salvaAv($("#av-t").value, true);
   if ($("#av-sv-no")) $("#av-sv-no").onclick = () => salvaAv($("#av-t").value, false);
+  d.querySelectorAll("[data-av-no]").forEach((b) => b.onclick = () => { document.querySelectorAll("#dlg button").forEach((x) => x.disabled = true);
+    ancoraFerma(sigla, avMan[+b.dataset.avNo]).then(() => { render(); dettaglio(sigla); }, (e) => { toast(e.message); dettaglio(sigla); }); });
   d.querySelectorAll("[data-av-cls]").forEach((b) => b.onclick = () => { document.querySelectorAll("#dlg button").forEach((x) => x.disabled = true); chiudiAvaria(sigla, avMan[+b.dataset.avCls], true); });
   if ($("#bt-st")) $("#bt-st").onclick = () => { const box = $("#ed-st"); box.hidden = !box.hidden; if ($("#av-box")) $("#av-box").hidden = true; if (!box.hidden) box.scrollIntoView({ block: "nearest" }); };
   if ($("#st-an")) $("#st-an").onclick = () => { $("#ed-st").hidden = true; };
@@ -1063,7 +1081,7 @@ async function importa(ev) {
     const aMap = Object.fromEntries(g.linee.flatMap((l) => l.aerei.map((a) => [a.sigla, a])));
     const avNote = Object.entries(S.avarie).flatMap(([sig, arr]) => arr.filter((v) => g.data > v.d && aMap[sig]).map((v) => {
       const st = aMap[sig].stato;
-      return st === "IN LINEA" ? `${sig} (${v.t}): in questa giornaliera risulta IN LINEA — resterà segnata come avaria finché non la chiudi.`
+      return st === "IN LINEA" ? `${sig} (${v.t}): in questa giornaliera risulta IN LINEA: la conto efficiente e ti chiedo se è risolta.`
         : `${sig} (${v.t}): confermata ferma (${stato(st)[1]}).`;
     }));
     const d = $("#dlg");
